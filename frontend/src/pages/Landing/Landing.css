@@ -1,0 +1,9 @@
+.path-options{
+    font-size: 2rem;
+    padding: 1rem 2rem;
+    margin: 1rem 0;
+
+    background-color: white;
+    border-radius: 20px;
+    cursor: pointer;
+}

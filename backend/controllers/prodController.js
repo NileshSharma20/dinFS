@@ -2,11 +2,19 @@ const asyncHandler = require('express-async-handler')
 
 const Shocker = require('../models/shockerModel')
 
-// @desc   Get Products
+// @desc   Get All Products
 // @route  GET /api/prod
 // @access Private
-const getProd = asyncHandler(async (req,res)=>{
+const getAllProd = asyncHandler(async (req,res)=>{
     const prod = await Shocker.find()
+    res.status(200).json(prod)
+})
+
+// @desc   Get Specific Product
+// @route  GET /api/prod/findSpecific
+// @access Private
+const getFilteredProd = asyncHandler(async (req,res)=>{
+    const prod = await Shocker.find(req.body)
     res.status(200).json(prod)
 })
 
@@ -17,8 +25,10 @@ const setProd = asyncHandler(async (req,res)=>{
     if(!req.body.itemCode || !req.body.vehicleModel || !req.body.brandCompany ||
         !req.body.partNum || !req.body.mrp){
         res.status(400)
-        throw new Error('Please add all essential fields')
+        throw new Error('Please fill all essential fields')
     }
+
+    // console.log(`vehicleModel: ${req.body.vehicleModel}, type:${typeof req.body.vehicleModel}`)
 
     const prod = await Shocker.create({
         itemCode: req.body.itemCode,
@@ -72,7 +82,8 @@ const deleteProd = asyncHandler(async (req,res)=>{
 })
 
 module.exports = {
-    getProd,
+    getAllProd,
+    getFilteredProd,
     setProd,
     updateProd,
     deleteProd,

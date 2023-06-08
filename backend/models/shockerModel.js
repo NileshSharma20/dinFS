@@ -3,23 +3,23 @@ const mongoose = require('mongoose')
 const shockerSchema = mongoose.Schema({
     itemCode:{
         type: String,
-        required: [true, 'Please add a Item code']
+        required: [true, 'Please add the Item code']
     },   
     vehicleModel:{
-        type: String,
-        required: [true, 'Please add a Model']
+        type: [String],
+        required: [true, 'Please add the Model/s']
     },
     brandCompany:{
         type: String,
-        required: [true, 'Please add a Company name']
+        required: [true, 'Please add the Company name']
     }, 
     partNum:{
         type: String,
-        required: [true, 'Please add a Part number']
+        required: [true, 'Please add the Part number']
     },
     mrp: {
         type: String,
-        required: [true, 'Please add MRP']
+        required: [true, 'Please add the MRP']
     },
     colour: {
         type: String,
@@ -39,7 +39,7 @@ const shockerSchema = mongoose.Schema({
     }
     },
     {
-        timestamps: true,
+        timestamps: false,
     }
 )
 
