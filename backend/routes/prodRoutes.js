@@ -3,13 +3,16 @@ const router = express.Router()
 const {getAllProd,
        getFilteredProd,
        setProd,
+       setManyProd,
        updateProd,
        deleteProd} = require('../controllers/prodController')
 
        
 router.route('/').get(getAllProd).post(setProd)
 
-router.route('/findSpecific').get(getFilteredProd)
+router.get('/findSpecific',getFilteredProd)
+
+router.post('/setMany', setManyProd)
 
 router.route('/:id').put(updateProd).delete(deleteProd)
 

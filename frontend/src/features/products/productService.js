@@ -1,19 +1,5 @@
 // import axios from 'axios'
 
-// productData: [{
-//     productType:"",
-//     productBrand:"",
-//     productName:"",
-//     price:"",
-//     unitInStock:"",
-// }],
-
-// CSV2JSONData = [{
-//     Name:"",
-//     Price:"",
-//     ProductType:""
-// }]
-
 // Convert Product CSV Data to JSON Data
 const createProductDataJSON = (csvFileData, brandsList) => {
     var returnData = []
@@ -21,22 +7,23 @@ const createProductDataJSON = (csvFileData, brandsList) => {
         returnData=[]
         console.log(`Error`)
     }else{
-        returnData = csvFileData.map((csvItem)=>{
+        returnData = csvFileData
+        // csvFileData.map((csvItem)=>{
             
-            let brandCheck = "" 
-            for(let i=0;i<brandsList.length;i++){
-                if(csvItem.Name.includes(brandsList[i].brandName)){
-                    brandCheck = brandsList[i].brandName
-                }
-            }
+        //     let brandCheck = "" 
+        //     for(let i=0;i<brandsList.length;i++){
+        //         if(csvItem.Name.includes(brandsList[i].brandName)){
+        //             brandCheck = brandsList[i].brandName
+        //         }
+        //     }
             
-            return { 
-                productName: csvItem.Name,
-                productBrand: brandCheck,
-                productType: csvItem.ProductType,
-                price: csvItem.Price 
-            }
-        })
+        //     return { 
+        //         productName: csvItem.Name,
+        //         productBrand: brandCheck,
+        //         productType: csvItem.ProductType,
+        //         price: csvItem.Price 
+        //     }
+        // })
     }
 
     return returnData

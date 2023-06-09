@@ -45,6 +45,63 @@ const setProd = asyncHandler(async (req,res)=>{
     res.status(200).json(prod)
 })
 
+// @desc   Set Multiple Products
+// @route  POST /api/prod/setMany
+// @access Private
+const setManyProd = asyncHandler(async (req,res)=>{
+    // if(!req.body.itemCode || !req.body.vehicleModel || !req.body.brandCompany ||
+    //     !req.body.partNum || !req.body.mrp){
+    //     res.status(400)
+    //     throw new Error('Please fill all essential fields')
+    // }
+
+
+
+    // console.log(`vehicleModel: ${req.body.vehicleModel}, type:${typeof req.body.vehicleModel}`)
+
+    const prod =[{
+        itemCode: "SKR",
+        vehicleModel: "PULSAR 150",
+        brandCompany: "ENDURANCE",
+        partNum: "S330102901",
+        mrp: "1186",
+        colour: "",
+        position: "REAR",
+        type: "DOUBLE",
+        compatibileModels: [],
+    },
+    {
+        itemCode: "SKR",
+        vehicleModel: "GLAMOUR N/M",
+        brandCompany: "HERO",
+        partNum: "52400KTRA841S",
+        mrp: "965",
+        colour: "RED",
+        position: "REAR",
+        type: "DOUBLE",
+        compatibileModels: ["52400KWA90099S"],
+    },
+    {
+        itemCode: "SKR",
+        vehicleModel: "PASSION PRO",
+        brandCompany: "HERO",
+        partNum: "52400KWA90099S",
+        mrp: "1015",
+        colour: "RED",
+        position: "REAR",
+        type: "DOUBLE",
+        compatibileModels: ["52400KTRA841S"],
+    }]
+
+    const options = { ordered: true };
+
+    const result = await Shocker.insertMany(prod);
+
+    console.log(`${result.insertedCount} documents were inserted`);
+
+    res.status(200).json(prod)
+})
+
 // @desc   Get Products
 // @route  PUT /api/prod/:id
 // @access Private
@@ -85,6 +142,7 @@ module.exports = {
     getAllProd,
     getFilteredProd,
     setProd,
+    setManyProd,
     updateProd,
     deleteProd,
 }

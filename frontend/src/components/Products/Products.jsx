@@ -7,9 +7,9 @@ import "./Products.css"
 
 function Products() {
   const dispatch = useDispatch();
-  const {productData, brandsList} =useSelector(
-    (state)=>state.product
-  ) 
+  // const {productData, brandsList} =useSelector(
+  //   (state)=>state.product
+  // ) 
 
   const [csvData, setCsvData] = useState([])
   const [finalData, setFinalData]= useState([])
@@ -40,20 +40,22 @@ function Products() {
     const onSubmit=(e)=>{
       e.preventDefault()
       
-      if(csvData.length===0 && productTypeForm===""){
+      if(csvData.length===0){
         alert(`Fill all the fields`)
       }else{
-        
-        dispatch(createProductDataJSON(finalData))
+        console.log(`OK`)
+        // dispatch(createProductDataJSON(finalData))
     }
   }
 
   useEffect(()=>{
-    if(productTypeForm!=="" && csvData.length!==0){
-      const prodData = csvData.map((item)=>{return{...item, ProductType:productTypeForm}})
-      setFinalData(prodData)
-    }
-  },[productTypeForm, csvData])
+    // if(productTypeForm!=="" && csvData.length!==0){
+      // const prodData = csvData.map((item)=>{return{...item, ProductType:productTypeForm}})
+      // setFinalData(prodData)
+    // }
+
+    console.log(`${JSON.stringify(csvData,null,4)}`)
+  },[csvData])
 
   return (
     <div className='data-container'>
@@ -64,37 +66,20 @@ function Products() {
 
 
       <div className='grid'>
-        {/* <h1>Product Grid</h1> */}
-        {brandsList.map((brand,index)=>
-        
-          <div key={index}>
-
-            {productData.length>0 && 
-              <div className='productCol-conatiner'>
-              <h1>{brand.brandName} {productData[0].productType} ({productData?.filter((i)=>i.productBrand===brand.brandName).length})</h1>
-              {productData.filter((i)=>i.productBrand===brand.brandName).map((item,index)=>
-                <div className='productCol' key={index}>
-                  <h3>{item.productName}</h3>
-                  
-                  <h3>{item.price}</h3>
-                </div>)}
-              </div>}
-
-          </div>
-        )}
-
-        {productData.length>0 && 
-        <div className='productCol-conatiner'>
-          <h1>Un-named {productData[0].productType} ({productData?.filter((i)=>i.productBrand==="").length})</h1>
-          {productData.filter(i=>i.productBrand==="").map((item,index)=>
-            <div className='productCol' key={index}>
-            <h3>{item.productName}</h3>
-            
-            <h3>{item.price}</h3>
-          </div>
-          ) }
+        <div className="productCol-conatiner">
+            {csvData.map((item,index)=>
+            <div className="productCol" key={index}>
+              <h3>{item.vehicleModel}</h3>
+              <h3>{item.brandCompany}</h3>
+              <h3>{item.partNum}</h3>
+              <h3>{item.colour}</h3>
+              <h3>{item.mrp}</h3>
+              <h3>{item.compatibileModels}</h3>
+            </div>
+            )
+            }
         </div>
-        }
+        
 
     
       </div>
@@ -115,7 +100,7 @@ function Products() {
               ></input>
           </div>
 
-          <div className="form-group">
+          {/* <div className="form-group">
             <label>Product</label>
             <input list="data" 
               onChange={(e)=>setProductTypeForm(e.target.value)}
@@ -127,7 +112,7 @@ function Products() {
                   )}
               </datalist>
 
-          </div>
+          </div> */}
 
           <div className="form-group">
                 <button type="submit" className="submit-btn">
