@@ -35,6 +35,8 @@ const createProductDataJSON = (csvFileData) => {
           const cleanedPN = spaceRemovedPN.split("-").join("")
           const pN = cleanedPN.toUpperCase()
 
+          const delimitedCM = prod.compatibileModels.split(',')
+
           sku = iC+"-"+vM+"-"+bC+"-"+pN
 
           const prodClone = Object.assign({},prod)
@@ -56,7 +58,7 @@ const createProductDataJSON = (csvFileData) => {
             partNum: spaceRemovedPN,
             mrp: prod.mrp.replace(/ /g,""),
             sku: sku,
-            compatibileModels: prod.compatibileModels,
+            compatibileModels: delimitedCM,
             metaData: metaData
           }
         })

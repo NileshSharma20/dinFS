@@ -1,4 +1,5 @@
 const asyncHandler = require('express-async-handler')
+const {cleanJsonData, createMongoDataBackup} = require("../helper/prodHelper")
 
 const Shocker = require('../models/shockerModel')
 
@@ -6,7 +7,16 @@ const Shocker = require('../models/shockerModel')
 // @route  GET /api/prod
 // @access Private
 const getAllProd = asyncHandler(async (req,res)=>{
-    const prod = await Shocker.find()
+    var prod
+    
+    if(req.body.saveFile==="true"){
+        prod = await Shocker.find().lean()
+
+        createMongoDataBackup(prod)
+    }else{
+        prod = await Shocker.find()
+
+    }
     res.status(200).json(prod)
 })
 
@@ -49,55 +59,36 @@ const setProd = asyncHandler(async (req,res)=>{
 // @route  POST /api/prod/setMany
 // @access Private
 const setManyProd = asyncHandler(async (req,res)=>{
-    // if(!req.body.itemCode || !req.body.vehicleModel || !req.body.brandCompany ||
-    //     !req.body.partNum || !req.body.mrp){
-    //     res.status(400)
-    //     throw new Error('Please fill all essential fields')
-    // }
-
-
-
-    // console.log(`vehicleModel: ${req.body.vehicleModel}, type:${typeof req.body.vehicleModel}`)
-
     const prod =[{
         itemCode: "SKR",
-        vehicleModel: "PULSAR 150",
-        brandCompany: "ENDURANCE",
-        partNum: "S330102901",
-        mrp: "1186",
+        vehicleModel: "DISCOVER-135        ",
+        brandCompany: "BAJAJ",
+        partNum: "JN122000        ",
+        mrp: "1277        ",
         colour: "",
         position: "REAR",
         type: "DOUBLE",
-        compatibileModels: [],
+        compatibileModels: "SKR-DIS100-BAJ-JN122000        ",
     },
     {
         itemCode: "SKR",
-        vehicleModel: "GLAMOUR N/M",
-        brandCompany: "HERO",
-        partNum: "52400KTRA841S",
-        mrp: "965",
-        colour: "RED",
+        vehicleModel: "DISCOVER-100        ",
+        brandCompany: "BAJAJ        ",
+        partNum: "JN122000        ",
+        mrp: "1,277        ",
+        colour: "",
         position: "REAR",
         type: "DOUBLE",
-        compatibileModels: ["52400KWA90099S"],
-    },
-    {
-        itemCode: "SKR",
-        vehicleModel: "PASSION PRO",
-        brandCompany: "HERO",
-        partNum: "52400KWA90099S",
-        mrp: "1015",
-        colour: "RED",
-        position: "REAR",
-        type: "DOUBLE",
-        compatibileModels: ["52400KTRA841S"],
-    }]
+        compatibileModels: "SKR-DIS135-BAJ-JN122000   ",
+    },]
+
+    const cleanedJSON = cleanJsonData(prod)
 
     const options = { ordered: true };
 
-    const result = await Shocker.insertMany(prod);
+    const result = await Shocker.insertMany(cleanedJSON, options);
 
-    console.log(`${result.insertedCount} documents were inserted`);
+    console.log(`${result.length} documents were inserted`);
 
     res.status(200).json(prod)
 })
