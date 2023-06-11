@@ -3,54 +3,57 @@ import productService from './productService'
 
 const initialState = {
     // productData: [{
-    //     productType:"",
-    //     productBrand:"",
-    //     productName:"",
-    //     price:"",
-    //     unitInStock:"",
+    //     itemCode:"",
+    //     vehicleModel:"",
+    //     brandCompany:"",
+    //     partNum:"",
+    //     mrp:"",
+    //     compatibileModels:"",
+    //     sku:"",
+    //     metaData:{},
     // }],
     productData:[],
-    brandsList:[{
-        brandName:"PULSAR",
-      },{
-        brandName:"DISCOVER",
-      },{
-        brandName:"CT-100",
-      },{
-        brandName:"PLATINA",
-      },{
-        brandName:"PASSION",
-      },{
-        brandName:"HUNK",
-      },{
-        brandName:"X-PRO",
-      },{
-        brandName:"ACTIVA",
-      },{
-        brandName:"UNICORN",
-      },{
-        brandName:"DREAM YUGA",
-      },{
-        brandName:"FZ",
-      },{
-        brandName:"R15",
-      },{
-        brandName:"RTR",
-      },{
-        brandName:"VICTOR",
-      },{
-        brandName:"STR",
-      },{
-        brandName:"APACHE",
-      },{
-        brandName:"PHONIX",
-      },{
-        brandName:"WEGO",
-      },{
-        brandName:"GIXXER",
-      },{
-        brandName:"ACHIVER",
-      },],
+    // brandsList:[{
+    //     brandName:"PULSAR",
+    //   },{
+    //     brandName:"DISCOVER",
+    //   },{
+    //     brandName:"CT-100",
+    //   },{
+    //     brandName:"PLATINA",
+    //   },{
+    //     brandName:"PASSION",
+    //   },{
+    //     brandName:"HUNK",
+    //   },{
+    //     brandName:"X-PRO",
+    //   },{
+    //     brandName:"ACTIVA",
+    //   },{
+    //     brandName:"UNICORN",
+    //   },{
+    //     brandName:"DREAM YUGA",
+    //   },{
+    //     brandName:"FZ",
+    //   },{
+    //     brandName:"R15",
+    //   },{
+    //     brandName:"RTR",
+    //   },{
+    //     brandName:"VICTOR",
+    //   },{
+    //     brandName:"STR",
+    //   },{
+    //     brandName:"APACHE",
+    //   },{
+    //     brandName:"PHONIX",
+    //   },{
+    //     brandName:"WEGO",
+    //   },{
+    //     brandName:"GIXXER",
+    //   },{
+    //     brandName:"ACHIVER",
+    //   },],
     isError: false,
     isSuccess: false,
     isLoading: false,
@@ -63,9 +66,9 @@ export const createProductDataJSON = createAsyncThunk(
     'createProductDataJSON',
     async(csvFileData, thunkAPI) =>{
         try {
-            const brandsList = thunkAPI.getState().product.brandsList
-            console.log(`brands:${JSON.stringify(brandsList,null,4)}`)
-            return await productService.createProductDataJSON(csvFileData, brandsList)
+            // const brandsList = thunkAPI.getState().product.brandsList
+            // console.log(`brands:${JSON.stringify(brandsList,null,4)}`)
+            return await productService.createProductDataJSON(csvFileData)
         } catch (error) {
             const message =
             (error.response && error.response.data && error.response.data.message) ||

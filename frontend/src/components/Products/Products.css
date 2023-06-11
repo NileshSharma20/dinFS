@@ -2,13 +2,14 @@
     width: 100%;
     min-height: 92vh;
 
-    display: grid;
-    grid-template-columns: 20% 60% 20%;
+    /* display: grid;
+    grid-template-columns: 20% 75%;
+    gap: 2rem; */
 
-    /* display: flex;
+    display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center; */
+    align-items: center;
 
     margin-top: clamp(120px,10vh,10vh);
     
@@ -29,8 +30,12 @@
 }
 
 .csv-upload{
-    width:100%;
+    width:30%;
     height:fit-content;
+
+    justify-self: center;
+    margin-bottom: 2rem;
+
     border-radius:30px 30px 30px 30px;
 }
 
@@ -38,6 +43,8 @@
     /* border: 1px solid blue; */
 
     display: grid;
+
+    width: 100%;
     /* place-items: center; */
     justify-content: flex-start;
     align-items: flex-start;
@@ -65,7 +72,7 @@
   .productCol{
     width: 100%;
     display: grid;
-    grid-template-columns: 30% 15% 15% 10% 10% auto;
+    grid-template-columns: 20% 15% 20% 15% 5% auto;
     flex-direction: column;
     /* border: 0.5px solid red; */
     

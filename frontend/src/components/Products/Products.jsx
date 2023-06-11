@@ -7,9 +7,9 @@ import "./Products.css"
 
 function Products() {
   const dispatch = useDispatch();
-  // const {productData, brandsList} =useSelector(
-  //   (state)=>state.product
-  // ) 
+  const {productData} =useSelector(
+    (state)=>state.product
+  ) 
 
   const [csvData, setCsvData] = useState([])
   const [finalData, setFinalData]= useState([])
@@ -44,7 +44,7 @@ function Products() {
         alert(`Fill all the fields`)
       }else{
         console.log(`OK`)
-        // dispatch(createProductDataJSON(finalData))
+        dispatch(createProductDataJSON(csvData))
     }
   }
 
@@ -54,36 +54,16 @@ function Products() {
       // setFinalData(prodData)
     // }
 
-    console.log(`${JSON.stringify(csvData,null,4)}`)
+    // console.log(`${JSON.stringify(csvData,null,4)}`)
   },[csvData])
 
   return (
     <div className='data-container'>
 
-      <div className="product-filter-container">
+      {/* <div className="product-filter-container">
         <h1>Filter Box</h1>
-      </div>
+      </div> */}
 
-
-      <div className='grid'>
-        <div className="productCol-conatiner">
-            {csvData.map((item,index)=>
-            <div className="productCol" key={index}>
-              <h3>{item.vehicleModel}</h3>
-              <h3>{item.brandCompany}</h3>
-              <h3>{item.partNum}</h3>
-              <h3>{item.colour}</h3>
-              <h3>{item.mrp}</h3>
-              <h3>{item.compatibileModels}</h3>
-            </div>
-            )
-            }
-        </div>
-        
-
-    
-      </div>
-        
       <div className="form-container csv-upload">
         <form onSubmit={onSubmit}>
 
@@ -99,6 +79,9 @@ function Products() {
               onChange={handleCSVFile}
               ></input>
           </div>
+
+      
+        
 
           {/* <div className="form-group">
             <label>Product</label>
@@ -123,6 +106,46 @@ function Products() {
         </div>
       </form>
       </div>
+
+      <div className='grid'>
+        <div className="productCol-conatiner">
+          <div className="productCol">
+              <h3 style={{fontSize:"1.5rem"}}>vehicleModel</h3>
+              <h3 style={{fontSize:"1.5rem"}}>brandCompany</h3>
+              <h3 style={{fontSize:"1.5rem"}}>position</h3>
+              <h3 style={{fontSize:"1.5rem"}}>sku</h3>
+              <h3 style={{fontSize:"1.5rem"}}>colour</h3>
+              <h3 style={{fontSize:"1.5rem"}}>compatibileModels</h3>
+            </div>
+            {productData?.map((item,index)=>
+            <div className="productCol" key={index}>
+              <h3>{item.vehicleModel}</h3>
+              <h3>{item.brandCompany}</h3>
+              <h3>{item.metaData.position}</h3>
+              <h3>{item.sku}</h3>
+              <h3>{item.metaData.colour}</h3>
+              <h3>{item.compatibileModels}</h3>
+            </div>
+            )
+            }
+        </div>
+        
+
+    
+      </div>
+
+      {/* <div>
+        <h2>shockerDownload</h2>
+
+        <a
+          href={ExamplePdf}
+          download="Example-PDF-document"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <button>Download .pdf file</button>
+        </a>
+      </div> */}
 
     </div>
   )
