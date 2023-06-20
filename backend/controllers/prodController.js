@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler')
-const {cleanJsonData, createMongoDataBackup} = require("../helper/prodHelper")
+const {cleanJsonData, localCSVtoJSON, createMongoDataBackup} = require("../helper/prodHelper")
 
 const Shocker = require('../models/shockerModel')
 
@@ -28,7 +28,28 @@ const getFilteredProd = asyncHandler(async (req,res)=>{
     res.status(200).json(prod)
 })
 
-// @desc   Set Products
+// @desc   Get Specific SKU Product
+// @route  GET /api/prod/findSKU
+// @access Private
+const getSKUProd = asyncHandler(async (req,res)=>{
+    const iC = req.body.itemCode?req.body.itemCode.toUpperCase():""
+    const vM = req.body.vehicleModel?req.body.vehicleModel.toUpperCase():""
+    const bC = req.body.brandCompany?req.body.brandCompany.toUpperCase():""
+    const spaceRemovedPN = req.body.partNum?req.body.partNum.replace(/ /g,""):""
+    const cleanedPN = spaceRemovedPN.replace(/-/g,"") 
+    const pN = cleanedPN.toUpperCase()
+
+    const prod = await Shocker.find({ $and:[
+                            {sku: { $regex: iC}}, 
+                            {sku: { $regex: vM}}, 
+                            {sku: { $regex: bC}}, 
+                            {sku: { $regex: pN}}
+                        ]},{__v:0})
+
+    res.status(200).json(prod)
+})
+
+// @desc   Set Product
 // @route  POST /api/prod
 // @access Private
 const setProd = asyncHandler(async (req,res)=>{
@@ -46,10 +67,12 @@ const setProd = asyncHandler(async (req,res)=>{
         brandCompany: req.body.brandCompany,
         partNum: req.body.partNum,
         mrp: req.body.mrp,
-        colour: req.body.colour?req.body.colour:"",
-        position: req.body.position?req.body.position:"",
-        type: req.body.type?req.body.type:"",
         compatibileModels: req.body.compatibileModels?req.body.compatibileModels:[],
+        metaData:{
+            colour: req.body.colour?req.body.colour:"",
+            position: req.body.position?req.body.position:"",
+            type: req.body.type?req.body.type:"",
+        },
     })
 
     res.status(200).json(prod)
@@ -59,41 +82,21 @@ const setProd = asyncHandler(async (req,res)=>{
 // @route  POST /api/prod/setMany
 // @access Private
 const setManyProd = asyncHandler(async (req,res)=>{
-    const prod =[{
-        itemCode: "SKR",
-        vehicleModel: "DISCOVER-135        ",
-        brandCompany: "BAJAJ",
-        partNum: "JN122000        ",
-        mrp: "1277        ",
-        colour: "",
-        position: "REAR",
-        type: "DOUBLE",
-        compatibileModels: "SKR-DIS100-BAJ-JN122000        ",
-    },
-    {
-        itemCode: "SKR",
-        vehicleModel: "DISCOVER-100        ",
-        brandCompany: "BAJAJ        ",
-        partNum: "JN122000        ",
-        mrp: "1,277        ",
-        colour: "",
-        position: "REAR",
-        type: "DOUBLE",
-        compatibileModels: "SKR-DIS135-BAJ-JN122000   ",
-    },]
 
-    const cleanedJSON = cleanJsonData(prod)
+    const localJson = localCSVtoJSON()
+
+    const cleanedJSON = cleanJsonData(localJson)
 
     const options = { ordered: true };
 
     const result = await Shocker.insertMany(cleanedJSON, options);
 
-    console.log(`${result.length} documents were inserted`);
+    // console.log(`${result.length} documents were inserted`);
 
-    res.status(200).json(prod)
+    res.status(200).json({message: `${localJson.length} documents were inserted.`})
 })
 
-// @desc   Get Products
+// @desc   Update specific Product
 // @route  PUT /api/prod/:id
 // @access Private
 const updateProd = asyncHandler(async (req,res)=>{
@@ -112,7 +115,7 @@ const updateProd = asyncHandler(async (req,res)=>{
     res.status(200).json(updatedProd)
 })
 
-// @desc   Get Products
+// @desc   Delete specific Product
 // @route  DELETE /api/prod/:id
 // @access Private
 const deleteProd = asyncHandler(async (req,res)=>{
@@ -129,11 +132,23 @@ const deleteProd = asyncHandler(async (req,res)=>{
     res.status(200).json({id:req.params.id})
 })
 
+// @desc   Delete all Products from a Collection
+// @route  DELETE /api/prod/deleteAll
+// @access Private
+const deleteAllProd = asyncHandler(async (req,res)=>{
+    // await Shocker.remove()
+    await Shocker.deleteMany({})
+
+    res.status(200).json({message:`Deleted All from Collection`})
+})
+
 module.exports = {
     getAllProd,
     getFilteredProd,
+    getSKUProd,
     setProd,
     setManyProd,
     updateProd,
     deleteProd,
+    deleteAllProd,
 }

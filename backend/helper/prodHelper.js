@@ -2,6 +2,7 @@ const fs = require('fs');
 const Papa = require('papaparse');
 
 // @desc   Clean Mongo Collection data and save it locally
+// @route  "../MongoData/shockerMongo.csv"
 const createMongoDataBackup = (mongoFile) =>{
     const jsonData = mongoFile.map((item)=>{
         //single object
@@ -32,29 +33,38 @@ const createMongoDataBackup = (mongoFile) =>{
     })
 }
 
+// @desc   Get Local CSV files and convert them to JSON
+// @route  "../CsvData/shockerUpdated.csv"
+const localCSVtoJSON = () => {
+    const csvFile = '../CsvData/shockerUpdated.csv'
+    const csvData = fs.readFileSync(csvFile, 'utf8');
 
-// @desc   Clean JSON recieved from frontend and pass it to Controller
+    const jsonData = Papa.parse(csvData, { header: true });
+
+    return jsonData.data
+}
+
+
+// @desc   Clean raw JSON
 const cleanJsonData = (rawJson) => {
     var cleanedData = []
 
     if(!rawJson || rawJson.length===0){
-        // res.status(400)
-        // throw new Error('Please attach RAW JSON file')
         cleanedData=[]
     }else{
 
-    cleanedData = rawJson.map((prod)=>{
+    cleanedData = rawJson.filter((item=>item.itemCode && item.vehicleModel && item.brandCompany && item.partNum && item.mrp)).map((prod)=>{
         var sku=""
         var metaData = []
 
         //itemCode cleanup
         const cleanedIC = prod.itemCode.toUpperCase()
-        const iC = cleanedIC.replace(/ /g,'')
+        var iC = cleanedIC.replace(/ /g,'')
             // const iC = cleanedIC.split(" ").join("")
         
         //vehicleModel cleanup
         let cleanedVM =""
-        const spaceRemovedVM = prod.vehicleModel.replace(/ /g,"")
+        var spaceRemovedVM = prod.vehicleModel?prod.vehicleModel.replace(/ /g,""):""
 
         const delimitedVM = spaceRemovedVM.split('-',2)
         
@@ -67,22 +77,22 @@ const cleanJsonData = (rawJson) => {
         const vM = cleanedVM.toUpperCase()
 
         //brandCompany cleanup
-        const spaceRemovedBC = prod.brandCompany.replace(/ /g,"")
+        var spaceRemovedBC = prod.brandCompany?prod.brandCompany.replace(/ /g,""):""
         const cleanedBC = spaceRemovedBC.slice(0,3)
         const bC = cleanedBC.toUpperCase()
 
         //partNum cleanup
-        const spaceRemovedPN = prod.partNum.replace(/ /g,"")
+        var spaceRemovedPN = prod.partNum?prod.partNum.replace(/ /g,""):""
         const cleanedPN = spaceRemovedPN.split("-").join("")
         const pN = cleanedPN.toUpperCase()
 
         //mrp cleanup
-        const spaceRemovedMRP = prod.mrp.replace(/ /g,'')
-        const cleanedMRP = spaceRemovedMRP.replace(/,/g,'')
+        const spaceRemovedMRP = prod.mrp?prod.mrp.replace(/ /g,''):""
+        var cleanedMRP = spaceRemovedMRP.replace(/,/g,'')
 
         //compatibileModels cleanup and conversion to Array
-        const spaceRemovedCM = prod.compatibileModels.replace(/ /g,'')
-        const delimitedCM = spaceRemovedCM.split(',')
+        const spaceRemovedCM = prod.compatibileModels?prod.compatibileModels.replace(/ /g,''):""
+        var delimitedCM = spaceRemovedCM.split(',')
 
         //SKU generation
         sku = iC+"-"+vM+"-"+bC+"-"+pN
@@ -96,7 +106,7 @@ const cleanJsonData = (rawJson) => {
         delete prodClone.compatibileModels
 
         metaData = prodClone
-
+        
         return {
             itemCode: iC,
             vehicleModel: spaceRemovedVM,
@@ -106,7 +116,7 @@ const cleanJsonData = (rawJson) => {
             sku: sku,
             compatibileModels: delimitedCM,
             metaData: metaData
-          }
+        }
     })
 }  
 
@@ -116,5 +126,6 @@ return cleanedData
 
 module.exports = {
     cleanJsonData,
+    localCSVtoJSON,
     createMongoDataBackup,
 }
