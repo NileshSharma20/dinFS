@@ -3,7 +3,7 @@ const Papa = require('papaparse');
 
 // @desc   Clean Mongo Collection data and save it locally
 // @route  "../MongoData/shockerMongo.csv"
-const createMongoDataBackup = (mongoFile) =>{
+const createMongoDataBackup = (mongoFile,iC) =>{
     const jsonData = mongoFile.map((item)=>{
         //single object
         const mD = item.metaData
@@ -24,7 +24,22 @@ const createMongoDataBackup = (mongoFile) =>{
 
     // console.log(`item:${JSON.stringify(jsonData,null,4)}`)
     const csvData = Papa.unparse(jsonData,{newline: '\n'});
-    fs.writeFile('../MongoData/shockerMongo.csv',csvData, (err)=>{
+    var filePath
+    switch(iC){
+        case "SKR":
+            filePath = '../MongoData/shockerMongo.csv'
+            break;
+        case "BSH":
+            filePath = '../MongoData/brakeShoeMongo.csv'
+            break;
+        case "DPD":
+            filePath = '../MongoData/discpadMongo.csv'
+            break;
+        default:
+            filePath = '../MongoData/productsMongo.csv'
+            break;
+    }
+    fs.writeFile(filePath,csvData, (err)=>{
         if(err){
             console.log(`createMongoDataBackup(HelperFunction): Error during writing file: ${err}`)
         }else{
@@ -35,8 +50,22 @@ const createMongoDataBackup = (mongoFile) =>{
 
 // @desc   Get Local CSV files and convert them to JSON
 // @route  "../CsvData/shockerUpdated.csv"
-const localCSVtoJSON = () => {
-    const csvFile = '../CsvData/shockerUpdated.csv'
+const localCSVtoJSON = (iC) => {
+    var csvFile
+    switch(iC){
+        case "SKR":
+            csvFile = '../CsvData/shockerUpdated.csv'
+            break;
+        case "BSH":
+            csvFile = '../CsvData/brakeShoeUpdated.csv'
+            break;
+        case "DPD":
+            csvFile = '../CsvData/discpadUpdated.csv'
+            break;
+        default:
+            csvFile = '../CsvData/shockerUpdated.csv'
+            break;
+    }
     const csvData = fs.readFileSync(csvFile, 'utf8');
 
     const jsonData = Papa.parse(csvData, { header: true });
@@ -45,7 +74,7 @@ const localCSVtoJSON = () => {
 }
 
 
-// @desc   Clean raw JSON
+// @desc   Clean raw JSON (and SKU generation)
 const cleanJsonData = (rawJson) => {
     var cleanedData = []
 
@@ -84,7 +113,8 @@ const cleanJsonData = (rawJson) => {
         //partNum cleanup
         var spaceRemovedPN = prod.partNum?prod.partNum.replace(/ /g,""):""
         const cleanedPN = spaceRemovedPN.split("-").join("")
-        const pN = cleanedPN.toUpperCase()
+        const cleanedPN2 = cleanedPN.split("/").join("")
+        const pN = cleanedPN2.toUpperCase()
 
         //mrp cleanup
         const spaceRemovedMRP = prod.mrp?prod.mrp.replace(/ /g,''):""

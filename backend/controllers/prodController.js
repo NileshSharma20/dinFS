@@ -2,6 +2,8 @@ const asyncHandler = require('express-async-handler')
 const {cleanJsonData, localCSVtoJSON, createMongoDataBackup} = require("../helper/prodHelper")
 
 const Shocker = require('../models/shockerModel')
+const Brakeshoe = require('../models/brakeshoeModel')
+const Discpad = require('../models/discpadModel')
 
 // @desc   Get All Products
 // @route  GET /api/prod
@@ -10,11 +12,35 @@ const getAllProd = asyncHandler(async (req,res)=>{
     var prod
     
     if(req.body.saveFile==="true"){
-        prod = await Shocker.find().lean()
+        switch(req.body.itemCode.toUpperCase()){
+            case "SKR":
+                prod = await Shocker.find().lean()
+                break;
+            case "BSH":
+                prod = await Brakeshoe.find().lean()
+                break;
+            case "DPD":
+                prod = await Discpad.find().lean()
+                break;
+            default:
+                throw new Error('Specify Collection in body')
+        }
 
-        createMongoDataBackup(prod)
+        createMongoDataBackup(prod, req.body.itemCode.toUpperCase())
     }else{
-        prod = await Shocker.find()
+        switch(req.body.itemCode.toUpperCase()){
+            case "SKR":
+                prod = await Shocker.find()
+                break;
+            case "BSH":
+                prod = await Brakeshoe.find()
+                break;
+            case "DPD":
+                prod = await Discpad.find()
+                break;
+            default:
+                throw new Error('Specify Collection in body')
+        }
 
     }
     res.status(200).json(prod)
@@ -39,12 +65,36 @@ const getSKUProd = asyncHandler(async (req,res)=>{
     const cleanedPN = spaceRemovedPN.replace(/-/g,"") 
     const pN = cleanedPN.toUpperCase()
 
-    const prod = await Shocker.find({ $and:[
-                            {sku: { $regex: iC}}, 
-                            {sku: { $regex: vM}}, 
-                            {sku: { $regex: bC}}, 
-                            {sku: { $regex: pN}}
-                        ]},{__v:0})
+    var prod
+
+    switch(req.body.itemCode.toUpperCase()){
+        case "SKR":
+            prod = await Shocker.find({ $and:[
+                {sku: { $regex: iC}}, 
+                {sku: { $regex: vM}}, 
+                {sku: { $regex: bC}}, 
+                {sku: { $regex: pN}}
+            ]},{__v:0})
+            break;
+        case "BSH":
+            prod = await Brakeshoe.find({ $and:[
+                {sku: { $regex: iC}}, 
+                {sku: { $regex: vM}}, 
+                {sku: { $regex: bC}}, 
+                {sku: { $regex: pN}}
+            ]},{__v:0})
+            break;
+        case "DPD":
+            prod = await Discpad.find({ $and:[
+                {sku: { $regex: iC}}, 
+                {sku: { $regex: vM}}, 
+                {sku: { $regex: bC}}, 
+                {sku: { $regex: pN}}
+            ]},{__v:0})
+            break;
+        default:
+            throw new Error("Add Item Code in body")
+    }
 
     res.status(200).json(prod)
 })
@@ -59,21 +109,36 @@ const setProd = asyncHandler(async (req,res)=>{
         throw new Error('Please fill all essential fields')
     }
 
-    // console.log(`vehicleModel: ${req.body.vehicleModel}, type:${typeof req.body.vehicleModel}`)
+    const prodObject = {
+                        itemCode: req.body.itemCode,
+                        vehicleModel: req.body.vehicleModel,
+                        brandCompany: req.body.brandCompany,
+                        partNum: req.body.partNum,
+                        mrp: req.body.mrp,
+                        compatibileModels: req.body.compatibileModels?req.body.compatibileModels:[],
+                        metaData:{
+                            colour: req.body.colour?req.body.colour:"",
+                            position: req.body.position?req.body.position:"",
+                            type: req.body.type?req.body.type:"",
+                        },
+                    }
 
-    const prod = await Shocker.create({
-        itemCode: req.body.itemCode,
-        vehicleModel: req.body.vehicleModel,
-        brandCompany: req.body.brandCompany,
-        partNum: req.body.partNum,
-        mrp: req.body.mrp,
-        compatibileModels: req.body.compatibileModels?req.body.compatibileModels:[],
-        metaData:{
-            colour: req.body.colour?req.body.colour:"",
-            position: req.body.position?req.body.position:"",
-            type: req.body.type?req.body.type:"",
-        },
-    })
+    var prod
+
+    switch(req.body.itemCode.toUpperCase()){
+        case "SKR":
+            prod = await Shocker.create(prodObject)
+            break;
+        case "BSH":
+            prod = await Brakeshoe.create(prodObject)
+            break;
+        case "DPD":
+            prod = await Discpad.create(prodObject)
+            break;
+        default:
+            throw new Error("Add Item Code in body")
+    }
+
 
     res.status(200).json(prod)
 })
@@ -83,17 +148,30 @@ const setProd = asyncHandler(async (req,res)=>{
 // @access Private
 const setManyProd = asyncHandler(async (req,res)=>{
 
-    const localJson = localCSVtoJSON()
+    const localJson = localCSVtoJSON(req.body.itemCode.toUpperCase())
 
     const cleanedJSON = cleanJsonData(localJson)
 
     const options = { ordered: true };
 
-    const result = await Shocker.insertMany(cleanedJSON, options);
+    var result
+    switch(req.body.itemCode.toUpperCase()){
+        case "SKR":
+            result = await Shocker.insertMany(cleanedJSON, options);
+            break;
+        case "BSH":
+            result = await Brakeshoe.insertMany(cleanedJSON, options);
+            break;
+        case "DPD":
+            result = await Discpad.insertMany(cleanedJSON, options);
+            break;
+        default:
+            throw new Error('Specify Collection in body')
+    }
 
     // console.log(`${result.length} documents were inserted`);
 
-    res.status(200).json({message: `${localJson.length} documents were inserted.`})
+    res.status(200).json({message: `${result.length} documents were inserted.`})
 })
 
 // @desc   Update specific Product
@@ -106,10 +184,26 @@ const updateProd = asyncHandler(async (req,res)=>{
         res.status(400)
         throw new Error('Product not found')
     }
-
-    const updatedProd = await Shocker.findByIdAndUpdate(req.params.id, req.body,{
-        new: true,
-    })
+    var updatedProd
+    switch(req.body.itemCode.toUpperCase()){
+        case "SKR":
+            updatedProd = await Shocker.findByIdAndUpdate(req.params.id, req.body,{
+                new: true,
+            })
+            break;
+        case "BSH":
+            updatedProd = await Brakeshoe.findByIdAndUpdate(req.params.id, req.body,{
+                new: true,
+            })
+            break;
+        case "DPD":
+            updatedProd = await Discpad.findByIdAndUpdate(req.params.id, req.body,{
+                new: true,
+            })
+            break;
+        default:
+            throw new Error('Specify Collection in body')
+    }
 
 
     res.status(200).json(updatedProd)
@@ -119,8 +213,22 @@ const updateProd = asyncHandler(async (req,res)=>{
 // @route  DELETE /api/prod/:id
 // @access Private
 const deleteProd = asyncHandler(async (req,res)=>{
-    // Shocker.findByIdAndDelete(req.params.id)
-    const prod = Shocker.findById(req.params.id)
+    var prod
+
+    switch(req.body.itemCode.toUpperCase()){
+        case "SKR":
+            prod = await Shocker.findById(req.params.id)
+            break;
+        case "BSH":
+            prod = await Brakeshoe.findById(req.params.id)
+            break;
+        case "DPD":
+            prod = await Discpad.findById(req.params.id)
+            break;
+        default:
+            throw new Error('Specify Collection in body')
+    }
+
 
     if(!prod){
         res.status(400)
@@ -136,8 +244,20 @@ const deleteProd = asyncHandler(async (req,res)=>{
 // @route  DELETE /api/prod/deleteAll
 // @access Private
 const deleteAllProd = asyncHandler(async (req,res)=>{
-    // await Shocker.remove()
-    await Shocker.deleteMany({})
+    
+    switch(req.body.itemCode.toUpperCase()){
+        case "SKR":
+            await Shocker.deleteMany({})
+            break;
+        case "BSH":
+            await Brakeshoe.deleteMany({})
+            break;
+        case "DPD":
+            await Discpad.deleteMany({})
+            break;
+        default:
+            throw new Error('Specify Collection in body')
+    }
 
     res.status(200).json({message:`Deleted All from Collection`})
 })
