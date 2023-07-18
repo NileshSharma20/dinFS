@@ -1,46 +1,38 @@
 const asyncHandler = require('express-async-handler')
 const {cleanJsonData, localCSVtoJSON, createMongoDataBackup} = require("../helper/prodHelper")
 
-const Shocker = require('../models/shockerModel')
-const Brakeshoe = require('../models/brakeshoeModel')
-const Discpad = require('../models/discpadModel')
+// const Shocker = require('../models/shockerModel')
+// const Brakeshoe = require('../models/brakeshoeModel')
+// const Discpad = require('../models/discpadModel')
+// const Mobilfilter = require('../models/mobilFilterModel')
+
+const dbCollectionList ={
+    "SKR":"shockerModel",
+    "BSH":"brakeshoeModel",
+    "DPD":"discpadModel",
+    "MOF":"mobilFilterModel",
+}
 
 // @desc   Get All Products
 // @route  GET /api/prod
 // @access Private
 const getAllProd = asyncHandler(async (req,res)=>{
-    var prod
-    
-    if(req.body.saveFile==="true"){
-        switch(req.body.itemCode.toUpperCase()){
-            case "SKR":
-                prod = await Shocker.find().lean()
-                break;
-            case "BSH":
-                prod = await Brakeshoe.find().lean()
-                break;
-            case "DPD":
-                prod = await Discpad.find().lean()
-                break;
-            default:
-                throw new Error('Specify Collection in body')
-        }
+    var prod, dbCollection 
 
+    //Finding right Collection
+    const dbKeys = Object.keys(dbCollectionList)
+    if(dbKeys.includes(req.body.itemCode.toUpperCase() )){
+        dbCollection = require(`../models/${dbCollectionList[req.body.itemCode.toUpperCase()]}`) 
+    }else{
+        throw new Error('Specify Collection in body')
+    }
+    
+    //Checking if we want to create Local CSV file or not
+    if(req.body.saveFile==="true"){
+        prod = await dbCollection.find().lean()
         createMongoDataBackup(prod, req.body.itemCode.toUpperCase())
     }else{
-        switch(req.body.itemCode.toUpperCase()){
-            case "SKR":
-                prod = await Shocker.find()
-                break;
-            case "BSH":
-                prod = await Brakeshoe.find()
-                break;
-            case "DPD":
-                prod = await Discpad.find()
-                break;
-            default:
-                throw new Error('Specify Collection in body')
-        }
+        prod = await dbCollection?.find()
 
     }
     res.status(200).json(prod)
@@ -49,10 +41,11 @@ const getAllProd = asyncHandler(async (req,res)=>{
 // @desc   Get Specific Product
 // @route  GET /api/prod/findSpecific
 // @access Private
-const getFilteredProd = asyncHandler(async (req,res)=>{
-    const prod = await Shocker.find(req.body)
-    res.status(200).json(prod)
-})
+
+// const getFilteredProd = asyncHandler(async (req,res)=>{
+//     const prod = await Shocker.find(req.body)
+//     res.status(200).json(prod)
+// })
 
 // @desc   Get Specific SKU Product
 // @route  GET /api/prod/findSKU
@@ -65,36 +58,22 @@ const getSKUProd = asyncHandler(async (req,res)=>{
     const cleanedPN = spaceRemovedPN.replace(/-/g,"") 
     const pN = cleanedPN.toUpperCase()
 
-    var prod
+    var prod, dbCollection
 
-    switch(req.body.itemCode.toUpperCase()){
-        case "SKR":
-            prod = await Shocker.find({ $and:[
-                {sku: { $regex: iC}}, 
-                {sku: { $regex: vM}}, 
-                {sku: { $regex: bC}}, 
-                {sku: { $regex: pN}}
-            ]},{__v:0})
-            break;
-        case "BSH":
-            prod = await Brakeshoe.find({ $and:[
-                {sku: { $regex: iC}}, 
-                {sku: { $regex: vM}}, 
-                {sku: { $regex: bC}}, 
-                {sku: { $regex: pN}}
-            ]},{__v:0})
-            break;
-        case "DPD":
-            prod = await Discpad.find({ $and:[
-                {sku: { $regex: iC}}, 
-                {sku: { $regex: vM}}, 
-                {sku: { $regex: bC}}, 
-                {sku: { $regex: pN}}
-            ]},{__v:0})
-            break;
-        default:
-            throw new Error("Add Item Code in body")
+    //Finding right Collection
+    const dbKeys = Object.keys(dbCollectionList)
+    if(dbKeys.includes(req.body.itemCode.toUpperCase() )){
+        dbCollection = require(`../models/${dbCollectionList[req.body.itemCode.toUpperCase()]}`) 
+    }else{
+        throw new Error('Specify Collection in body')
     }
+
+    prod = await dbCollection.find({ $and:[
+        {sku: { $regex: iC}}, 
+        {sku: { $regex: vM}}, 
+        {sku: { $regex: bC}}, 
+        {sku: { $regex: pN}}
+    ]},{__v:0})
 
     res.status(200).json(prod)
 })
@@ -123,22 +102,17 @@ const setProd = asyncHandler(async (req,res)=>{
                         },
                     }
 
-    var prod
+    var prod, dbCollection
 
-    switch(req.body.itemCode.toUpperCase()){
-        case "SKR":
-            prod = await Shocker.create(prodObject)
-            break;
-        case "BSH":
-            prod = await Brakeshoe.create(prodObject)
-            break;
-        case "DPD":
-            prod = await Discpad.create(prodObject)
-            break;
-        default:
-            throw new Error("Add Item Code in body")
+    //Finding right Collection
+    const dbKeys = Object.keys(dbCollectionList)
+    if(dbKeys.includes(req.body.itemCode.toUpperCase() )){
+        dbCollection = require(`../models/${dbCollectionList[req.body.itemCode.toUpperCase()]}`) 
+    }else{
+        throw new Error('Specify Collection in body')
     }
 
+    prod = await dbCollection.create(prodObject)
 
     res.status(200).json(prod)
 })
@@ -154,22 +128,17 @@ const setManyProd = asyncHandler(async (req,res)=>{
 
     const options = { ordered: true };
 
-    var result
-    switch(req.body.itemCode.toUpperCase()){
-        case "SKR":
-            result = await Shocker.insertMany(cleanedJSON, options);
-            break;
-        case "BSH":
-            result = await Brakeshoe.insertMany(cleanedJSON, options);
-            break;
-        case "DPD":
-            result = await Discpad.insertMany(cleanedJSON, options);
-            break;
-        default:
-            throw new Error('Specify Collection in body')
+    var result, dbCollection
+    
+    //Finding right Collection
+    const dbKeys = Object.keys(dbCollectionList)
+    if(dbKeys.includes(req.body.itemCode.toUpperCase() )){
+        dbCollection = require(`../models/${dbCollectionList[req.body.itemCode.toUpperCase()]}`) 
+    }else{
+        throw new Error('Specify Collection in body')
     }
-
-    // console.log(`${result.length} documents were inserted`);
+    
+    result = await dbCollection.insertMany(cleanedJSON, options);
 
     res.status(200).json({message: `${result.length} documents were inserted.`})
 })
@@ -178,32 +147,25 @@ const setManyProd = asyncHandler(async (req,res)=>{
 // @route  PUT /api/prod/:id
 // @access Private
 const updateProd = asyncHandler(async (req,res)=>{
-    const prod = Shocker.findById(req.params.id)
+    // const prod = Shocker.findById(req.params.id)
 
-    if(!prod){
-        res.status(400)
-        throw new Error('Product not found')
+    // if(!prod){
+    //     res.status(400)
+    //     throw new Error('Product not found')
+    // }
+    var updatedProd, dbCollection
+
+    //Finding right Collection
+    const dbKeys = Object.keys(dbCollectionList)
+    if(dbKeys.includes(req.body.itemCode.toUpperCase() )){
+        dbCollection = require(`../models/${dbCollectionList[req.body.itemCode.toUpperCase()]}`) 
+    }else{
+        throw new Error('Specify Collection in body')
     }
-    var updatedProd
-    switch(req.body.itemCode.toUpperCase()){
-        case "SKR":
-            updatedProd = await Shocker.findByIdAndUpdate(req.params.id, req.body,{
-                new: true,
-            })
-            break;
-        case "BSH":
-            updatedProd = await Brakeshoe.findByIdAndUpdate(req.params.id, req.body,{
-                new: true,
-            })
-            break;
-        case "DPD":
-            updatedProd = await Discpad.findByIdAndUpdate(req.params.id, req.body,{
-                new: true,
-            })
-            break;
-        default:
-            throw new Error('Specify Collection in body')
-    }
+
+    updatedProd = await dbCollection.findByIdAndUpdate(req.params.id, req.body,{
+        new: true,
+    })
 
 
     res.status(200).json(updatedProd)
@@ -213,22 +175,17 @@ const updateProd = asyncHandler(async (req,res)=>{
 // @route  DELETE /api/prod/:id
 // @access Private
 const deleteProd = asyncHandler(async (req,res)=>{
-    var prod
+    var prod, dbCollection
 
-    switch(req.body.itemCode.toUpperCase()){
-        case "SKR":
-            prod = await Shocker.findById(req.params.id)
-            break;
-        case "BSH":
-            prod = await Brakeshoe.findById(req.params.id)
-            break;
-        case "DPD":
-            prod = await Discpad.findById(req.params.id)
-            break;
-        default:
-            throw new Error('Specify Collection in body')
+    //Finding right Collection
+    const dbKeys = Object.keys(dbCollectionList)
+    if(dbKeys.includes(req.body.itemCode.toUpperCase() )){
+        dbCollection = require(`../models/${dbCollectionList[req.body.itemCode.toUpperCase()]}`) 
+    }else{
+        throw new Error('Specify Collection in body')
     }
 
+    prod = await dbCollection.findById(req.params.id)
 
     if(!prod){
         res.status(400)
@@ -244,27 +201,23 @@ const deleteProd = asyncHandler(async (req,res)=>{
 // @route  DELETE /api/prod/deleteAll
 // @access Private
 const deleteAllProd = asyncHandler(async (req,res)=>{
-    
-    switch(req.body.itemCode.toUpperCase()){
-        case "SKR":
-            await Shocker.deleteMany({})
-            break;
-        case "BSH":
-            await Brakeshoe.deleteMany({})
-            break;
-        case "DPD":
-            await Discpad.deleteMany({})
-            break;
-        default:
-            throw new Error('Specify Collection in body')
+    var dbCollection
+
+    //Finding right Collection
+    const dbKeys = Object.keys(dbCollectionList)
+    if(dbKeys.includes(req.body.itemCode.toUpperCase() )){
+        dbCollection = require(`../models/${dbCollectionList[req.body.itemCode.toUpperCase()]}`) 
+    }else{
+        throw new Error('Specify Collection in body')
     }
 
+    await dbCollection.deleteMany({})
     res.status(200).json({message:`Deleted All from Collection`})
 })
 
 module.exports = {
     getAllProd,
-    getFilteredProd,
+    // getFilteredProd,
     getSKUProd,
     setProd,
     setManyProd,

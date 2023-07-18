@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const {getAllProd,
-       getFilteredProd,
+       // getFilteredProd,
        getSKUProd,
        setProd,
        setManyProd,
@@ -14,7 +14,7 @@ router.route('/').get(getAllProd).post(setProd)
 
 router.delete('/deleteAll',deleteAllProd)
 
-router.get('/findSpecific',getFilteredProd)
+// router.get('/findSpecific',getFilteredProd)
 
 router.get('/findSKU',getSKUProd)
 

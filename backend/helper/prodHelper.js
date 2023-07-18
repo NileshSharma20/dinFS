@@ -1,6 +1,13 @@
 const fs = require('fs');
 const Papa = require('papaparse');
 
+const filenameList ={
+    "SKR":["shockerMongo.csv","shockerUpdated.csv"],
+    "BSH":["brakeShoeMongo.csv", "brakeShoeUpdated.csv"],
+    "DPD":["discpadMongo.csv", "discpadUpdated.csv"],
+    "MOF":["mobilFilterMongo.csv", "mobilFilterUpdated.csv"],
+}
+
 // @desc   Clean Mongo Collection data and save it locally
 // @route  "../MongoData/shockerMongo.csv"
 const createMongoDataBackup = (mongoFile,iC) =>{
@@ -8,11 +15,12 @@ const createMongoDataBackup = (mongoFile,iC) =>{
         //single object
         const mD = item.metaData
 
+        if(mD){
         Object.entries(mD).forEach((entry)=>{
             //insert new objects
             const [key, value] = entry;
             item[key] = value; 
-        })
+        })}
         delete item.metaData
         delete item.__v
 
@@ -25,20 +33,15 @@ const createMongoDataBackup = (mongoFile,iC) =>{
     // console.log(`item:${JSON.stringify(jsonData,null,4)}`)
     const csvData = Papa.unparse(jsonData,{newline: '\n'});
     var filePath
-    switch(iC){
-        case "SKR":
-            filePath = '../MongoData/shockerMongo.csv'
-            break;
-        case "BSH":
-            filePath = '../MongoData/brakeShoeMongo.csv'
-            break;
-        case "DPD":
-            filePath = '../MongoData/discpadMongo.csv'
-            break;
-        default:
-            filePath = '../MongoData/productsMongo.csv'
-            break;
+
+    //Finding right Path
+    const dbKeys = Object.keys(filenameList)
+    if(dbKeys.includes(iC)){
+        filePath = `../MongoData/${ filenameList[iC][0] }` 
+    }else{
+        filePath = '../MongoData/productsMongo.csv'
     }
+    
     fs.writeFile(filePath,csvData, (err)=>{
         if(err){
             console.log(`createMongoDataBackup(HelperFunction): Error during writing file: ${err}`)
@@ -52,20 +55,14 @@ const createMongoDataBackup = (mongoFile,iC) =>{
 // @route  "../CsvData/shockerUpdated.csv"
 const localCSVtoJSON = (iC) => {
     var csvFile
-    switch(iC){
-        case "SKR":
-            csvFile = '../CsvData/shockerUpdated.csv'
-            break;
-        case "BSH":
-            csvFile = '../CsvData/brakeShoeUpdated.csv'
-            break;
-        case "DPD":
-            csvFile = '../CsvData/discpadUpdated.csv'
-            break;
-        default:
-            csvFile = '../CsvData/shockerUpdated.csv'
-            break;
+    //Finding right Path
+    const dbKeys = Object.keys(filenameList)
+    if(dbKeys.includes(iC)){
+        csvFile = `../CsvData/${ filenameList[iC][1] }` 
+    }else{
+        csvFile = '../CsvData/shockerUpdated.csv'
     }
+
     const csvData = fs.readFileSync(csvFile, 'utf8');
 
     const jsonData = Papa.parse(csvData, { header: true });
