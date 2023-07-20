@@ -10,7 +10,12 @@ const dbCollectionList ={
     "SKR":"shockerModel",
     "BSH":"brakeshoeModel",
     "DPD":"discpadModel",
-    "MOF":"mobilFilterModel",
+    "MOF":"mobilfilterModel",
+    "RSR":"ballracerModel",
+    "BDX":"bendexModel",
+    "FTR":"footrestModel",
+    "ARF":"airfilterModel",
+    "SSN":"sidestandModel",
 }
 
 // @desc   Get All Products
