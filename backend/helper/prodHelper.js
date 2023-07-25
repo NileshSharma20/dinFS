@@ -11,6 +11,7 @@ const filenameList ={
     "FTR":["footRestMongo.csv", "footRestUpdated.csv"],
     "ARF":["airFilterMongo.csv", "airFilterUpdated.csv"],
     "SSN":["sideStandMongo.csv", "sideStandUpdated.csv"],
+    "MSN":["mainStandMongo.csv", "mainStandUpdated.csv"],
 }
 
 // @desc   Clean Mongo Collection data and save it locally

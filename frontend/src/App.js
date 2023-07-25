@@ -6,9 +6,6 @@ import Products from './components/Products/Products';
 import Landing from './pages/Landing/Landing';
 
 function App() {
-  
-
-
   return (
     <>
     <Router>

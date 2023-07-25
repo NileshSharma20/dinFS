@@ -16,6 +16,7 @@ const dbCollectionList ={
     "FTR":"footrestModel",
     "ARF":"airfilterModel",
     "SSN":"sidestandModel",
+    "MSN":"mainstandModel"
 }
 
 // @desc   Get All Products
