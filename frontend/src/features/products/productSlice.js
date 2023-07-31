@@ -2,58 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import productService from './productService'
 
 const initialState = {
-    // productData: [{
-    //     itemCode:"",
-    //     vehicleModel:"",
-    //     brandCompany:"",
-    //     partNum:"",
-    //     mrp:"",
-    //     compatibileModels:"",
-    //     sku:"",
-    //     metaData:{},
-    // }],
     productData:[],
-    // brandsList:[{
-    //     brandName:"PULSAR",
-    //   },{
-    //     brandName:"DISCOVER",
-    //   },{
-    //     brandName:"CT-100",
-    //   },{
-    //     brandName:"PLATINA",
-    //   },{
-    //     brandName:"PASSION",
-    //   },{
-    //     brandName:"HUNK",
-    //   },{
-    //     brandName:"X-PRO",
-    //   },{
-    //     brandName:"ACTIVA",
-    //   },{
-    //     brandName:"UNICORN",
-    //   },{
-    //     brandName:"DREAM YUGA",
-    //   },{
-    //     brandName:"FZ",
-    //   },{
-    //     brandName:"R15",
-    //   },{
-    //     brandName:"RTR",
-    //   },{
-    //     brandName:"VICTOR",
-    //   },{
-    //     brandName:"STR",
-    //   },{
-    //     brandName:"APACHE",
-    //   },{
-    //     brandName:"PHONIX",
-    //   },{
-    //     brandName:"WEGO",
-    //   },{
-    //     brandName:"GIXXER",
-    //   },{
-    //     brandName:"ACHIVER",
-    //   },],
     isError: false,
     isSuccess: false,
     isLoading: false,
@@ -79,6 +28,22 @@ export const createProductDataJSON = createAsyncThunk(
     }
 ) 
 
+// Get Products
+export const getProducts = createAsyncThunk(
+  'getProducts',
+  async(itemData, thunkAPI)=>{
+    try {
+      return await productService.getProducts(itemData)
+    } catch (error) {
+      const message =
+          (error.response && error.response.data && error.response.data.message) ||
+          error.message ||
+          error.toString()
+      return thunkAPI.rejectWithValue(message) 
+    }
+  }
+)
+
 export const productSlice = createSlice({
     name: 'products',
     initialState,
@@ -101,6 +66,21 @@ export const productSlice = createSlice({
           state.isError = true
           state.message = action.payload
         })
+
+      // Get products
+      .addCase(getProducts.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(getProducts.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.productData = action.payload
+      })
+      .addCase(getProducts.rejected, (state, action) => {
+        state.isLoading = false
+        state.isError = true
+        state.message = action.payload
+      })
     },
 })
 

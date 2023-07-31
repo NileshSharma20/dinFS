@@ -20,16 +20,17 @@ const dbCollectionList ={
 }
 
 // @desc   Get All Products
-// @route  GET /api/prod
+// @route  POST /api/prod/getProducts
 // @access Private
 const getAllProd = asyncHandler(async (req,res)=>{
     var prod, dbCollection 
 
     //Finding right Collection
     const dbKeys = Object.keys(dbCollectionList)
-    if(dbKeys.includes(req.body.itemCode.toUpperCase() )){
+    if(dbKeys.includes(req.body.itemCode.toUpperCase())){
         dbCollection = require(`../models/${dbCollectionList[req.body.itemCode.toUpperCase()]}`) 
     }else{
+        // console.log(`Server: ${JSON.stringify(req.body)}`)
         throw new Error('Specify Collection in body')
     }
     

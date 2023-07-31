@@ -10,13 +10,13 @@ const {getAllProd,
        deleteAllProd} = require('../controllers/prodController')
 
        
-router.route('/').get(getAllProd).post(setProd)
+router.route('/').post(setProd)
 
 router.delete('/deleteAll',deleteAllProd)
 
 // router.get('/findSpecific',getFilteredProd)
 
-router.get('/findSKU',getSKUProd)
+router.get('/findSKU',getSKUProd).post('/getProducts',getAllProd)
 
 router.post('/setMany', setManyProd)
 

@@ -1,4 +1,6 @@
-// import axios from 'axios'
+import axios from 'axios'
+
+const prod_URI = '/api/prod/'
 
 // Convert Product CSV Data to JSON Data
 const createProductDataJSON = (csvFileData) => {
@@ -83,8 +85,24 @@ const createProductDataJSON = (csvFileData) => {
     return returnData
   }
 
+  //Get Products
+  const getProducts = async (itemData) => {
+
+    const response = await axios.post(prod_URI + 'getProducts', itemData)
+    console.log(`itemData:${JSON.stringify(itemData,null,4)}`)
+
+    // if(response.data){
+    //   console.log(`response.data:${JSON.stringify(response.data,null,4)}`)
+    // } else{
+    //   console.log(`response empty`)
+    // }
+
+    return response.data
+  } 
+
   const productService = {
     createProductDataJSON,  
+    getProducts
   }
   
   export default productService

@@ -1,27 +1,65 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux"
-import {createProductDataJSON} from "../../features/products/productSlice"
+import {createProductDataJSON, getProducts} from "../../features/products/productSlice"
 import Papa from 'papaparse'
 
 import "./Products.css"
+import Dropdown from '../../components/Dropdown/Dropdown';
 
 function Products() {
   const dispatch = useDispatch();
   const {productData} =useSelector(
     (state)=>state.product
-  ) 
+  )
 
-  const [csvData, setCsvData] = useState([])
-  const [finalData, setFinalData]= useState([])
-  const [productTypeForm, setProductTypeForm] = useState("") 
+  const [itemData, setItemData] = useState({
+    saveFile: false,
+    itemCode:""
+  })
+  
+  const {saveFile, itemCode} = itemData
 
-  const prodDropdownList = [{
+  const prodCodeList = [{
     name:"Shocker",
     code:"SKR",
-  },{
+  },
+  {
     name:"Brake-Shoe",
-    code:"BRK",
-  }]
+    code:"BSH",
+  },
+  {
+    name:"Disc-Pad",
+    code:"DPD",
+  },
+  {
+    name:"Mobil-Filter",
+    code:"MOF",
+  },
+  {
+    name:"Ball-Racer",
+    code:"RSR",
+  },
+  {
+    name:"Bendex",
+    code:"BDX",
+  },
+  {
+    name:"Foot-Rest",
+    code:"FTR",
+  },
+  {
+    name:"Air-Filter",
+    code:"ARF",
+  },
+  {
+    name:"Side-Stand",
+    code:"SSN",
+  },
+  {
+    name:"Main-Stand",
+    code:"MSN",
+  },
+  ]
 
   /////////////////////////////////////////////////
   //////// Functions /////////////////////////////
@@ -32,44 +70,42 @@ function Products() {
       header:true,
       skipEmptyLines: true,
       complete: function(res){
-        setCsvData(res.data)
+        // setCsvData(res.data)
         }
       })
     }
+
+  const onChange=(e)=>{
+    setItemData((prevState)=>({
+        ...prevState,
+        [e.target.name]:e.target.value
+    }))
+  }
     
-    const onSubmit=(e)=>{
-      e.preventDefault()
+  const onSubmit=(e)=>{
+    e.preventDefault()
       
-      if(csvData.length===0){
-        alert(`Fill all the fields`)
-      }else{
-        console.log(`OK`)
-        dispatch(createProductDataJSON(csvData))
+    if(itemCode==="" || saveFile===null){
+      alert(`Please enter Item Code`)
+    }else{
+      dispatch(getProducts(itemData))
     }
   }
 
-  useEffect(()=>{
-    // if(productTypeForm!=="" && csvData.length!==0){
-      // const prodData = csvData.map((item)=>{return{...item, ProductType:productTypeForm}})
-      // setFinalData(prodData)
-    // }
 
-    // console.log(`${JSON.stringify(csvData,null,4)}`)
-  },[csvData])
+  useEffect(()=>{
+    console.log(`itemData=${JSON.stringify(itemData,null,4)}`)
+  },[itemData])
 
   return (
     <div className='data-container'>
-
-      {/* <div className="product-filter-container">
-        <h1>Filter Box</h1>
-      </div> */}
 
       <div className="form-container csv-upload">
         <form onSubmit={onSubmit}>
 
         <div className="form-grid">
 
-          <div className="form-group">
+          {/* <div className="form-group">
 
             <label>File</label>
             <input className='file-input'
@@ -78,24 +114,28 @@ function Products() {
               accpet=".csv"
               onChange={handleCSVFile}
               ></input>
-          </div>
-
-      
-        
-
-          {/* <div className="form-group">
-            <label>Product</label>
-            <input list="data" 
-              onChange={(e)=>setProductTypeForm(e.target.value)}
-              placeholder='Select product...'/>
-
-              <datalist id="data">
-                {prodDropdownList.map((item,index)=>
-                  <option id={index}>{item.name}</option>
-                  )}
-              </datalist>
-
           </div> */}
+
+          <div className="form-group">
+            <label>Item Code</label>
+            {/* <select name="itemCode" id="itemCode" onChange={onChange}>
+              {prodDropdownList.map((option,index)=>{
+                <option value={option.code} key={index}>{option.name}</option>
+              })}
+            </select> */}
+            {/* <input type="text"
+              name='itemCode'
+              id='itemCode'
+              value={itemCode}
+              placeholder='Item Code'
+              onChange={onChange}
+            /> */}
+
+            <Dropdown  
+              dataList={prodCodeList} 
+              passItemCode={setItemData}
+              />
+          </div>
 
           <div className="form-group">
                 <button type="submit" className="submit-btn">
@@ -104,7 +144,7 @@ function Products() {
             </div>
 
         </div>
-      </form>
+        </form>
       </div>
 
       <div className='grid'>
@@ -112,19 +152,19 @@ function Products() {
           <div className="productCol">
               <h3 style={{fontSize:"1.5rem"}}>vehicleModel</h3>
               <h3 style={{fontSize:"1.5rem"}}>brandCompany</h3>
-              <h3 style={{fontSize:"1.5rem"}}>position</h3>
+              {/* <h3 style={{fontSize:"1.5rem"}}>position</h3> */}
               <h3 style={{fontSize:"1.5rem"}}>sku</h3>
-              <h3 style={{fontSize:"1.5rem"}}>colour</h3>
+              <h3 style={{fontSize:"1.5rem"}}>mrp</h3>
               <h3 style={{fontSize:"1.5rem"}}>compatibileModels</h3>
             </div>
             {productData?.map((item,index)=>
             <div className="productCol" key={index}>
               <h3>{item.vehicleModel}</h3>
               <h3>{item.brandCompany}</h3>
-              <h3>{item.metaData.position}</h3>
+              {/* <h3>{item.metaData.position}</h3> */}
               <h3>{item.sku}</h3>
-              <h3>{item.metaData.colour}</h3>
-              <h3>{item.compatibileModels}</h3>
+              <h3>{item.mrp}</h3>
+              <h3>{item.compatibileModels.map((item,i)=>{return <p key={i}>{item}</p>})}</h3>
             </div>
             )
             }

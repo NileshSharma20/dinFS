@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useSelector } from "react-redux"
 import { AnimatePresence, motion } from "framer-motion"
-import CopyForm from '../CopyForm/CopyForm'
+import CopyForm from '../../components/CopyForm/CopyForm'
 
 import "./IndiaMartRes.css"
 
