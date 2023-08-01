@@ -25,7 +25,7 @@ const ballracerSchema = mongoose.Schema({
         type: String,
         required: [true, 'Please add the MRP']
     },
-    compatibileModels:{
+    compatibleModels:{
         type: [String],
         required: [false]
     },

@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux"
-import {createProductDataJSON, getProducts} from "../../features/products/productSlice"
-import Papa from 'papaparse'
+import { getProducts} from "../../features/products/productSlice"
+// import Papa from 'papaparse'
 
 import "./Products.css"
 import Dropdown from '../../components/Dropdown/Dropdown';
+import Loader from '../../components/Loader/Loader';
 
 function Products() {
   const dispatch = useDispatch();
-  const {productData} =useSelector(
+  const {productData, isLoading} =useSelector(
     (state)=>state.product
   )
 
@@ -65,22 +66,22 @@ function Products() {
   //////// Functions /////////////////////////////
   ////////////////////////////////////////////////
 
-  const handleCSVFile=(e)=>{
-      Papa.parse(e.target.files[0],{
-      header:true,
-      skipEmptyLines: true,
-      complete: function(res){
-        // setCsvData(res.data)
-        }
-      })
-    }
+  // const handleCSVFile=(e)=>{
+  //     Papa.parse(e.target.files[0],{
+  //     header:true,
+  //     skipEmptyLines: true,
+  //     complete: function(res){
+  //       setCsvData(res.data)
+  //       }
+  //     })
+  //   }
 
-  const onChange=(e)=>{
-    setItemData((prevState)=>({
-        ...prevState,
-        [e.target.name]:e.target.value
-    }))
-  }
+  // const onChange=(e)=>{
+  //   setItemData((prevState)=>({
+  //       ...prevState,
+  //       [e.target.name]:e.target.value
+  //   }))
+  // }
     
   const onSubmit=(e)=>{
     e.preventDefault()
@@ -92,44 +93,37 @@ function Products() {
     }
   }
 
+  /////////////////////////////////////////////////
+  //////// Hooks /////////////////////////////////
+  ////////////////////////////////////////////////
 
-  useEffect(()=>{
-    console.log(`itemData=${JSON.stringify(itemData,null,4)}`)
-  },[itemData])
+  // useEffect(()=>{
+  //   console.log(`itemData=${JSON.stringify(itemData,null,4)}`)
+  // },[itemData])
 
   return (
+    <>
+    {isLoading && <Loader />}
     <div className='data-container'>
 
-      <div className="form-container csv-upload">
+      <div className="controlbox-container" >
         <form onSubmit={onSubmit}>
 
-        <div className="form-grid">
+        <div className="controlbox">
 
           {/* <div className="form-group">
 
             <label>File</label>
             <input className='file-input'
-              type="file"
-              name="file"
-              accpet=".csv"
-              onChange={handleCSVFile}
+            type="file"
+            name="file"
+            accpet=".csv"
+            onChange={handleCSVFile}
               ></input>
-          </div> */}
+            </div> */}
 
-          <div className="form-group">
-            <label>Item Code</label>
-            {/* <select name="itemCode" id="itemCode" onChange={onChange}>
-              {prodDropdownList.map((option,index)=>{
-                <option value={option.code} key={index}>{option.name}</option>
-              })}
-            </select> */}
-            {/* <input type="text"
-              name='itemCode'
-              id='itemCode'
-              value={itemCode}
-              placeholder='Item Code'
-              onChange={onChange}
-            /> */}
+          <div className="control-section">
+            <label>Item</label>
 
             <Dropdown  
               dataList={prodCodeList} 
@@ -138,10 +132,10 @@ function Products() {
           </div>
 
           <div className="form-group">
-                <button type="submit" className="submit-btn">
-                   Upload
-                </button>
-            </div>
+            <button type="submit" className="submit-btn">
+                Submit
+            </button>
+          </div>
 
         </div>
         </form>
@@ -155,7 +149,7 @@ function Products() {
               {/* <h3 style={{fontSize:"1.5rem"}}>position</h3> */}
               <h3 style={{fontSize:"1.5rem"}}>sku</h3>
               <h3 style={{fontSize:"1.5rem"}}>mrp</h3>
-              <h3 style={{fontSize:"1.5rem"}}>compatibileModels</h3>
+              <h3 style={{fontSize:"1.5rem"}}>compatibleModels</h3>
             </div>
             {productData?.map((item,index)=>
             <div className="productCol" key={index}>
@@ -164,10 +158,10 @@ function Products() {
               {/* <h3>{item.metaData.position}</h3> */}
               <h3>{item.sku}</h3>
               <h3>{item.mrp}</h3>
-              <h3>{item.compatibileModels.map((item,i)=>{return <p key={i}>{item}</p>})}</h3>
+              <h3>{item.compatibleModels.map((item,i)=>{return <p key={i}>{productData.filter(prod=>prod.sku===item).map(prod=>prod.vehicleModel+" "+prod.brandCompany)}</p>})}</h3>
             </div>
             )
-            }
+          }
         </div>
         
 
@@ -176,7 +170,7 @@ function Products() {
 
       {/* <div>
         <h2>shockerDownload</h2>
-
+        
         <a
           href={ExamplePdf}
           download="Example-PDF-document"
@@ -184,10 +178,11 @@ function Products() {
           rel="noreferrer"
         >
           <button>Download .pdf file</button>
-        </a>
+          </a>
       </div> */}
 
     </div>
+    </>
   )
 }
 

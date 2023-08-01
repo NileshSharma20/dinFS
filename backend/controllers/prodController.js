@@ -30,7 +30,6 @@ const getAllProd = asyncHandler(async (req,res)=>{
     if(dbKeys.includes(req.body.itemCode.toUpperCase())){
         dbCollection = require(`../models/${dbCollectionList[req.body.itemCode.toUpperCase()]}`) 
     }else{
-        // console.log(`Server: ${JSON.stringify(req.body)}`)
         throw new Error('Specify Collection in body')
     }
     
@@ -151,57 +150,61 @@ const setManyProd = asyncHandler(async (req,res)=>{
 })
 
 // @desc   Update specific Product
-// @route  PUT /api/prod/:id
+// @route  PUT /api/prod/:sku
 // @access Private
 const updateProd = asyncHandler(async (req,res)=>{
-    // const prod = Shocker.findById(req.params.id)
+    var dbCollection, jsonList=[]
+    jsonList.push(req.body)
+    const cleanedJSON = cleanJsonData(jsonList)[0]
 
-    // if(!prod){
-    //     res.status(400)
-    //     throw new Error('Product not found')
-    // }
-    var updatedProd, dbCollection
+    const sku = req.params.sku
+    const itemCode = sku.split('-')[0]
+
+    const prod = {$set: cleanedJSON}
+    const options = {upsert: true}
 
     //Finding right Collection
     const dbKeys = Object.keys(dbCollectionList)
-    if(dbKeys.includes(req.body.itemCode.toUpperCase() )){
-        dbCollection = require(`../models/${dbCollectionList[req.body.itemCode.toUpperCase()]}`) 
+    if(dbKeys.includes(itemCode.toUpperCase() )){
+        dbCollection = require(`../models/${dbCollectionList[itemCode.toUpperCase()]}`) 
     }else{
         throw new Error('Specify Collection in body')
     }
 
-    updatedProd = await dbCollection.findByIdAndUpdate(req.params.id, req.body,{
-        new: true,
-    })
+    const result = await dbCollection.updateOne({sku:sku}, prod,{upsert: true})
+    // console.log(`${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`)
 
-
-    res.status(200).json(updatedProd)
+    res.status(200).json({message:`${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`})
 })
 
 // @desc   Delete specific Product
-// @route  DELETE /api/prod/:id
+// @route  DELETE /api/prod/:sku
 // @access Private
 const deleteProd = asyncHandler(async (req,res)=>{
     var prod, dbCollection
+    const sku = req.params.sku
+    const itemCode = sku.split('-')[0]
 
     //Finding right Collection
     const dbKeys = Object.keys(dbCollectionList)
-    if(dbKeys.includes(req.body.itemCode.toUpperCase() )){
-        dbCollection = require(`../models/${dbCollectionList[req.body.itemCode.toUpperCase()]}`) 
+    if(dbKeys.includes(itemCode.toUpperCase() )){
+        dbCollection = require(`../models/${dbCollectionList[itemCode.toUpperCase()]}`) 
     }else{
         throw new Error('Specify Collection in body')
     }
 
-    prod = await dbCollection.findById(req.params.id)
+    //Finding if Product exists
+    prod = await dbCollection.find({sku:sku})
 
     if(!prod){
         res.status(400)
         throw new Error('Product not found')
     }
 
-    await prod.findOneAndRemove()
+    const result = await dbCollection.findOneAndRemove({sku:sku})
 
-    res.status(200).json({id:req.params.id})
+    res.status(200).json({message:`Deleted ${result.sku}`})
+    // json({id:req.params.id})
 })
 
 // @desc   Delete all Products from a Collection

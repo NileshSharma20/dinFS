@@ -87,15 +87,7 @@ const createProductDataJSON = (csvFileData) => {
 
   //Get Products
   const getProducts = async (itemData) => {
-
     const response = await axios.post(prod_URI + 'getProducts', itemData)
-    console.log(`itemData:${JSON.stringify(itemData,null,4)}`)
-
-    // if(response.data){
-    //   console.log(`response.data:${JSON.stringify(response.data,null,4)}`)
-    // } else{
-    //   console.log(`response empty`)
-    // }
 
     return response.data
   } 

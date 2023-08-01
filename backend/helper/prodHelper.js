@@ -86,6 +86,7 @@ const cleanJsonData = (rawJson) => {
     }else{
 
     cleanedData = rawJson.filter((item=>item.itemCode && item.vehicleModel && item.brandCompany && item.partNum && item.mrp)).map((prod)=>{
+        // console.log(`rawJSON:${JSON.stringify(rawJson)}`)
         var sku=""
         var metaData = []
 
@@ -123,8 +124,8 @@ const cleanJsonData = (rawJson) => {
         const spaceRemovedMRP = prod.mrp?prod.mrp.replace(/ /g,''):""
         var cleanedMRP = spaceRemovedMRP.replace(/,/g,'')
 
-        //compatibileModels cleanup and conversion to Array
-        const spaceRemovedCM = prod.compatibileModels?prod.compatibileModels.replace(/ /g,''):""
+        //compatibleModels cleanup and conversion to Array
+        const spaceRemovedCM = prod.compatibleModels?prod.compatibleModels.replace(/ /g,''):""
         var delimitedCM = spaceRemovedCM.split(',')
 
         //SKU generation
@@ -136,7 +137,7 @@ const cleanJsonData = (rawJson) => {
         delete prodClone.brandCompany
         delete prodClone.partNum
         delete prodClone.mrp
-        delete prodClone.compatibileModels
+        delete prodClone.compatibleModels
 
         metaData = prodClone
         
@@ -147,7 +148,7 @@ const cleanJsonData = (rawJson) => {
             partNum: spaceRemovedPN,
             mrp: cleanedMRP,
             sku: sku,
-            compatibileModels: delimitedCM,
+            compatibleModels: delimitedCM,
             metaData: metaData
         }
     })
