@@ -44,14 +44,6 @@ const getAllProd = asyncHandler(async (req,res)=>{
     res.status(200).json(prod)
 })
 
-// @desc   Get Specific Product
-// @route  GET /api/prod/findSpecific
-// @access Private
-
-// const getFilteredProd = asyncHandler(async (req,res)=>{
-//     const prod = await Shocker.find(req.body)
-//     res.status(200).json(prod)
-// })
 
 // @desc   Get Specific SKU Product
 // @route  GET /api/prod/findSKU
@@ -204,7 +196,6 @@ const deleteProd = asyncHandler(async (req,res)=>{
     const result = await dbCollection.findOneAndRemove({sku:sku})
 
     res.status(200).json({message:`Deleted ${result.sku}`})
-    // json({id:req.params.id})
 })
 
 // @desc   Delete all Products from a Collection
@@ -227,7 +218,6 @@ const deleteAllProd = asyncHandler(async (req,res)=>{
 
 module.exports = {
     getAllProd,
-    // getFilteredProd,
     getSKUProd,
     setProd,
     setManyProd,

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux"
-import { getProducts} from "../../features/products/productSlice"
+import { useNavigate } from 'react-router-dom';
+import { getProducts, resetProducts} from "../../features/products/productSlice"
 // import Papa from 'papaparse'
 
 import "./Products.css"
@@ -8,10 +9,15 @@ import Dropdown from '../../components/Dropdown/Dropdown';
 import Loader from '../../components/Loader/Loader';
 
 function Products() {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const {productData, isLoading} =useSelector(
     (state)=>state.product
   )
+
+  const [showSKUFlag, setShowSKUFlag] = useState(false)
+  const [prodNavFlag, setProdNavFlag] = useState(false)
 
   const [itemData, setItemData] = useState({
     saveFile: false,
@@ -82,12 +88,20 @@ function Products() {
   //       [e.target.name]:e.target.value
   //   }))
   // }
+
+  const handleProductClick = (sku) =>{
+    if(prodNavFlag){
+      dispatch(resetProducts())
+      navigate(`${sku}`)
+      // console.log(`edit data ${sku}`)
+    }
+  }
     
   const onSubmit=(e)=>{
     e.preventDefault()
       
     if(itemCode==="" || saveFile===null){
-      alert(`Please enter Item Code`)
+      alert(`Please enter Item`)
     }else{
       dispatch(getProducts(itemData))
     }
@@ -97,9 +111,9 @@ function Products() {
   //////// Hooks /////////////////////////////////
   ////////////////////////////////////////////////
 
-  // useEffect(()=>{
-  //   console.log(`itemData=${JSON.stringify(itemData,null,4)}`)
-  // },[itemData])
+  useEffect(()=>{
+    dispatch(resetProducts())
+  },[])
 
   return (
     <>
@@ -107,6 +121,8 @@ function Products() {
     <div className='data-container'>
 
       <div className="controlbox-container" >
+        
+        {/* Load Product Controls */}
         <form onSubmit={onSubmit}>
 
         <div className="controlbox">
@@ -139,26 +155,72 @@ function Products() {
 
         </div>
         </form>
+          
+        {/* On Product Load Controls */}
+        {productData.length>0 &&
+          <div className="control-box">
+          <div className="control-section">
+            
+            <div className="control-btn"
+              style={{backgroundColor:`var(--buttonGreen)`}}
+              onClick={()=>setShowSKUFlag(!showSKUFlag)}
+            >
+              {showSKUFlag?"Show Product Name":"Show SKU"}
+            </div>
+            
+            <div className="control-btn"
+              style={prodNavFlag?{backgroundColor:`var(--buttonRed)`}:{backgroundColor:`var(--buttonGreen)`}}
+              onClick={()=>setProdNavFlag(!prodNavFlag)}
+            >
+              {prodNavFlag?"De-activate Products":"Activate Products"}
+            </div>
+
+          </div>
+        </div>}
+
+
       </div>
 
       <div className='grid'>
         <div className="productCol-conatiner">
+          {/* Product Fields */}
           <div className="productCol">
-              <h3 style={{fontSize:"1.5rem"}}>vehicleModel</h3>
-              <h3 style={{fontSize:"1.5rem"}}>brandCompany</h3>
-              {/* <h3 style={{fontSize:"1.5rem"}}>position</h3> */}
-              <h3 style={{fontSize:"1.5rem"}}>sku</h3>
-              <h3 style={{fontSize:"1.5rem"}}>mrp</h3>
-              <h3 style={{fontSize:"1.5rem"}}>compatibleModels</h3>
-            </div>
-            {productData?.map((item,index)=>
-            <div className="productCol" key={index}>
+              <h3>vehicleModel</h3>
+              <h3>brandCompany</h3>
+              <h3>sku</h3>
+              <h3>mrp</h3>
+              <h3>compatibleModels</h3>
+              <h3>metaData</h3>
+          </div>
+
+          {/* Product Data */}
+          {productData?.map((item,index)=>
+            <div className={`productCol ${prodNavFlag?"navProdCol":""}`}
+              // style={prodNavFlag?{cursor:`pointer`}:{}} 
+              key={index}
+              onClick={()=>handleProductClick(item.sku)}
+            >
               <h3>{item.vehicleModel}</h3>
               <h3>{item.brandCompany}</h3>
-              {/* <h3>{item.metaData.position}</h3> */}
               <h3>{item.sku}</h3>
               <h3>{item.mrp}</h3>
-              <h3>{item.compatibleModels.map((item,i)=>{return <p key={i}>{productData.filter(prod=>prod.sku===item).map(prod=>prod.vehicleModel+" "+prod.brandCompany)}</p>})}</h3>
+              <h3>{item.compatibleModels.map((item,i)=>{
+                return <p key={i}>{ 
+                  showSKUFlag?
+                  item
+                  :
+                  productData.filter(prod=>prod.sku===item).map(prod=>prod.vehicleModel+" "+prod.brandCompany)
+                }
+                </p>})}
+              </h3>
+              {item.metaData && 
+              <h3>
+                {Object.keys(item.metaData)?.map((k,i)=>{
+                  return <p key={i}>{k}- {item.metaData[k]}</p>
+                  } 
+                )}
+              </h3>
+              }
             </div>
             )
           }
@@ -167,19 +229,6 @@ function Products() {
 
     
       </div>
-
-      {/* <div>
-        <h2>shockerDownload</h2>
-        
-        <a
-          href={ExamplePdf}
-          download="Example-PDF-document"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button>Download .pdf file</button>
-          </a>
-      </div> */}
 
     </div>
     </>

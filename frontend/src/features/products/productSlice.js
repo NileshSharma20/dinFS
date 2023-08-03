@@ -1,8 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import productService from './productService'
 
+// Get user from localStorage
+// const productData = JSON.parse(localStorage.getItem('productData'))
+
 const initialState = {
-    productData:[],
+    productData: [],
     isError: false,
     isSuccess: false,
     isLoading: false,

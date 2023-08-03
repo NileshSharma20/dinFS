@@ -88,7 +88,9 @@ const createProductDataJSON = (csvFileData) => {
   //Get Products
   const getProducts = async (itemData) => {
     const response = await axios.post(prod_URI + 'getProducts', itemData)
-
+    // if(response.data){
+    //   localStorage.setItem('productData', JSON.stringify(response.data))
+    // }
     return response.data
   } 
 

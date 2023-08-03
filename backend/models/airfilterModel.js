@@ -33,14 +33,6 @@ const airfilterSchema = mongoose.Schema({
         type: Object,
         required: false,
     },
-    // netRate: {
-    //     type: String,
-    //     required: [false]
-    // },
-    // position: {
-    //     type: String,
-    //     required: [false]
-    // },
     
     },
     {

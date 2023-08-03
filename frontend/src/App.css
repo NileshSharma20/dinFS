@@ -3,6 +3,8 @@
 :root{
   --backgroundColor:#2a9d8f;
   --formBgColor:#d8e2dc;
+  --buttonGreen:#2a9d8f;
+  --buttonRed:#e63946;
 }
 
 *{
