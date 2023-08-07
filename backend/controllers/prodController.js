@@ -20,27 +20,28 @@ const dbCollectionList ={
 }
 
 // @desc   Get All Products
-// @route  POST /api/prod/getProducts
+// @route  POST /api/prod/:itemCode
 // @access Private
 const getAllProd = asyncHandler(async (req,res)=>{
     var prod, dbCollection 
+    const { itemCode, saveFile } = req.params
 
     //Finding right Collection
     const dbKeys = Object.keys(dbCollectionList)
-    if(dbKeys.includes(req.body.itemCode.toUpperCase())){
-        dbCollection = require(`../models/${dbCollectionList[req.body.itemCode.toUpperCase()]}`) 
+    if(dbKeys.includes(itemCode.toUpperCase())){
+        dbCollection = require(`../models/${dbCollectionList[itemCode.toUpperCase()]}`) 
     }else{
         throw new Error('Specify Collection in body')
     }
     
     //Checking if we want to create Local CSV file or not
-    if(req.body.saveFile==="true"){
-        prod = await dbCollection.find().lean()
-        createMongoDataBackup(prod, req.body.itemCode.toUpperCase())
-    }else{
+    // if(saveFile==="true"){
+    //     prod = await dbCollection.find().lean()
+    //     createMongoDataBackup(prod, itemCode.toUpperCase())
+    // }else{
         prod = await dbCollection?.find()
 
-    }
+    // }
     res.status(200).json(prod)
 })
 

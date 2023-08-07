@@ -51,8 +51,6 @@ const createProductDataJSON = (csvFileData) => {
 
           metaData = prodClone
 
-          // console.log(`metaData colour:${JSON.stringify(metaData.colour,null,4)}`)
-
           return {
             itemCode: iC,
             vehicleModel: spaceRemovedVM,
@@ -87,7 +85,7 @@ const createProductDataJSON = (csvFileData) => {
 
   //Get Products
   const getProducts = async (itemData) => {
-    const response = await axios.post(prod_URI + 'getProducts', itemData)
+    const response = await axios.get(prod_URI + `${itemData.itemCode}`)
     // if(response.data){
     //   localStorage.setItem('productData', JSON.stringify(response.data))
     // }
