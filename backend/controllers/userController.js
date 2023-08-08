@@ -27,7 +27,7 @@ const createNewUser = asyncHandler( async(req,res)=>{
     if(!username || !firstname || !lastname || !password || 
         !Array.isArray(roles) || !roles.length){
             res.status(400)
-            throw new Error('Please enter all fields')
+            throw new Error('Please fill all fields')
     }
 
     //Check for duplicate users
@@ -59,7 +59,7 @@ const createNewUser = asyncHandler( async(req,res)=>{
 })
 
 //@desc Update an user
-//@route POST /api/users
+//@route PATCH /api/users
 //@access PRIVATE
 const updateUser = asyncHandler(async(req,res)=>{
     const {id, username, roles, active, password } = req.body
@@ -113,7 +113,7 @@ const deleteUser = asyncHandler(async(req,res)=>{
     const user = await User.findById(id).exec()
 
     if(!user){
-        return res.status(400).json({mesage:`User not found`})
+        return res.status(400).json({message:`User not found`})
     }
 
     const result = await user.deleteOne()

@@ -18,8 +18,9 @@ app.use(express.json())
 app.use(express.urlencoded({ extended:false }))
 app.use(cookieParser())
 
-app.use('/api/prod', require('./routes/prodRoutes'))
 app.use('/api/users', require('./routes/userRoutes'))
+app.use('/api/auth', require('./routes/authRoutes'))
+app.use('/api/prod', require('./routes/prodRoutes'))
 
 app.use(errorHandler)
 
