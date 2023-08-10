@@ -18,7 +18,7 @@ router.get('/findSKU',getSKUProd)
 
 router.post('/setMany', setManyProd)
 
-router.route('/:sku').put(updateProd).delete(deleteProd)
+router.route('/:sku').patch(updateProd).delete(deleteProd)
 
 
 module.exports = router

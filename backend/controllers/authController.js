@@ -11,18 +11,23 @@ const login = asyncHandler(async(req,res)=>{
     const { username, password } = req.body
 
     if(!username || !password){
-        return res.status(400).json({message: `Please fill all fields`})
+        res.status(400)
+        throw new Error(`Please fill all fields`)
     }
 
     const foundUser = await User.findOne({username}).exec()
 
     if(!foundUser || !foundUser.active){
-        return res.status(401).json({message:`Unauthorized`})
+        res.status(401)
+        throw new Error(`Unauthorized`)
     }
 
     const passwordMatch = await bcrypt.compare(password, foundUser.password)
 
-    if(!passwordMatch) {return res.status(401).json({message:`Unauthorized`})}
+    if(!passwordMatch){
+        res.status(401)
+        throw new Error(`Unauthorized`)
+    }
 
     // Create Tokens for Authorization on Successful Login
     const accessToken = jwt.sign(

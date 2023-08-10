@@ -21,7 +21,7 @@ const dbCollectionList ={
 
 // @desc   Get All Products
 // @route  POST /api/prod/:itemCode
-// @access Private
+// @access Public
 const getAllProd = asyncHandler(async (req,res)=>{
     var prod, dbCollection 
     const { itemCode, saveFile } = req.params
@@ -48,7 +48,7 @@ const getAllProd = asyncHandler(async (req,res)=>{
 
 // @desc   Get Specific SKU Product
 // @route  GET /api/prod/findSKU
-// @access Private
+// @access Public
 const getSKUProd = asyncHandler(async (req,res)=>{
     const iC = req.body.itemCode?req.body.itemCode.toUpperCase():""
     const vM = req.body.vehicleModel?req.body.vehicleModel.toUpperCase():""
@@ -143,7 +143,7 @@ const setManyProd = asyncHandler(async (req,res)=>{
 })
 
 // @desc   Update specific Product
-// @route  PUT /api/prod/:sku
+// @route  PATCH /api/prod/:sku
 // @access Private
 const updateProd = asyncHandler(async (req,res)=>{
     var dbCollection, jsonList=[]
@@ -154,6 +154,8 @@ const updateProd = asyncHandler(async (req,res)=>{
     const itemCode = sku.split('-')[0]
 
     const prod = {$set: cleanedJSON}
+
+    //options not working, replacing whole Mongoose object
     const options = {upsert: true}
 
     //Finding right Collection

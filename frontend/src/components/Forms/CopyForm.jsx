@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useDispatch } from "react-redux"
 import {formResponseSubmit} from "../../features/template/templateSlice"
-import "./CopyForm.css"
+import "./Form.css"
 
 function CopyForm() {
     const dispatch = useDispatch(); 
@@ -46,7 +46,7 @@ function CopyForm() {
 
   return (
     <>
-        <div className='form-container'>
+        <div className='form-container left-border-form'>
         <form onSubmit={onSubmit}>
 
             <div className="form-grid">
@@ -58,6 +58,7 @@ function CopyForm() {
                         id='customer_name'
                         value = {customer_name}
                         placeholder="Customer's name"
+                        autoComplete='off'
                         onChange={onChange} />
                 </div>
 
