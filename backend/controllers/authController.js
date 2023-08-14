@@ -4,6 +4,13 @@ const asyncHandler = require('express-async-handler')
 
 const User = require('../models/userModel')
 
+//@desc Verify Access Token's validity
+//@route GET /auth
+//@access PUBLIC (Polling Function for Authorization)
+const healthCheck = asyncHandler(async(req,res)=>{
+    res.status(200).json({verified:true})
+})
+
 //@desc Login user
 //@route POST /auth
 //@access PUBLIC
@@ -38,7 +45,7 @@ const login = asyncHandler(async(req,res)=>{
             }
         },
         process.env.ACCESS_TOKEN_SECRET,
-        {expiresIn: '10s'}
+        {expiresIn: '15s'}
     )
 
     const refreshToken = jwt.sign(
@@ -54,7 +61,7 @@ const login = asyncHandler(async(req,res)=>{
         httpOnly: true, //accessible only by web server
         secure: true, //https only
         sameSite: 'None', //cross-site cookie
-        maxAge: 7*24*60*60*1000, //cookie expiry: set to match refreshToken
+        maxAge: 24*60*60*1000, //cookie expiry: set to match refreshToken (7d)
     })
 
     // Send accessToken containing username and roles
@@ -63,12 +70,13 @@ const login = asyncHandler(async(req,res)=>{
 
 //@desc Refresh
 //@route GET /auth/refresh
-//@access PUBLIC - because access token has expired
+//@access PUBLIC - because Access Token has expired
 const refresh = (req,res)=>{
     const cookies = req.cookies
 
     if(!cookies?.jwt){
-        return res.status(401).json({message: `Unauthorized`})
+        res.status(401)
+        throw new Error(`Unauthorized`)
     }
 
     const refreshToken = cookies.jwt
@@ -76,11 +84,17 @@ const refresh = (req,res)=>{
         refreshToken,
         process.env.REFRESH_TOKEN_SECRET,
         asyncHandler(async(err, decoded)=>{
-            if(err) {return res.status(403).json({message:'Forbidden'})}
+            if(err){
+                res.status(403)
+                throw new Error('Forbidden')
+            }
 
             const foundUser = await User.findOne({username: decoded.username}).exec()
 
-            if(!foundUser){return res.status(401).json({message:'Unauthorized'})}
+            if(!foundUser){
+                res.status(401)
+                throw new Error('Unauthorized')
+            }
 
             const accessToken = jwt.sign(
                 {
@@ -90,7 +104,7 @@ const refresh = (req,res)=>{
                     }
                 },
                 process.env.ACCESS_TOKEN_SECRET,
-                {expiresIn:'10s'}
+                {expiresIn:'15s'}
             )
 
             res.json({accessToken})
@@ -112,6 +126,7 @@ const logout = (req,res)=>{
 }
 
 module.exports = {
+    healthCheck,
     login,
     refresh,
     logout,

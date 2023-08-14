@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useDispatch } from "react-redux"
 import "./Form.css"
-import {resetAuth, setUserCredentials} from "../../features/auth/authSlice"
+import {refreshToken, resetAuth, setUserCredentials} from "../../features/auth/authSlice"
 
 function LoginForm() {
     const dispatch = useDispatch(); 
@@ -10,6 +10,8 @@ function LoginForm() {
         username:'',
         password:'',
     })
+
+    const [showPasswordFlag, setShowPasswordFlag] = useState(false)
 
     const {username, password } = formData
 
@@ -35,8 +37,9 @@ function LoginForm() {
                 username,
                 password
             }
+            // dispatch(refreshToken(userData))
             dispatch(setUserCredentials(userData))
-            console.log(JSON.stringify(userData,null,4))
+            // console.log(JSON.stringify(userData,null,4))
         }
     }
 
@@ -60,7 +63,7 @@ function LoginForm() {
 
                 <div className="form-group">
                     <label>Password</label>
-                    <input type="password" 
+                    <input type={showPasswordFlag?`text`:`password`} 
                         className='form-control'
                         name= 'password'
                         id='password'
@@ -68,6 +71,14 @@ function LoginForm() {
                         placeholder="Password"
                         autoComplete='off'
                         onChange={onChange} />
+                </div>
+
+                <div className="form-group">
+                    <div className="submit-btn"
+                        onClick={()=>setShowPasswordFlag(!showPasswordFlag)}
+                    >
+                        Show Password
+                    </div>
                 </div>
 
             </div>

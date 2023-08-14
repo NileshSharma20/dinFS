@@ -7,6 +7,7 @@ import { getProducts, resetProducts} from "../../features/products/productSlice"
 import "./Products.css"
 import Dropdown from '../../components/Dropdown/Dropdown';
 import Loader from '../../components/Loader/Loader';
+import { healthCheck, logOutUser } from '../../features/auth/authSlice';
 
 function Products() {
   const navigate = useNavigate();
@@ -15,6 +16,8 @@ function Products() {
   const {productData, isLoading} =useSelector(
     (state)=>state.product
   )
+
+  const {token,verified, isError} = useSelector((state)=>state.auth)
 
   const [showSKUFlag, setShowSKUFlag] = useState(false)
   const [prodNavFlag, setProdNavFlag] = useState(false)
@@ -112,6 +115,15 @@ function Products() {
   ////////////////////////////////////////////////
 
   useEffect(()=>{
+    // let id =async()=>{ setInterval(dispatch(healthCheck()),10*1000)}
+    // id()
+    
+    if(isError || !token){
+      // clearInterval(id)s
+      dispatch(logOutUser())
+      navigate("/")
+    }
+
     dispatch(resetProducts())
   },[])
 

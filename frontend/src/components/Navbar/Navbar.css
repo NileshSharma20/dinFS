@@ -7,15 +7,33 @@
     height: clamp(100px,8vh,8vh);
 
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
 
     color: #f2f4f3;
-    background-color: #2a9d8f;
+    background-color: var(--backgroundColor);
     /* background-color: #353535; */
 }
 
 .navbar-container>h1{
     cursor: pointer;
+}
+
+.logout-btn{
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translateY(50%);
+    transform-origin: (0,50%);
+
+    display: flex;
+    justify-self: flex-end;
+
+    padding: 0.5rem;
+    margin-right: 1rem;
+
+    cursor: pointer;
+
+    /* border: 0.5px solid red; */
 }

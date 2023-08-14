@@ -1,9 +1,12 @@
 const express = require('express')
 const router = express.Router()
 const loginLimiter = require('../middleware/loginLimiter')
-const {login, refresh, logout} = require("../controllers/authController")
+const {healthCheck, login, refresh, logout} = require("../controllers/authController")
+const verifyJWT = require('../middleware/verifyJWT')
 
-router.route('/').post(loginLimiter,login)
+router.route('/')
+    .get(verifyJWT, healthCheck)
+    .post(loginLimiter,login)
 
 router.route('/refresh').get(refresh)
 
