@@ -1,12 +1,10 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import "./Landing.css"
-import { useDispatch, useSelector } from 'react-redux';
-import { healthCheck, refreshToken } from '../../features/auth/authSlice';
+import { useSelector } from 'react-redux';
 
 function Landing() {
     const navigate = useNavigate();
-    const dispatch = useDispatch()
     const {token} = useSelector((state)=>state.auth)
 
     const pathList = [{
@@ -34,16 +32,6 @@ function Landing() {
                 {item.name}
         </div>
         )}
-        <div className="path-options"
-            onClick={()=>dispatch(refreshToken())}
-        >
-            refresh token
-        </div>
-        <div className="path-options"
-            onClick={()=>dispatch(healthCheck())}
-        >
-            Health Check
-        </div>
         </>
         :
         <div className="path-options"

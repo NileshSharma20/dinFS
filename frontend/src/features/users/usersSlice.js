@@ -15,9 +15,12 @@ export const getAllUsers = createAsyncThunk(
     async(_, thunkAPI) =>{
         try {
           try {
+            
             const token = thunkAPI.getState().auth.token
             return await usersService.getAllUsers(token) 
+
           } catch (err) {
+            
             if(err.response.status === 403){
               await thunkAPI.dispatch(refreshToken())
 
@@ -26,11 +29,11 @@ export const getAllUsers = createAsyncThunk(
             }
           }
         } catch (error) {
-        const message = (error.response && error.response.data && error.response.data.message) 
-        || error.message || error.toString()
+            const message = (error.response && error.response.data && error.response.data.message) 
+            || error.message || error.toString()
 
-        return thunkAPI.rejectWithValue(message)
-    }
+            return thunkAPI.rejectWithValue(message)
+        }
     }
 )  
 

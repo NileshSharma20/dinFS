@@ -10,7 +10,6 @@ const healthCheck = async(token)=> {
         }
       }
     const response = await axios.get(auth_URI, config)
-    // console.log(`healthService:${JSON.stringify(response,null,4)}`)
     return response.data
 }
 

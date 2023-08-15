@@ -10,8 +10,6 @@ const getAllUsers = async(token)=>{
   }
   const response = await axios.get(users_URI, config)
 
-  // console.log(`usersRes: ${JSON.stringify(response,null,4)}`)
-
   return response.data
 }
 

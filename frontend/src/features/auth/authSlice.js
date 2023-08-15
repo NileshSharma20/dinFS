@@ -108,18 +108,6 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     resetAuth: (state) => initialState,
-    // decodeAuth: (state) =>{(...state,
-    //   return (
-
-    //     if(state.token){
-    //       const decoded = jwtDecode(token)
-    //       const {username,roles} = decoded.UserInfo
-    //       state.username = username
-    //       state.roles = roles
-    //     }
-    //     )
-    //   )
-    // }
   },
   extraReducers: (builder) => {
     builder

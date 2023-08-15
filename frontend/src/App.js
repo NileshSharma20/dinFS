@@ -1,7 +1,4 @@
-import { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate, Link} from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux';
-import { healthCheck } from './features/auth/authSlice';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 
 import Navbar from './components/Navbar/Navbar';
 import QuickRes from './pages/IndiaMartRes/QuickRes';
@@ -15,28 +12,6 @@ import Users from './pages/UserManagement/Users';
 import './App.css';
 
 function App() {
-  const dispatch = useDispatch();
-  // const navigate = useNavigate()
-  const {token} = useSelector((state)=>state.auth)
-  // const token = JSON.parse(sessionStorage.getItem('token')).accessToken
-
-  const pollingFunctions=()=>{
-    if(token || token!==""){
-      // dispatch(getAllUsers())
-    }else{
-      <Link to="/" />
-    }
-  }
-  
-  useEffect(()=>{
-    // const pollingInterval = setInterval(pollingFunctions,8*1000)
-    // dispatch(healthCheck())
-
-    // if(!token || token==="" ){
-    //   clearInterval(pollingInterval)
-    // }
-  },[])
-
   return (
     <>
     <Router>
