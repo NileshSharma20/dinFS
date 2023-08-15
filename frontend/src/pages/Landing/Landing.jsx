@@ -2,7 +2,7 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import "./Landing.css"
 import { useDispatch, useSelector } from 'react-redux';
-import { refreshToken } from '../../features/auth/authSlice';
+import { healthCheck, refreshToken } from '../../features/auth/authSlice';
 
 function Landing() {
     const navigate = useNavigate();
@@ -38,6 +38,11 @@ function Landing() {
             onClick={()=>dispatch(refreshToken())}
         >
             refresh token
+        </div>
+        <div className="path-options"
+            onClick={()=>dispatch(healthCheck())}
+        >
+            Health Check
         </div>
         </>
         :

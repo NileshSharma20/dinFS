@@ -45,7 +45,7 @@ const login = asyncHandler(async(req,res)=>{
             }
         },
         process.env.ACCESS_TOKEN_SECRET,
-        {expiresIn: '15s'}
+        {expiresIn: '15m'}
     )
 
     const refreshToken = jwt.sign(
@@ -53,7 +53,7 @@ const login = asyncHandler(async(req,res)=>{
             "username": foundUser.username
         },
         process.env.REFRESH_TOKEN_SECRET,
-        {expiresIn:'1d'}
+        {expiresIn:'7d'}
     )
 
     // Create secure http cookie with refresh token
@@ -61,7 +61,7 @@ const login = asyncHandler(async(req,res)=>{
         httpOnly: true, //accessible only by web server
         secure: true, //https only
         sameSite: 'None', //cross-site cookie
-        maxAge: 24*60*60*1000, //cookie expiry: set to match refreshToken (7d)
+        maxAge: 7*24*60*60*1000, //cookie expiry: set to match refreshToken (7d)
     })
 
     // Send accessToken containing username and roles
@@ -75,6 +75,7 @@ const refresh = (req,res)=>{
     const cookies = req.cookies
 
     if(!cookies?.jwt){
+        console.log(`no cookie`)
         res.status(401)
         throw new Error(`Unauthorized`)
     }
@@ -104,7 +105,7 @@ const refresh = (req,res)=>{
                     }
                 },
                 process.env.ACCESS_TOKEN_SECRET,
-                {expiresIn:'15s'}
+                {expiresIn:'15m'}
             )
 
             res.json({accessToken})

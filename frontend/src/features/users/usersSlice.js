@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import usersService from './usersService'
+import { refreshToken } from '../auth/authSlice'
 
 const initialState = {
     usersList: [],
@@ -13,11 +14,21 @@ export const getAllUsers = createAsyncThunk(
     'users/getAllUsers',
     async(_, thunkAPI) =>{
         try {
-          const token = JSON.parse(sessionStorage.getItem('token')).accessToken
-          return await usersService.getAllUsers(token) 
+          try {
+            const token = thunkAPI.getState().auth.token
+            return await usersService.getAllUsers(token) 
+          } catch (err) {
+            if(err.response.status === 403){
+              await thunkAPI.dispatch(refreshToken())
+
+              const token = thunkAPI.getState().auth.token
+              return await usersService.getAllUsers(token) 
+            }
+          }
         } catch (error) {
         const message = (error.response && error.response.data && error.response.data.message) 
         || error.message || error.toString()
+
         return thunkAPI.rejectWithValue(message)
     }
     }

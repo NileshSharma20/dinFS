@@ -14,10 +14,10 @@ function Product() {
     const {productData, isLoading} = useSelector((state)=>state.product)
     const filteredProduct = productData?.filter(prod=>prod.sku===params.sku)[0]
 
-    const {token, verified} = useSelector((state)=>state.auth)
+    const { token, verified } = useSelector((state)=>state.auth)
 
     useEffect(()=>{
-        if(!token ){
+        if(!token){
             dispatch(logOutUser())
             navigate("/")
         }

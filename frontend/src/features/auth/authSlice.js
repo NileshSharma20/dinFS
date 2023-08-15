@@ -1,14 +1,18 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import authService from './authService'
+import { resetUser } from '../users/usersSlice'
+import { resetProducts } from '../products/productSlice'
+import jwtDecode from 'jwt-decode'
 
 // Get user from sessionStorage
 const token = JSON.parse(sessionStorage.getItem('token'))?.accessToken
 
-//Access Token : {UserInfo: "username":username, "roles":[roles]}
+// Access Token : {UserInfo: "username":username, "roles":[roles]}
 
 const initialState = {
-  token: token?token:null, //Access Token
-  verified: false,
+  token: token?token:null, // Access Token
+  username:"",
+  roles:[],
   isError: false,
   isSuccess: false,
   isLoading: false,
@@ -35,9 +39,6 @@ export const setUserCredentials = createAsyncThunk(
   async(userData, thunkAPI) =>{
       try {
         const response = await authService.setUserCredentials(userData)
-        // if(response.accessToken){
-        //   dispatch(healthCheck())
-        // }
         return response
       } catch (error) {
           const message = (error.response && error.response.data 
@@ -53,43 +54,50 @@ export const refreshToken = createAsyncThunk(
   async(_,thunkAPI)=>{
     try {
       const accessToken = thunkAPI.getState().auth.token
-      console.log(`aT:${accessToken}`)
-      // const healthResponse = 
-      return await authService.healthCheck(accessToken)
+      const res = await authService.healthCheck(accessToken)
+
+      console.log(`res status:${JSON.stringify(res)}`)
+      
+      return res
     } catch (error) {
-        const message = (error.response && error.response.data 
-          && error.response.data.message) 
-          || error.message || error.toString()
-        // if(error.status === 403){
-          console.log(`Error:${JSON.stringify(error,null,4)}`)
-          console.log(`Error Status:${JSON.stringify(error.message)}`)
-        // }
+      
+      const errorStatus =  error.response.status
+      
+      if(errorStatus === 403){
+        try {
+          const refreshResult = await authService.refreshToken()
+          console.log(`refreshSuccess:${JSON.stringify(refreshResult.data,null,4)}`)
+          return refreshResult?.data
+        } catch (err) {
+          const errStatus = err.response.status
 
-        //   const refreshResult =  await authService.refreshToken()
+          if(errStatus){
+            const message = (err.response && err.response.data 
+              && err.response.data.message) 
+              || err.message || err.toString()
 
-        //   if(refreshResult?.data){
-        //     await dispatch(setUserCredentials({...refreshResult.data}))
-        //   } else {
-        //     if(refreshResult?.error?.status===403){
-        //       //Handle expired Login
-        //       message = "Login has expired. Login again."
-        //     }
-        //   }
-        // }
-        return thunkAPI.rejectWithValue(message)
+            await thunkAPI.dispatch(logOutUser())
+
+            return thunkAPI.rejectWithValue(message)
+          }
+        }
+      }
+
+      console.log(`Error Status type: ${typeof errorStatus}`)
     }
-
   }
-)
+  )
 
 export const logOutUser = createAsyncThunk(
   'auth/logOutUser',
   async(_, thunkAPI) =>{
       try {
-          return await authService.logoutUser()
+          thunkAPI.dispatch(resetUser())
+          thunkAPI.dispatch(resetProducts())
+          return authService.logoutUser()
       } catch (error) {
         const message = (error.response && error.response.data && error.response.data.message) || error.message || error.toString()
-        // if(message===)
+
         return thunkAPI.rejectWithValue(message)
     }
   }
@@ -99,7 +107,19 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    resetAuth: (state) => initialState
+    resetAuth: (state) => initialState,
+    // decodeAuth: (state) =>{(...state,
+    //   return (
+
+    //     if(state.token){
+    //       const decoded = jwtDecode(token)
+    //       const {username,roles} = decoded.UserInfo
+    //       state.username = username
+    //       state.roles = roles
+    //     }
+    //     )
+    //   )
+    // }
   },
   extraReducers: (builder) => {
     builder
@@ -144,24 +164,27 @@ export const authSlice = createSlice({
         state.message = ""
       })
       .addCase(refreshToken.fulfilled, (state, action) => {
-        // state.token = action.payload
+        if(action.payload.accessToken){
+          state.token = action.payload.accessToken
+        }
         console.log(`Success Paylod: ${JSON.stringify(action.payload,null,4)}`)
         state.isLoading = false
         state.isSuccess = true
       })
       .addCase(refreshToken.rejected, (state, action) => {
+        if(action.payload.accessToken){
+          state.token=action.payload.accessToken
+        }
         state.isLoading = false
         state.isError = true
         state.message = action.payload
       })
 
       //Logout User
-      .addCase(logOutUser.pending, (state) => {
+      .addCase(logOutUser.fulfilled, (state, action) => {
         state.isError = false
         state.isLoading = false
         state.isSuccess = false
-        })
-      .addCase(logOutUser.fulfilled, (state, action) => {
         state.token = null
         state.message = ""
       })

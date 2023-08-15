@@ -10,7 +10,7 @@ const healthCheck = async(token)=> {
         }
       }
     const response = await axios.get(auth_URI, config)
-    console.log(`healthService:${JSON.stringify(response,null,4)}`)
+    // console.log(`healthService:${JSON.stringify(response,null,4)}`)
     return response.data
 }
 
@@ -30,7 +30,7 @@ const refreshToken= async ()=>{
 }
 
 // Logout User
-const logoutUser = async (userData) => {
+const logoutUser = () => {
     sessionStorage.removeItem('token')
 }
 
