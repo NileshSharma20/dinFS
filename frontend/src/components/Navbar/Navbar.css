@@ -1,5 +1,5 @@
 .navbar-container{
-    position: absolute;
+    position: relative;
     top: 0;
     left: 0;
 
@@ -8,29 +8,34 @@
 
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
 
     color: #f2f4f3;
     background-color: var(--backgroundColor);
     /* background-color: #353535; */
+    /* border: 1px solid red; */
 }
 
 .navbar-container>h1{
     cursor: pointer;
 }
 
+.navbar-container>h3{
+    padding: 0 1rem;
+}
+
 .logout-btn{
-    position: absolute;
+    /* position: absolute;
     right: 0;
     top: 0;
     transform: translateY(50%);
-    transform-origin: (0,50%);
+    transform-origin: (0,50%); */
 
     display: flex;
     justify-self: flex-end;
 
-    padding: 0.5rem;
+    padding: 0 0.5rem;
     margin-right: 1rem;
 
     cursor: pointer;

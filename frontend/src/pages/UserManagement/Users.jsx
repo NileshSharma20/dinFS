@@ -1,32 +1,38 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from "react-redux"
 import { getAllUsers } from '../../features/users/usersSlice'
 import LoginAgainModal from '../../components/Modals/LoginAgainModal'
 import useAuth from '../../hooks/useAuth'
+import Loader from '../../components/Loader/Loader'
 
 function Users() {
     const dispatch = useDispatch()
     const {token} = useSelector((state)=>state.auth)
     const {isAdmin} = useAuth()
 
-    const {usersList} = useSelector((state)=>state.users)
+    const {usersList, isLoading} = useSelector((state)=>state.users)
+
+    useEffect(()=>{
+        dispatch(getAllUsers())
+    },[])
 
   return (
     <>
     {!token && <LoginAgainModal />}
+    {isLoading && <Loader />}
     <div>
         
          <div className='form-container'>
             <div className="form-grid">
             {(isAdmin)?
             <>
-                <div className="form-group">
+                {/* <div className="form-group">
                     <div className="control-btn"
                         onClick={()=>dispatch(getAllUsers())}
                         >
                         User Data
                     </div>
-                </div>
+                </div> */}
 
                 {(usersList && usersList?.length!==0) && 
                     usersList?.map((userInfo,index)=>

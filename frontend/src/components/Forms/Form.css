@@ -46,6 +46,10 @@
     font-weight: bold;
 }
 
+.form-control{
+    padding-left: 0.2rem;
+}
+
 .radio-group{
     display: flex;
     flex-direction: column;

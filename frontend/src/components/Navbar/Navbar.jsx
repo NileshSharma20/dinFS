@@ -16,11 +16,12 @@ function Navbar() {
 
   const handleLogout=()=>{
     dispatch(logOutUser())
-    navigate("/")
+    navigate("/login")
   }
 
   return (
-    <div className='navbar-container'> 
+    <div className='navbar-container' style={token?{}:{justifyContent:`center`}}> 
+        {token && <h3>menu</h3>}
         <h1 onClick={()=>handleClick()}>Din</h1>
         {token && <div className='logout-btn' onClick={()=>handleLogout()}> Logout</div>}
     </div>

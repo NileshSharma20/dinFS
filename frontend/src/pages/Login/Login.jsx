@@ -20,7 +20,7 @@ function Login() {
     <>
     {isLoading && <Loader />}
     <div>
-        Login
+        {/* Login */}
         <LoginForm />
         {isError && <p>{message}</p>}
     </div>

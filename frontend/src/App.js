@@ -10,6 +10,7 @@ import Login from './pages/Login/Login';
 import Users from './pages/UserManagement/Users';
 
 import './App.css';
+import Footer from './components/Footer/Footer';
 
 function App() {
   return (
@@ -30,7 +31,7 @@ function App() {
         <Route path='*' element={<NotFound /> } />
       </Routes>
 
-    
+      <Footer />
     </div>
     </Router>
     </>

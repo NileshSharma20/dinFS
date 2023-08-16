@@ -6,7 +6,7 @@ const User = require('../models/userModel')
 
 //@desc Verify Access Token's validity
 //@route GET /auth
-//@access PUBLIC (Polling Function for Authorization)
+//@access PUBLIC (Function for Authorization)
 const healthCheck = asyncHandler(async(req,res)=>{
     res.status(200).json({verified:true})
 })

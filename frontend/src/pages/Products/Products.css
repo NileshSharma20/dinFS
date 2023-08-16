@@ -1,18 +1,11 @@
 .data-container{
   width: 100%;
-  min-height: 92vh;
-
-  /* display: grid;
-  grid-template-columns: 20% 75%;
-  gap: 2rem; */
 
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 
-  margin-top: clamp(120px,10vh,10vh);
-  
   /* border: 2px solid red; */
 }
 
