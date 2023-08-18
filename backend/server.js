@@ -7,12 +7,16 @@ const corsOptions = require('./config/corsOptions')
 const port = process.env.PORT || 5000
 const {errorHandler} = require('./middleware/errorMiddleware')
 const connectDB = require('./config/db')
+const { clockInterval } = require('./helper/clock')
 
 connectDB()
 
 const app = express()
 
 // app.use(cors(corsOptions))
+
+// setInterval(clockEvents(),60*1000)
+clockInterval()
 
 app.set('trust proxy', 1) // For express-rate-limit error message
 
@@ -23,6 +27,7 @@ app.use(cookieParser())
 app.use('/api/users', require('./routes/userRoutes'))
 app.use('/api/auth', require('./routes/authRoutes'))
 app.use('/api/prod', require('./routes/prodRoutes'))
+app.use('/api/order', require('./routes/orderRoutes'))
 
 app.use(errorHandler)
 

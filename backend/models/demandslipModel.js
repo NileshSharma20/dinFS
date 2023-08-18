@@ -6,8 +6,9 @@ const demandslipSchema = mongoose.Schema({
         required: true
     },   
     employeeId:{
-        type: String,
-        required: true
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref:"User"
     },
     deliveryPartnerName:{
         type: String,
@@ -18,20 +19,20 @@ const demandslipSchema = mongoose.Schema({
     }, 
     status:{
         type: String,
-        required: true
+        default:"pending"
+    },
+    totalCost:{
+        type:Number,
+        default:0
     },
     orderedProductList:{
-        type: Array,
+        type: [Object],
         required: true
     },
     recievedProductList: {
-        type: Array,
+        type: [Object],
         required: false
     },
-    // metaData:{
-    //     type: Object,
-    //     required: false,
-    // },
     
     },
     {

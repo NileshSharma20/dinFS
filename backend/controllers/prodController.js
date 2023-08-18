@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler')
-const {cleanJsonData, localCSVtoJSON, createMongoDataBackup} = require("../helper/prodHelper")
+const {cleanJsonData, localCSVtoJSON } = require("../helper/prodHelper")
 
 // const Shocker = require('../models/shockerModel')
 // const Brakeshoe = require('../models/brakeshoeModel')

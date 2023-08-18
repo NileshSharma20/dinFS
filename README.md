@@ -1,6 +1,6 @@
-# dinFS
+# din
 
-## ToDo List-
+## ToDo List
 - [ ] User Functions
     - [ ] Activate and Deactivate Users
 
