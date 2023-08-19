@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler')
-const { generateTicket } = require("../helper/orderHelper")
+const { generateTicket, generateDemandReciept } = require("../helper/orderHelper")
 
 const Demandslip = require("../models/demandslipModel")
 const User = require("../models/userModel")
@@ -19,11 +19,11 @@ const createNewDemandSlip = asyncHandler(async (req,res)=>{
             throw new Error(`All fields are required`)
         }
     
-    const ticketId = await generateTicket()
+    const { ticketNumber, date } = await generateTicket()
     
     
     const newDemandSlip = {
-        ticketNumber:ticketId,
+        ticketNumber,
         employeeId,
         deliveryPartnerName,
         distributorName,
@@ -31,9 +31,10 @@ const createNewDemandSlip = asyncHandler(async (req,res)=>{
     }
     
     const demandSlip = await Demandslip.create(newDemandSlip)
+    await generateDemandReciept(ticketNumber,distributorName,date,orderedProductList)
 
     if(demandSlip){
-        res.status(201).json({message:`New Demand Slip ${ticketId} created`})
+        res.status(201).json({message:`New Demand Slip ${ticketNumber} created`})
     }else{
         res.status(400)
         throw new Error(`Invalid data`)
@@ -41,13 +42,13 @@ const createNewDemandSlip = asyncHandler(async (req,res)=>{
 })
 
 // @desc   Update pending Demand Slip (Admin can update closed tickets)
-// @route  PATCH /api/order/:ticketId
+// @route  PATCH /api/order/:ticketNumber
 // @access Private
 const updateAfterDelivery = asyncHandler(async(req,res)=>{
     const { employeeId, status, recievedProductList,totalCost } = req.body
-    const { ticketId } = req.params
+    const { ticketNumber } = req.params
     
-    const demandSlip = await Demandslip.findOne({ticketNumber:ticketId}).exec()
+    const demandSlip = await Demandslip.findOne({ticketNumber:ticketNumber}).exec()
 
     if(!employeeId || !status || (status!=="failed" && !totalCost)){
         res.status(400)
@@ -62,18 +63,18 @@ const updateAfterDelivery = asyncHandler(async(req,res)=>{
         throw new Error('User not found')
     }
 
+    // Check for existing ticket
+    if(!demandSlip){
+        res.status(400)
+        throw new Error("Demand Slip not found")
+    }
+
     // Check if ticket status is pending or if User has Admin access
     if(user)
     if(demandSlip.status!=="pending" && !user.roles.includes("Admin") || 
         (employeeId!==demandSlip.employeeId.toString() && !user.roles.includes("Admin"))){
         res.status(403)
         throw new Error("Forbidden")
-    }
-
-    // Check for existing ticket
-    if(!demandSlip){
-        res.status(400)
-        throw new Error("Demand Slip not found")
     }
 
     // Status Logic
@@ -96,7 +97,36 @@ const updateAfterDelivery = asyncHandler(async(req,res)=>{
     res.json({message:`${updatedDemandslip.ticketNumber} with status ${updatedDemandslip.status}`})
 })
 
+// @desc   Delete Demand Slip (Admin access only)
+// @route  DELETE /api/order/:ticketNumber
+// @access Private
+const deleteDemandSlip = asyncHandler(async(req,res)=>{
+    const { username, roles } = req
+    const { ticketNumber } = req.params
+
+    // Check for Admin status
+    if(!roles.includes("Admin")){
+        res.status(403)
+        throw new Error("Forbidden")
+    }
+
+    const demandSlip = await Demandslip.findOne({ticketNumber:ticketNumber}).exec()
+
+    // Check for existing ticket
+    if(!demandSlip){
+        res.status(400)
+        throw new Error("Demand Slip not found")
+    }
+
+    const result = await demandSlip.deleteOne()
+
+    const message = `Demand Slip ${result.ticketNumber} deleted by Admin ${username}`
+
+    res.status(200).json({message})
+})
+
 module.exports={
     createNewDemandSlip,
     updateAfterDelivery,
+    deleteDemandSlip
 }
