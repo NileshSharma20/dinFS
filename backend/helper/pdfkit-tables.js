@@ -1,3 +1,6 @@
+// Source Code from
+// https://www.andronio.me/2017/09/02/pdfkit-tables/
+
 const PDFDocument = require('pdfkit');
 
 class PDFDocumentWithTables extends PDFDocument {
@@ -5,9 +8,11 @@ class PDFDocumentWithTables extends PDFDocument {
         super(options);
     }
 
-    table (table, arg0, arg1, arg2) {
+    table (table, arg0, arg1, arg2, info) {
         let startX = this.page.margins.left, startY = this.y;
         let options = {};
+
+        let pageNum = 1
 
         if ((typeof arg0 === 'number') && (typeof arg1 === 'number')) {
             startX = arg0;
@@ -44,15 +49,30 @@ class PDFDocumentWithTables extends PDFDocument {
         const columnWidth = columnContainerWidth - columnSpacing;
         const maxY = this.page.height - this.page.margins.bottom;
 
+        const footerY = maxY - 20
+
         let rowBottomY = 0;
 
         this.on('pageAdded', () => {
-            startY = this.page.margins.top;
+            startY = this.page.margins.top+50;
             rowBottomY = 0;
+            pageNum++
         });
 
         // Allow the user to override style for headers
         prepareHeader();
+
+        // Print Header for First Page
+        this.font("Helvetica")
+            .fontSize(10)
+            .text("Demand Reciept",55,65)
+            .text(`${info.distributorName}`,55,80)
+            .fontSize(20)
+            .text("Dinesh Auto Spares",100,57,{ align: 'center', width: 400 })
+            .fontSize(10)
+            .text(`TID: ${info.ticketNumber}`,200,65,{align:'right'})
+            .text(`${info.date}`,200,80,{align:'right'})
+            .moveDown();
 
         // Check to have enough room for header and first rows
         if (startY + 3 * computeRowHeight(table.headers) > maxY)
@@ -60,10 +80,17 @@ class PDFDocumentWithTables extends PDFDocument {
 
         // Print all headers
         table.headers.forEach((header, i) => {
-            this.text(header, startX + i * columnContainerWidth, startY, {
-                width: columnWidth,
-                align: 'left'
-            });
+            if(i===table.headers.length-1){
+                this.text(header, startX + i * columnContainerWidth, startY, {
+                    width: columnWidth,
+                    align: 'right'
+                });
+            }else{
+                this.text(header, startX + i * columnContainerWidth, startY, {
+                    width: columnWidth,
+                    align: 'left'
+                });
+            }
         });
 
         // Refresh the y coordinate of the bottom of the headers row
@@ -80,20 +107,57 @@ class PDFDocumentWithTables extends PDFDocument {
 
             // Switch to next page if we cannot go any further because the space is over.
             // For safety, consider 3 rows margin instead of just one
-            if (startY + 3 * rowHeight < maxY)
+            if (startY + 5 * rowHeight < maxY){
                 startY = rowBottomY + rowSpacing;
-            else
+            }
+            else{
+                // Print Header and Footer on Page Change
+                this.fontSize(10)
+                    .text(`${pageNum}`, 
+                        70, 
+                        footerY-15, 
+                        {align:'left', width:500}
+                    )
+                    .text('This is an auto-generated Demand Reciept. Thank you for your business.',
+                        50,
+                        footerY-15,
+                        { align: 'center', width: 500 },
+                    )
+                    .text('cont...',
+                        50,
+                        footerY,
+                        { align: 'center', width: 500 },
+                    )
+                
                 this.addPage();
 
+                this.font("Helvetica")
+                    .fontSize(10)
+                    .text("Demand Reciept",55,65)
+                    .text(`${info.distributorName}`,55,80)
+                    .fontSize(20)
+                    .text("Dinesh Auto Spares",100,57,{ align: 'center', width: 400 })
+                    .fontSize(10)
+                    .text(`TID: ${info.ticketNumber}`,200,65,{align:'right'})
+                    .text(`${info.date}`,200,80,{align:'right'})
+                    .moveDown();
+            }
             // Allow the user to override style for rows
             prepareRow(row, i);
 
             // Print all cells of the current row
             row.forEach((cell, i) => {
-                this.text(cell, startX + i * columnContainerWidth, startY, {
-                    width: columnWidth,
-                    align: 'left'
-                });
+                if(i===row.length-1){
+                    this.text(cell, startX + i * columnContainerWidth, startY, {
+                        width: columnWidth,
+                        align: 'right'
+                    });
+                }else{
+                    this.text(cell, startX + i * columnContainerWidth, startY, {
+                        width: columnWidth,
+                        align: 'left'
+                    });
+                }
             });
 
             // Refresh the y coordinate of the bottom of this row
@@ -110,6 +174,14 @@ class PDFDocumentWithTables extends PDFDocument {
 
         this.x = startX;
         this.moveDown();
+
+        this.fontSize(10)
+            .text(`${pageNum}`,70,footerY,{align:'left', width:500})
+            .text('This is an auto-generated Demand Reciept. Thank you for your business.',
+                50,
+                footerY,
+                { align: 'center', width: 500 },
+            )
 
         return this;
     }

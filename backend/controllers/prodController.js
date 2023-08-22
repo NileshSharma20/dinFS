@@ -155,10 +155,10 @@ const updateProd = asyncHandler(async (req,res)=>{
 
     const prod = {$set: cleanedJSON}
 
-    //options not working, replacing whole Mongoose object
+    // options not working, replacing whole Mongoose object
     const options = {upsert: true}
 
-    //Finding right Collection
+    // Finding right Collection
     const dbKeys = Object.keys(dbCollectionList)
     if(dbKeys.includes(itemCode.toUpperCase() )){
         dbCollection = require(`../models/${dbCollectionList[itemCode.toUpperCase()]}`) 
@@ -167,6 +167,34 @@ const updateProd = asyncHandler(async (req,res)=>{
     }
 
     const result = await dbCollection.updateOne({sku:sku}, prod,{upsert: true})
+    // const prodUpdate = await dbCollection.findOne({sku}).exec()
+    
+    // if(!prodUpdate){
+    //     res.status(400)
+    //     throw new Error("Product not found")
+    // }
+    // const prodUpdateKeys = Object.keys(prodUpdate._doc)
+    // console.log(prodUpdateKeys)
+
+    // Object.keys(cleanedJSON).forEach(key=>{
+    //     if(prodUpdateKeys.includes(key)){
+    //         prodUpdate[key] = cleanedJSON[key]
+    //     }else if(key==="metaData"){
+    //         Object.keys(cleanedJSON.metaData).forEach(k=>{
+    //             if(prodUpdate?.metaData[k]){
+    //                 prodUpdate.metaData[k] = cleanedJSON.metaData[k]
+    //             }
+    //         })
+
+    //     }
+    // })
+
+    // const lean = prodUpdate.lean()
+
+    // console.log(`cleanedJson: ${JSON.stringify(cleanedJSON,null,4)}`)
+    // console.log(`prodUpdate: ${JSON.stringify(prodUpdate,null,4)}`)
+    
+    // const result = await prodUpdate.save()
     // console.log(`${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`)
 
     res.status(200).json({message:`${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`})

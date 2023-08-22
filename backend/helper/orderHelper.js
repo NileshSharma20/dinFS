@@ -44,59 +44,27 @@ const generateDemandReciept=(ticketNumber, distributorName, date, prodData)=>{
     // Create new PDF Document
     const doc = new PDFDocument();
     
-    //Pipe PDF into the Invoice
+    // Pipe PDF into the Invoice
     doc.pipe(fs.createWriteStream(`../DemandSlips/DemandSlip-${ticketNumber}.pdf`))
     
-    // Add the header
-    doc
-        .fontSize(10)
-        .text("Demand Reciept",55,65)
-        .text(`${distributorName}`,55,80)
-        .fontSize(20)
-        .text("Dinesh Auto Spares",100,57,{ align: 'center', width: 400 })
-        .fontSize(10)
-        .text(`TID:${ticketNumber}`,200,65,{align:'right'})
-        .text(`${date}`,200,80,{align:'right'})
-        .moveDown();
-
-    // Adding Table
     const table = {
         headers:["SKU","Qty"],
         rows:[]
     }
 
-    // let i,topMargin = 200
-    // generateTableRow(doc,10,200,"SKU","Qty")
-    // for(i=0;i<prodData.length;i++){
-    //     const position =topMargin+(i+1)*30
-    //     generateTableRow(doc,10,position,prodData[i].sku,prodData[i].quantity)    
-    // }
-
+    // Generating PDF
     for (const prod of prodData){
         table.rows.push([prod.sku,prod.quantity])
     }
+    const headerInfo = {
+        distributorName,
+        ticketNumber,
+        date
+    }
 
-    doc.moveDown().table(table,60,180, {width:480});
-
-    // Adding Footer
-    doc
-        .fontSize(10)
-        .text('This is an auto-generated Reciept. Thank you for your business.',
-            50,
-            710,
-            { align: 'center', width: 500 },
-        );
+    doc.moveDown().table(table,100,150, {width:400}, headerInfo);
 
     doc.end();
-}
-
-// @desc   Generating Rows for PDF
-const generateTableRow=(doc,fSize,y,c1,c2)=>{
-    doc
-        .fontSize(`${fSize}`)
-        .text(c1, 60,y)
-        .text(c2,200,y,{align:'right',margin:'0 10 0 0'})
-
 }
 
 module.exports = {

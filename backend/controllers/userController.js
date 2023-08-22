@@ -31,12 +31,12 @@ const createNewUser = asyncHandler( async(req,res)=>{
             throw new Error('Please fill all fields')
     }
 
-    //Check for duplicate users
+    //Check for duplicate usernames
     const userExists = await User.findOne({username}).lean().exec()
 
     if(userExists){
-        return res.status(409).json({message:'Duplicate username'})
-        // throw new Error('Duplicate username')
+        res.status(409)
+        throw new Error('Duplicate username')
     }
 
     //Hash Password
@@ -63,43 +63,47 @@ const createNewUser = asyncHandler( async(req,res)=>{
 //@route PATCH /api/users
 //@access PRIVATE
 const updateUser = asyncHandler(async(req,res)=>{
-    const {id, username, roles, active, password } = req.body
+    const { id, username, roles, active, password } = req.body
+    // const { roles } = req 
 
     //Confirm data
     if(!id || !username || !Array.isArray(roles) || 
        !roles.length || typeof active !== 'boolean'){
-            return res.status(400).json({message:`All fields are required`})
-       }
+            res.status(400)
+            throw new Error(`All fields are required`)
+    }
 
-       const user = await User.findById(id).exec()
+    const user = await User.findById(id).exec()
 
-       if(!user){
-        return res.status(400).json({message:'User not found'})
-       }
+    if(!user){
+    res.status(400)
+    throw new Error('User not found')
+    }
 
-       //Check for duplicate
-       const userExists = await User.findOne({username}).lean().exec()
-       
-       //Allow updates to original user
-       if(userExists && userExists?._id.toString()!==id){
-        return res.status(409).json({message:'Duplicate username'})
-       }
+    //Check for duplicate
+    const userExists = await User.findOne({username}).lean().exec()
+    
+    //Allow updates to original user
+    if(userExists && userExists?._id.toString()!==id){
+    res.status(409)
+    throw new Error('Duplicate username')
+    }
 
-       user.username = username
-       user.roles = roles
-       user.active = active
+    user.username = username
+    user.roles = roles
+    user.active = active
 
-       if(password){
-        // Hash password
-        const salt = await bcrypt.genSalt(10)
-        const hashedPassword = await bcrypt.hash(password, salt)
-        
-        user.password= hashedPassword
-       }
+    if(password){
+    // Hash password
+    const salt = await bcrypt.genSalt(10)
+    const hashedPassword = await bcrypt.hash(password, salt)
+    
+    user.password= hashedPassword
+    }
 
-       const updatedUser = await user.save()
+    const updatedUser = await user.save()
 
-       res.json({message:`${updatedUser.username} updated`})
+    res.json({message:`${updatedUser.username} updated`})
 })
 
 //@desc Delete an user

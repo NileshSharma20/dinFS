@@ -3,13 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import "./Landing.css"
 import { useSelector } from 'react-redux';
 import useAuth from '../../hooks/useAuth';
-import useTicket from '../../hooks/useTicket';
 
 function Landing() {
     const navigate = useNavigate();
     const {token} = useSelector((state)=>state.auth)
     const {status} = useAuth()
-    const {ticket} = useTicket()
 
     const pathList = [{
         pathname:"products",
@@ -47,7 +45,6 @@ function Landing() {
                 {item.name}
         </div>
         )}
-        {`ticket:${ticket}`}
         </>
     </div>
   )

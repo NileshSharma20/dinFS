@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler')
 const { generateTicket, generateDemandReciept } = require("../helper/orderHelper")
 
 const Demandslip = require("../models/demandslipModel")
+const DemandslipHistory = require('../models/demandslipHistoryModel')
 const User = require("../models/userModel")
 
 // @desc   Create a new Demand Slip
@@ -14,6 +15,7 @@ const createNewDemandSlip = asyncHandler(async (req,res)=>{
            orderedProductList } = req.body
 
     if(!employeeId || !deliveryPartnerName || !distributorName ||
+        !orderedProductList ||
         !orderedProductList.length || !Array.isArray(orderedProductList)){
             res.status(400)
             throw new Error(`All fields are required`)
@@ -31,13 +33,15 @@ const createNewDemandSlip = asyncHandler(async (req,res)=>{
     }
     
     const demandSlip = await Demandslip.create(newDemandSlip)
+    const demandHistory =  await DemandslipHistory.create(newDemandSlip)
+
     await generateDemandReciept(ticketNumber,distributorName,date,orderedProductList)
 
-    if(demandSlip){
+    if(demandSlip && demandHistory){
         res.status(201).json({message:`New Demand Slip ${ticketNumber} created`})
     }else{
         res.status(400)
-        throw new Error(`Invalid data`)
+        throw new Error(`Failure`)
     }
 })
 
@@ -91,10 +95,26 @@ const updateAfterDelivery = asyncHandler(async(req,res)=>{
         demandSlip.recievedProductList = []
         demandSlip.totalCost = 0
     }
+    const demandBackup = {
+        ticketNumber: demandSlip.ticketNumber,
+        employeeId: demandSlip.employeeId,
+        deliveryPartnerName: demandSlip.deliveryPartnerName,
+        distributorName: demandSlip.distributorName,
+        status: demandSlip.status,
+        orderedProductList: demandSlip.orderedProductList,
+        recievedProductList: demandSlip.recievedProductList,
+        totalCost: demandSlip.totalCost
+    }
 
+    const demandHistory =  await DemandslipHistory.create(demandBackup)
     const updatedDemandslip = await demandSlip.save()
 
-    res.json({message:`${updatedDemandslip.ticketNumber} with status ${updatedDemandslip.status}`})
+    if(demandHistory){
+        res.json({message:`Demand Slip ${updatedDemandslip.ticketNumber} with ${updatedDemandslip.status} status`})
+    }else{
+        res.status(400)
+        throw new Error(`Failure`)
+    }
 })
 
 // @desc   Delete Demand Slip (Admin access only)
@@ -115,10 +135,22 @@ const deleteDemandSlip = asyncHandler(async(req,res)=>{
     // Check for existing ticket
     if(!demandSlip){
         res.status(400)
-        throw new Error("Demand Slip not found")
+        throw new Error(`Demand Slip ${ticketNumber} not found`)
+    }
+
+    const demandBackup = {
+        ticketNumber: demandSlip.ticketNumber,
+        employeeId: demandSlip.employeeId,
+        deliveryPartnerName: demandSlip.deliveryPartnerName,
+        distributorName: demandSlip.distributorName,
+        status: `deleted by Admin ${username}`,
+        orderedProductList: demandSlip.orderedProductList,
+        recievedProductList: demandSlip.recievedProductList,
+        totalCost: demandSlip.totalCost
     }
 
     const result = await demandSlip.deleteOne()
+    await DemandslipHistory.create(demandBackup)
 
     const message = `Demand Slip ${result.ticketNumber} deleted by Admin ${username}`
 
