@@ -18,12 +18,10 @@ const verifyJWT = (req,res,next)=>{
                 return res.status(403).json({message:"Forbidden"})
             }
 
-            // console.log(`u:${},r:${}`)
             req.username = decoded.UserInfo.username
             req.roles = decoded.UserInfo.roles
             next()
         }
-
     )
 }
 

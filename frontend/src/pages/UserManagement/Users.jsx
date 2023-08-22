@@ -4,6 +4,10 @@ import { getAllUsers } from '../../features/users/usersSlice'
 import LoginAgainModal from '../../components/Modals/LoginAgainModal'
 import useAuth from '../../hooks/useAuth'
 import Loader from '../../components/Loader/Loader'
+import { FiEdit2 } from 'react-icons/fi'
+
+import "./User.css"
+import UserCard from '../../components/Cards/UserCard'
 
 function Users() {
     const dispatch = useDispatch()
@@ -26,23 +30,24 @@ function Users() {
             <div className="form-grid">
             {(isAdmin)?
             <>
-                {/* <div className="form-group">
-                    <div className="control-btn"
-                        onClick={()=>dispatch(getAllUsers())}
-                        >
-                        User Data
+                <div className="form-group">
+
+                    <div className="header">
+                        <h3>User Data</h3>
+
+                        <div className='edit-btn' 
+                            onClick={()=>dispatch(getAllUsers())}>
+                            <FiEdit2 />
+                        </div>
                     </div>
-                </div> */}
+                
+                </div>
 
                 {(usersList && usersList?.length!==0) && 
                     usersList?.map((userInfo,index)=>
                     <div key={index}>
-                    <p>_id: {userInfo._id}</p>
-                    <p>username:{userInfo.username}</p>
-                    <p>firstname: {userInfo.firstname}</p>
-                    <p>lastname: {userInfo.lastname}</p>
-                    <p>roles:{userInfo.roles?.map((role,i)=><span key={i}>{role},</span>)}</p>
-                    <br />
+                        <UserCard info={userInfo} />
+                        <br />
                     </div>
                     )
                 }

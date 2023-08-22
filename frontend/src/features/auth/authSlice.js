@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import authService from './authService'
 import { resetUser } from '../users/usersSlice'
 import { resetProducts } from '../products/productSlice'
-import jwtDecode from 'jwt-decode'
 
 // Get user from sessionStorage
 const token = JSON.parse(sessionStorage.getItem('token'))?.accessToken
@@ -154,6 +153,7 @@ export const authSlice = createSlice({
       .addCase(refreshToken.fulfilled, (state, action) => {
         if(action.payload.accessToken){
           state.token = action.payload.accessToken
+          sessionStorage.setItem('token', JSON.stringify(action.payload))
         }
         console.log(`Success Paylod: ${JSON.stringify(action.payload,null,4)}`)
         state.isLoading = false

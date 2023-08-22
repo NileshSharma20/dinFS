@@ -1,4 +1,3 @@
-const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const asyncHandler = require('express-async-handler')
 
@@ -24,11 +23,19 @@ const getAllUsers = asyncHandler(async(req,res)=>{
 //@access PUBLIC
 const createNewUser = asyncHandler( async(req,res)=>{
     const {username, firstname, lastname, password, roles} = req.body
+    const rolesAccess = req.roles
     
     if(!username || !firstname || !lastname || !password || 
         !Array.isArray(roles) || !roles.length){
             res.status(400)
             throw new Error('Please fill all fields')
+    }
+
+    // Check for minimum Managaer Level Access
+    if(!rolesAccess?.length || !Array.isArray(rolesAccess) ||
+        !rolesAccess.includes("Manager")){
+            res.status(403)
+            throw new Error("Forbidden")
     }
 
     //Check for duplicate usernames
@@ -64,7 +71,7 @@ const createNewUser = asyncHandler( async(req,res)=>{
 //@access PRIVATE
 const updateUser = asyncHandler(async(req,res)=>{
     const { id, username, roles, active, password } = req.body
-    // const { roles } = req 
+    const rolesAccess = req.roles
 
     //Confirm data
     if(!id || !username || !Array.isArray(roles) || 
@@ -73,20 +80,27 @@ const updateUser = asyncHandler(async(req,res)=>{
             throw new Error(`All fields are required`)
     }
 
+    // Check for minimum Managaer Level Access
+    if(!rolesAccess?.length || !Array.isArray(rolesAccess) ||
+        !rolesAccess.includes("Manager")){
+        res.status(403)
+        throw new Error("Forbidden")
+    }
+
     const user = await User.findById(id).exec()
 
     if(!user){
-    res.status(400)
-    throw new Error('User not found')
+        res.status(400)
+        throw new Error('User not found')
     }
 
     //Check for duplicate
     const userExists = await User.findOne({username}).lean().exec()
     
-    //Allow updates to original user
+    // Allow updates to original user
     if(userExists && userExists?._id.toString()!==id){
-    res.status(409)
-    throw new Error('Duplicate username')
+        res.status(409)
+        throw new Error('Duplicate username')
     }
 
     user.username = username
@@ -94,11 +108,11 @@ const updateUser = asyncHandler(async(req,res)=>{
     user.active = active
 
     if(password){
-    // Hash password
-    const salt = await bcrypt.genSalt(10)
-    const hashedPassword = await bcrypt.hash(password, salt)
-    
-    user.password= hashedPassword
+        // Hash password
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(password, salt)
+        
+        user.password= hashedPassword
     }
 
     const updatedUser = await user.save()
@@ -111,9 +125,17 @@ const updateUser = asyncHandler(async(req,res)=>{
 //@access PRIVATE
 const deleteUser = asyncHandler(async(req,res)=>{
     const {id} = req.body
+    const {roles} = req
 
     if(!id){
         return res.status(400).json({message:`User ID Required`})
+    }
+
+    // Check for minimum Admin Level Access
+    if(!roles?.length || !Array.isArray(roles) || 
+        !roles.includes("Admin")){
+        res.status(403)
+        throw new Error("Forbidden")   
     }
 
     const user = await User.findById(id).exec()
@@ -144,7 +166,6 @@ const loginUser = asyncHandler( async(req, res) => {
             firstname: user.firstname,
             lastname: user.lastname,
             email: user.email,
-            // roles: user.roles
         })
     }else{
         res.status(400)
@@ -152,13 +173,6 @@ const loginUser = asyncHandler( async(req, res) => {
     }
 })
 
-
-//Generate JWT
-const generateToken = (data) => {
-    return jwt.sign({data}, process.env.JWT_SECRET, {
-        expiresIn: '30d',
-    })
-}
 
 module.exports = {
     getAllUsers,

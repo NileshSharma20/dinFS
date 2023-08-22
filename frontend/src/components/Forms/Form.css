@@ -30,6 +30,7 @@
 
 .form-group{
     display: grid;
+    position: relative;
     /* grid-template-columns: 40% 60%; */
     grid-auto-columns: minmax(max-content, 2fr);
     margin: 0 0 1rem;
@@ -42,6 +43,7 @@
 
 .form-group>label{
     display: flex;
+    width:fit-content;
     justify-content: flex-start;
     font-weight: bold;
 }
@@ -71,4 +73,10 @@
     border: none;
     box-shadow: 2px 2px black;
     cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+.submit-btn:hover{
+    transition: 0.3s ease-in-out;
+    background-color: #c6cec9;
 }
