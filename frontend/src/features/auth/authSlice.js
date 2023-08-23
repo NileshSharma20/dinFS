@@ -65,7 +65,7 @@ export const refreshToken = createAsyncThunk(
       if(errorStatus === 403){
         try {
           const refreshResult = await authService.refreshToken()
-          console.log(`refreshSuccess:${JSON.stringify(refreshResult.data,null,4)}`)
+          // console.log(`refreshSuccess:${JSON.stringify(refreshResult.data,null,4)}`)
           return refreshResult?.data
         } catch (err) {
           const errStatus = err.response.status
@@ -155,7 +155,7 @@ export const authSlice = createSlice({
           state.token = action.payload.accessToken
           sessionStorage.setItem('token', JSON.stringify(action.payload))
         }
-        console.log(`Success Paylod: ${JSON.stringify(action.payload,null,4)}`)
+        // console.log(`Success Paylod: ${JSON.stringify(action.payload,null,4)}`)
         state.isLoading = false
         state.isSuccess = true
       })

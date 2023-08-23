@@ -4,10 +4,10 @@ import { getAllUsers } from '../../features/users/usersSlice'
 import LoginAgainModal from '../../components/Modals/LoginAgainModal'
 import useAuth from '../../hooks/useAuth'
 import Loader from '../../components/Loader/Loader'
-import { FiEdit2 } from 'react-icons/fi'
 
 import "./User.css"
 import UserCard from '../../components/Cards/UserCard'
+import UserForm from '../../components/Forms/UserForm'
 
 function Users() {
     const dispatch = useDispatch()
@@ -26,7 +26,7 @@ function Users() {
     {isLoading && <Loader />}
     <div>
         
-         <div className='form-container'>
+         <div className='form-container' style={{width:"60vw"}}>
             <div className="form-grid">
             {(isAdmin)?
             <>
@@ -35,22 +35,26 @@ function Users() {
                     <div className="header">
                         <h3>User Data</h3>
 
-                        <div className='edit-btn' 
-                            onClick={()=>dispatch(getAllUsers())}>
-                            <FiEdit2 />
-                        </div>
+                        
                     </div>
                 
                 </div>
 
+                <div className="user-card-grid">
+
                 {(usersList && usersList?.length!==0) && 
                     usersList?.map((userInfo,index)=>
+                    
                     <div key={index}>
                         <UserCard info={userInfo} />
-                        <br />
-                    </div>
+                        {/* <UserForm  initialValue={userInfo}/> */}
+                        {/* <br /> */}
+                        </div>
+                    // </div>
                     )
+                    // <UserForm initialValue={usersList[0]}/>
                 }
+                </div>
             
             </>
             :

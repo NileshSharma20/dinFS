@@ -2,11 +2,13 @@
 
 ## ToDo List
 - [ ] User Functions
-    - [ ] Activate and Deactivate Users
-    - [ ] Manager and Admin access to update user data
-    - [ ] Build Product search
+    - [x] Activate and Deactivate Users
+    - [x] Manager and Admin access to update user data
+    - [ ] Fix Client Side rendering after multiple user updates
+    - [ ] Logic for Client side disabling of multiple edit on User Management Panel
 
 - [ ] Product Functions
+    - [ ] Build Product search
     - [ ] Update Products patch
     - [ ] Update Products in product collection logic
 

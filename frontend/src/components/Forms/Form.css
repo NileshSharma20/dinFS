@@ -22,24 +22,24 @@
     display: grid;
     grid-template-rows: auto auto;
 
+    width: 100%;
     padding: 1rem 0;
 
-    /* border: 2px solid blue; */
+    /* border: 1px solid blue; */
 
 }
 
 .form-group{
     display: grid;
     position: relative;
+    /* width: 100%; */
     /* grid-template-columns: 40% 60%; */
     grid-auto-columns: minmax(max-content, 2fr);
     margin: 0 0 1rem;
     accent-color: var(--backgroundColor);
-}
 
-/* .form-group>input{
-    border: none;
-} */
+    /* border: 1px solid red; */
+}
 
 .form-group>label{
     display: flex;
@@ -52,16 +52,23 @@
     padding-left: 0.2rem;
 }
 
+.card-form-control{
+    padding-left: 0rem;
+}
+
+.form-checkbox{
+    padding-left: 0.2rem;
+    display: flex;
+}
+.form-checkbox>span{
+    margin-left: 0.5rem;
+}
+
 .radio-group{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-
-    /* padding: 0 0 1rem; */
-    /* display: grid; */
-    /* grid-template-columns: 40% 60%; */
-    /* border:2px solid red; */
 }
 
 .radio-group-item{
