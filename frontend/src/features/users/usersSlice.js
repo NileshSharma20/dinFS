@@ -4,8 +4,8 @@ import { refreshToken } from '../auth/authSlice'
 
 const initialState = {
     usersList: [],
-    isError: false,
     isSuccess: false,
+    isError: false,
     isLoading: false,
     message: '',
   }
@@ -75,6 +75,7 @@ export const usersSlice = createSlice({
       .addCase(getAllUsers.pending, (state) => {
         state.isError = false
         state.isSuccess = false
+        state.message = ""
         state.isLoading = true
       })
       .addCase(getAllUsers.fulfilled, (state, action) => {
@@ -94,16 +95,15 @@ export const usersSlice = createSlice({
       .addCase(updateUser.pending, (state) => {
         state.isError = false
         state.isSuccess = false
+        state.message = ""
         state.isLoading = true
       })
       .addCase(updateUser.fulfilled, (state, action) => {
         state.isLoading = false
         state.isSuccess = true
-        // state.usersList = action.payload
-        state.message = ""
+        state.message = action.payload.message
       })
       .addCase(updateUser.rejected, (state, action) => {
-        // state.usersList = []
         state.isLoading = false
         state.isError = true
         state.message = action.payload

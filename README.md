@@ -4,8 +4,9 @@
 - [ ] User Functions
     - [x] Activate and Deactivate Users
     - [x] Manager and Admin access to update user data
-    - [ ] Fix Client Side rendering after multiple user updates
-    - [ ] Logic for Client side disabling of multiple edit on User Management Panel
+    - [x] Fix Client Side rendering after multiple user updates
+    - [x] Logic for Client side disabling of multiple edit on User Management Panel
+    - [ ] Admin Manager Employee Checkbox logic
 
 - [ ] Product Functions
     - [ ] Build Product search

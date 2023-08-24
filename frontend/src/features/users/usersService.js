@@ -19,7 +19,7 @@ const updateUser = async({userInfo, token})=>{
         Authorization: `Bearer ${token}`
     }
   }
-  // console.log(`service data: ${JSON.stringify(userInfo,null,4)}, ${token}`)
+  
   const response = await axios.patch(users_URI, userInfo, config)
 
   return response.data

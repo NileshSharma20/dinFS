@@ -7,14 +7,13 @@ import Loader from '../../components/Loader/Loader'
 
 import "./User.css"
 import UserCard from '../../components/Cards/UserCard'
-import UserForm from '../../components/Forms/UserForm'
 
 function Users() {
     const dispatch = useDispatch()
     const {token} = useSelector((state)=>state.auth)
     const {isAdmin} = useAuth()
 
-    const {usersList, isLoading} = useSelector((state)=>state.users)
+    const { usersList, isLoading } = useSelector((state)=>state.users)
 
     useEffect(()=>{
         dispatch(getAllUsers())
@@ -34,8 +33,6 @@ function Users() {
 
                     <div className="header">
                         <h3>User Data</h3>
-
-                        
                     </div>
                 
                 </div>
@@ -47,12 +44,8 @@ function Users() {
                     
                     <div key={index}>
                         <UserCard info={userInfo} />
-                        {/* <UserForm  initialValue={userInfo}/> */}
-                        {/* <br /> */}
-                        </div>
-                    // </div>
+                    </div>
                     )
-                    // <UserForm initialValue={usersList[0]}/>
                 }
                 </div>
             

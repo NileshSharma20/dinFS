@@ -196,14 +196,16 @@ function Products() {
       <div className='grid'>
         <div className="productCol-conatiner">
           {/* Product Fields */}
-          <div className="productCol">
-              <h3>vehicleModel</h3>
-              <h3>brandCompany</h3>
-              <h3>sku</h3>
-              <h3>mrp</h3>
-              <h3>compatibleModels</h3>
-              <h3>metaData</h3>
-          </div>
+          {productData?.length>0 &&
+            <div className="productCol">
+                <h3>vehicleModel</h3>
+                <h3>brandCompany</h3>
+                <h3>sku</h3>
+                <h3>mrp</h3>
+                <h3>compatibleModels</h3>
+                <h3>metaData</h3>
+            </div>
+          }
 
           {/* Product Data */}
           {productData?.map((item,index)=>

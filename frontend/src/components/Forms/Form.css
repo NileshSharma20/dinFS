@@ -60,7 +60,7 @@
     padding-left: 0.2rem;
     display: flex;
 }
-.form-checkbox>span{
+.form-checkbox>label{
     margin-left: 0.5rem;
 }
 
