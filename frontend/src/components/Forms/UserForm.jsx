@@ -34,11 +34,40 @@ function UserForm({initialValue, setFlag}) {
 
     const handleCheck=(e)=>{
         const {value, checked} = e.target
+        console.log(`value:${value},\nchecked:${checked}`)
 
         if(checked && !checkList.includes(value)){
-            setCheckList(prev=>[...prev, value])
+            if(value==="Admin"){
+                setCheckList(["Admin","Manager","Employee"])
+            }else if(value==="Manager"){
+                setCheckList(["Manager","Employee"])
+            }else{
+                setCheckList(["Employee"])
+            }
+            // setCheckList(prev=>[...prev, value])
         }else if(!checked){
-            setCheckList(prev=>prev.filter(role => role!==value))
+            if(value==="Admin"){
+                setCheckList(["Manager","Employee"])
+            }else if(value==="Manager" && !checkList.includes("Admin")){
+                setCheckList(["Employee"])
+            }else if(value==="Employee" && !checkList.includes("Admin") && !checkList.includes("Manager") ){
+                setCheckList(["Employee"])
+                setFormData((prevState)=>({
+                    ...prevState,
+                    active:false
+                }))
+            }
+            // setCheckList(prev=>prev.filter(role => role!==value))
+        }
+    }
+
+    const handleRoles=(e)=>{
+        if(e.target.value==="admin"){
+            setCheckList(["Admin","Manager","Employee"])
+        }else if(e.target.value==="manager"){
+            setCheckList(["Manager","Employee"])
+        }else if(e.target.value==="employee"){
+            setCheckList(["Employee"])
         }
     }
 
@@ -54,7 +83,7 @@ function UserForm({initialValue, setFlag}) {
                 username,
                 firstname,
                 lastname,
-                active: active==="true"?true:false,
+                active: active?true:false,
                 roles
             }
             
@@ -153,7 +182,48 @@ function UserForm({initialValue, setFlag}) {
             <div className="form-group">
                     <label>roles</label>
 
-                    <div className="form-checkbox">
+                    <div className="radio-group">
+                        <div className="radio-group-item">
+                        <input type="radio" 
+                            name="roles" 
+                            id={`${initialValue.username} role admin`} 
+                            value="admin"
+                            defaultChecked={initialValue.roles.includes("Admin")?true:false}
+                            onChange={handleRoles} />
+                        <label htmlFor={`${initialValue.username} role admin`}>Admin</label>
+                        </div>
+                    </div>
+
+                    <div className="radio-group">
+                        <div className="radio-group-item">
+                        <input type="radio" 
+                            name="roles" 
+                            id={`${initialValue.username} role manager`} 
+                            value="manager"
+                            defaultChecked={initialValue.roles.includes("Manager") && 
+                                            !initialValue.roles.includes("Admin") ?
+                                            true:false}
+                            onChange={handleRoles} />
+                        <label htmlFor={`${initialValue.username} role manager`}>Manager</label>
+                        </div>
+                    </div>
+
+                    <div className="radio-group">
+                        <div className="radio-group-item">
+                        <input type="radio" 
+                            name="roles" 
+                            id={`${initialValue.username} role employee`} 
+                            value="employee"
+                            defaultChecked={initialValue.roles.includes("Employee") && 
+                                            !initialValue.roles.includes("Admin") && 
+                                            !initialValue.roles.includes("Manager") ?
+                                            true:false}
+                            onChange={handleRoles} />
+                        <label htmlFor={`${initialValue.username} role employee`}>Employee</label>
+                        </div>
+                    </div>
+                    {/* /////////////////////// */}
+                    {/* <div className="form-checkbox">
                         <input type="checkbox"
                             name="role-checkbox"
                             id={`Admin ${initialValue.username}`}
@@ -168,7 +238,7 @@ function UserForm({initialValue, setFlag}) {
                             name="role-checkbox"
                             id={`Manager ${initialValue.username}`}
                             value="Manager"
-                            defaultChecked={initialValue.roles.includes("Manager")?true:false}
+                            defaultChecked={initialValue.roles.includes("Manager")||roles.includes("Admin")?true:false}
                             onChange={handleCheck} />
                         <label>Manager</label>
                     </div>
@@ -181,13 +251,13 @@ function UserForm({initialValue, setFlag}) {
                             defaultChecked={initialValue.roles.includes("Employee")?true:false} 
                             onChange={handleCheck} />
                         <label>Employee</label>
-                    </div>
+                    </div> */}
                 
                 </div>
 
                 <div className="form-group">
                     <button type="submit" className="submit-btn">
-                        Submit
+                        Update
                 </button>
 
             </div>
