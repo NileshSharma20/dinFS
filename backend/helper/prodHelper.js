@@ -97,7 +97,7 @@ const cleanJsonData = (rawJson) => {
         
         //vehicleModel cleanup
         let cleanedVM =""
-        var spaceRemovedVM = prod.vehicleModel?prod.vehicleModel.replace(/ /g,""):""
+        var spaceRemovedVM = prod.vehicleModel?prod.vehicleModel.replace(/ /g,"").toUpperCase():""
 
         const delimitedVM = spaceRemovedVM.split('-',2)
         
@@ -107,12 +107,12 @@ const cleanJsonData = (rawJson) => {
             cleanedVM = delimitedVM[0].slice(0,3)
         }
 
-        const vM = cleanedVM.toUpperCase()
+        const vM = cleanedVM
 
         //brandCompany cleanup
-        var spaceRemovedBC = prod.brandCompany?prod.brandCompany.replace(/ /g,""):""
+        var spaceRemovedBC = prod.brandCompany?prod.brandCompany.replace(/ /g,"").toUpperCase():""
         const cleanedBC = spaceRemovedBC.slice(0,3)
-        const bC = cleanedBC.toUpperCase()
+        const bC = cleanedBC
 
         //partNum cleanup
         var spaceRemovedPN = prod.partNum?prod.partNum.replace(/ /g,""):""
@@ -138,6 +138,10 @@ const cleanJsonData = (rawJson) => {
         delete prodClone.partNum
         delete prodClone.mrp
         delete prodClone.compatibleModels
+
+        Object.keys(prodClone).forEach(key=>{
+            prodClone[key]=prodClone[key].toUpperCase()
+        })
 
         metaData = prodClone
         

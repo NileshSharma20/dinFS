@@ -5,6 +5,7 @@ const {cleanJsonData, localCSVtoJSON } = require("../helper/prodHelper")
 // const Brakeshoe = require('../models/brakeshoeModel')
 // const Discpad = require('../models/discpadModel')
 // const Mobilfilter = require('../models/mobilFilterModel')
+const Products = require('../models/productsModel')
 
 const dbCollectionList ={
     "SKR":"shockerModel",
@@ -20,51 +21,74 @@ const dbCollectionList ={
 }
 
 // @desc   Get All Products
-// @route  POST /api/prod/:itemCode
+// @route  GET /api/prod/:itemCode
 // @access Public
 const getAllProd = asyncHandler(async (req,res)=>{
     var prod, dbCollection 
-    const { itemCode, saveFile } = req.params
+    const { itemCode } = req.params
+
+    // Finding right Collection
+    const dbKeys = Object.keys(dbCollectionList)
+    if(dbKeys.includes(itemCode.toUpperCase())){
+        dbCollection = require(`../models/${dbCollectionList[itemCode.toUpperCase()]}`) 
+    }else{
+        res.status(400)
+        throw new Error('Specify Collection')
+    }
+    
+    prod = await dbCollection?.find().lean()
+
+    res.status(200).json(prod)
+})
+
+// @desc   Push to Products Collection 
+// @route  POST /api/prod/
+// @access Public
+const pushToProduct = asyncHandler(async (req,res)=>{
+    var prod, dbCollection 
+    const { itemCode } = req.body
 
     //Finding right Collection
     const dbKeys = Object.keys(dbCollectionList)
     if(dbKeys.includes(itemCode.toUpperCase())){
         dbCollection = require(`../models/${dbCollectionList[itemCode.toUpperCase()]}`) 
     }else{
-        throw new Error('Specify Collection in body')
+        res.status(400)
+        throw new Error('Specify Collection')
     }
     
-    //Checking if we want to create Local CSV file or not
-    // if(saveFile==="true"){
-    //     prod = await dbCollection.find().lean()
-    //     createMongoDataBackup(prod, itemCode.toUpperCase())
-    // }else{
-        prod = await dbCollection?.find()
+    prod = await dbCollection?.find().lean()
 
+    // if(pushProd){
+    const options = { ordered: true };
+    await Products.insertMany(prod, options);
     // }
+
     res.status(200).json(prod)
 })
 
 
-// @desc   Get Specific SKU Product
-// @route  GET /api/prod/findSKU
+// @desc   Find Specific SKU Product
+// @route  POST /api/prod/search/sku
 // @access Public
 const getSKUProd = asyncHandler(async (req,res)=>{
     const iC = req.body.itemCode?req.body.itemCode.toUpperCase():""
-    const vM = req.body.vehicleModel?req.body.vehicleModel.toUpperCase():""
+    const cleanedVM = req.body.vehicleModel?req.body.vehicleModel.toUpperCase():""
+    const vM = cleanedVM.replace(/-/g,"")
     const bC = req.body.brandCompany?req.body.brandCompany.toUpperCase():""
     const spaceRemovedPN = req.body.partNum?req.body.partNum.replace(/ /g,""):""
     const cleanedPN = spaceRemovedPN.replace(/-/g,"") 
     const pN = cleanedPN.toUpperCase()
 
-    var prod, dbCollection
+    let prod, dbCollection
 
-    //Finding right Collection
+    // Finding right Collection
     const dbKeys = Object.keys(dbCollectionList)
-    if(dbKeys.includes(req.body.itemCode.toUpperCase() )){
+    if(dbKeys.includes(iC)){
         dbCollection = require(`../models/${dbCollectionList[req.body.itemCode.toUpperCase()]}`) 
     }else{
-        throw new Error('Specify Collection in body')
+        res.status(400)
+        throw new Error('Specify Collection')
     }
 
     prod = await dbCollection.find({ $and:[
@@ -72,72 +96,94 @@ const getSKUProd = asyncHandler(async (req,res)=>{
         {sku: { $regex: vM}}, 
         {sku: { $regex: bC}}, 
         {sku: { $regex: pN}}
-    ]},{__v:0})
+    ]},{__v:0}).lean()
 
     res.status(200).json(prod)
 })
 
-// @desc   Set Product
-// @route  POST /api/prod
+// @desc   Find Products matching key
+// @route  POST /api/prod/search/searchAll
+// @access Public
+const searchAll = asyncHandler(async(req,res)=>{
+    const searchKey = req.body.searchKey.toUpperCase()
+
+    const response = await Products.find({$or:[
+        {itemCode:{$regex: searchKey}},
+        {vehicleModel:{$regex: searchKey}},
+        {brandCompany:{$regex: searchKey}},
+        {partNum:{$regex: searchKey}},
+        {sku:{$regex: searchKey}},
+    ]}).lean()
+    
+    res.status(200).json(response)
+})
+
+// @desc   Set Product 
+// @route  POST /api/prod/upload
 // @access Private
 const setProd = asyncHandler(async (req,res)=>{
+    // Checking for Missing Feilds
     if(!req.body.itemCode || !req.body.vehicleModel || !req.body.brandCompany ||
         !req.body.partNum || !req.body.mrp){
         res.status(400)
         throw new Error('Please fill all essential fields')
     }
 
-    const prodObject = {
-                        itemCode: req.body.itemCode,
-                        vehicleModel: req.body.vehicleModel,
-                        brandCompany: req.body.brandCompany,
-                        partNum: req.body.partNum,
-                        mrp: req.body.mrp,
-                        compatibileModels: req.body.compatibileModels?req.body.compatibileModels:[],
-                        metaData:{
-                            colour: req.body.colour?req.body.colour:"",
-                            position: req.body.position?req.body.position:"",
-                            type: req.body.type?req.body.type:"",
-                        },
-                    }
+    // Converting and Cleaning to useful data
+    const cleanedObj = cleanJsonData([req.body])
 
-    var prod, dbCollection
+    let prod, dbCollection
 
-    //Finding right Collection
+    // Finding right Collection
     const dbKeys = Object.keys(dbCollectionList)
     if(dbKeys.includes(req.body.itemCode.toUpperCase() )){
         dbCollection = require(`../models/${dbCollectionList[req.body.itemCode.toUpperCase()]}`) 
     }else{
-        throw new Error('Specify Collection in body')
+        res.status(400)
+        throw new Error('Specify Collection')
     }
 
-    prod = await dbCollection.create(prodObject)
+    // Checking for Existing Products
+    const duplicate = await dbCollection.findOne({sku:cleanedObj[0].sku})
+    const prodDuplicate = await dbCollection.findOne({sku:cleanedObj[0].sku})
+
+    if(duplicate || prodDuplicate){
+        res.status(409)
+        throw new Error(`Product Already Exists`)
+    }
+
+    prod = await dbCollection.create(cleanedObj)
+    await Products.create(cleanedObj)
 
     res.status(200).json(prod)
 })
 
+
+
 // @desc   Set Multiple Products
-// @route  POST /api/prod/setMany
+// @route  POST /api/prod/upload/multiple
 // @access Private
 const setManyProd = asyncHandler(async (req,res)=>{
-
-    const localJson = localCSVtoJSON(req.body.itemCode.toUpperCase())
+    const { itemCode } = req.body
+    const localJson = localCSVtoJSON(itemCode.toUpperCase())
 
     const cleanedJSON = cleanJsonData(localJson)
 
     const options = { ordered: true };
 
-    var result, dbCollection
+    let result, dbCollection
     
-    //Finding right Collection
+    // Finding right Collection
     const dbKeys = Object.keys(dbCollectionList)
-    if(dbKeys.includes(req.body.itemCode.toUpperCase() )){
-        dbCollection = require(`../models/${dbCollectionList[req.body.itemCode.toUpperCase()]}`) 
+    if(dbKeys.includes(itemCode.toUpperCase() )){
+        dbCollection = require(`../models/${dbCollectionList[itemCode.toUpperCase()]}`) 
     }else{
-        throw new Error('Specify Collection in body')
+        res.status(400)
+        throw new Error('Specify Collection')
     }
-    
+
     result = await dbCollection.insertMany(cleanedJSON, options);
+    await Products.insertMany(cleanedJSON, options);
 
     res.status(200).json({message: `${result.length} documents were inserted.`})
 })
@@ -146,7 +192,7 @@ const setManyProd = asyncHandler(async (req,res)=>{
 // @route  PATCH /api/prod/:sku
 // @access Private
 const updateProd = asyncHandler(async (req,res)=>{
-    var dbCollection, jsonList=[]
+    let dbCollection, jsonList=[]
     jsonList.push(req.body)
     const cleanedJSON = cleanJsonData(jsonList)[0]
 
@@ -163,39 +209,12 @@ const updateProd = asyncHandler(async (req,res)=>{
     if(dbKeys.includes(itemCode.toUpperCase() )){
         dbCollection = require(`../models/${dbCollectionList[itemCode.toUpperCase()]}`) 
     }else{
-        throw new Error('Specify Collection in body')
+        res.status(400)
+        throw new Error('Specify Collection')
     }
 
     const result = await dbCollection.updateOne({sku:sku}, prod,{upsert: true})
-    // const prodUpdate = await dbCollection.findOne({sku}).exec()
-    
-    // if(!prodUpdate){
-    //     res.status(400)
-    //     throw new Error("Product not found")
-    // }
-    // const prodUpdateKeys = Object.keys(prodUpdate._doc)
-    // console.log(prodUpdateKeys)
-
-    // Object.keys(cleanedJSON).forEach(key=>{
-    //     if(prodUpdateKeys.includes(key)){
-    //         prodUpdate[key] = cleanedJSON[key]
-    //     }else if(key==="metaData"){
-    //         Object.keys(cleanedJSON.metaData).forEach(k=>{
-    //             if(prodUpdate?.metaData[k]){
-    //                 prodUpdate.metaData[k] = cleanedJSON.metaData[k]
-    //             }
-    //         })
-
-    //     }
-    // })
-
-    // const lean = prodUpdate.lean()
-
-    // console.log(`cleanedJson: ${JSON.stringify(cleanedJSON,null,4)}`)
-    // console.log(`prodUpdate: ${JSON.stringify(prodUpdate,null,4)}`)
-    
-    // const result = await prodUpdate.save()
-    // console.log(`${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`)
+    await Products.updateOne({sku:sku}, prod,{upsert: true})
 
     res.status(200).json({message:`${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`})
 })
@@ -204,7 +223,7 @@ const updateProd = asyncHandler(async (req,res)=>{
 // @route  DELETE /api/prod/:sku
 // @access Private
 const deleteProd = asyncHandler(async (req,res)=>{
-    var prod, dbCollection
+    let prod, dbCollection
     const sku = req.params.sku
     const itemCode = sku.split('-')[0]
 
@@ -213,43 +232,52 @@ const deleteProd = asyncHandler(async (req,res)=>{
     if(dbKeys.includes(itemCode.toUpperCase() )){
         dbCollection = require(`../models/${dbCollectionList[itemCode.toUpperCase()]}`) 
     }else{
-        throw new Error('Specify Collection in body')
+        res.status(400)
+        throw new Error('Specify Collection')
     }
 
-    //Finding if Product exists
-    prod = await dbCollection.find({sku:sku})
+    // Checking if Product exists
+    prod = await dbCollection.findOne({sku:sku})
+    prodAll = await Products.findOne({sku:sku})
 
-    if(!prod){
+    if(!prod && !prodAll){
         res.status(400)
         throw new Error('Product not found')
     }
 
     const result = await dbCollection.findOneAndRemove({sku:sku})
+    const resultProd = await Products.findOneAndRemove({sku:sku})
 
-    res.status(200).json({message:`Deleted ${result.sku}`})
+    res.status(200).json({message:`Deleted ${result?result.sku:resultProd.sku} from all Collections`})
 })
 
 // @desc   Delete all Products from a Collection
 // @route  DELETE /api/prod/deleteAll
 // @access Private
 const deleteAllProd = asyncHandler(async (req,res)=>{
-    var dbCollection
+    const { itemCode } = req.body
+    let dbCollection
 
-    //Finding right Collection
+    // Finding right Collection
     const dbKeys = Object.keys(dbCollectionList)
-    if(dbKeys.includes(req.body.itemCode.toUpperCase() )){
-        dbCollection = require(`../models/${dbCollectionList[req.body.itemCode.toUpperCase()]}`) 
+    if(dbKeys.includes(itemCode.toUpperCase() )){
+        dbCollection = require(`../models/${dbCollectionList[itemCode.toUpperCase()]}`) 
     }else{
-        throw new Error('Specify Collection in body')
+        res.status(400)
+        throw new Error('Specify Collection')
     }
 
     await dbCollection.deleteMany({})
-    res.status(200).json({message:`Deleted All from Collection`})
+    await Products.deleteMany({itemCode:itemCode.toUpperCase()})
+
+    res.status(200).json({message:`Deleted all products from all Collection`})
 })
 
 module.exports = {
     getAllProd,
     getSKUProd,
+    pushToProduct,
+    searchAll,
     setProd,
     setManyProd,
     updateProd,

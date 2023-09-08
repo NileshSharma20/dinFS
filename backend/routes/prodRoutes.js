@@ -2,23 +2,27 @@ const express = require('express')
 const router = express.Router()
 const {getAllProd,
        getSKUProd,
+       pushToProduct,
+       searchAll,
        setProd,
        setManyProd,
        updateProd,
        deleteProd,
        deleteAllProd} = require('../controllers/prodController')
-
+const verifyJWT = require('../middleware/verifyJWT')
        
+router.route('/').post(verifyJWT, pushToProduct)
 router.route('/:itemCode').get(getAllProd).post(setProd)
 
-router.delete('/deleteAll',deleteAllProd)
+router.delete('/deleteAll',verifyJWT, deleteAllProd)
 
-router.get('/findSKU',getSKUProd)
-// .post('/getProducts',getAllProd)
+router.route('/search/sku').post(getSKUProd)
+router.route('/search/searchAll').post(searchAll)
 
-router.post('/setMany', setManyProd)
+router.post('/upload/multiple',verifyJWT, setManyProd)
+router.post('/upload',verifyJWT, setManyProd)
 
-router.route('/:sku').patch(updateProd).delete(deleteProd)
+router.route('/:sku').patch(verifyJWT, updateProd).delete(verifyJWT, deleteProd)
 
 
 module.exports = router
