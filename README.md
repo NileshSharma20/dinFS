@@ -7,14 +7,15 @@
     - [x] Fix Client Side rendering after multiple user updates
     - [x] Logic for Client side disabling of multiple edit on User
     Management Panels
-    - [x] Admin Manager Employee Checkbox logic
+    - [x] Admin Manager Employee Radiobox logic
 
 - [ ] Product Functions
     - [x] Build Product search
     - [ ] Update Products patch
     - [x] Update Products in product collection logic
     - [x] Make POST /api/prod/:itemCode dynamic
-    - [ ] Protected Middleware
+    - [x] Protected Middleware
+    - [x] Product Search (with Debouncing)
 
 - [ ] Clocked Functions
     - [ ] Account for Time Differences in Server and set to IST

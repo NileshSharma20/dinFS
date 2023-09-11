@@ -102,10 +102,10 @@ const getSKUProd = asyncHandler(async (req,res)=>{
 })
 
 // @desc   Find Products matching key
-// @route  POST /api/prod/search/searchAll
+// @route  GET /api/prod/search/:searchKey
 // @access Public
 const searchAll = asyncHandler(async(req,res)=>{
-    const searchKey = req.body.searchKey.toUpperCase()
+    const searchKey = req.params.searchKey.toUpperCase()
 
     const response = await Products.find({$or:[
         {itemCode:{$regex: searchKey}},
@@ -113,7 +113,14 @@ const searchAll = asyncHandler(async(req,res)=>{
         {brandCompany:{$regex: searchKey}},
         {partNum:{$regex: searchKey}},
         {sku:{$regex: searchKey}},
-    ]}).lean()
+    ]})
+    .lean()
+    // .select('sku -_id')
+
+    // if(response.length===0){
+    //     res.status(204)
+    //     throw new Error('No Content')
+    // }
     
     res.status(200).json(response)
 })

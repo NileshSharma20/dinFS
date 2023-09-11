@@ -6,6 +6,7 @@ import productService from './productService'
 
 const initialState = {
     productData: [],
+    noMatch: false,
     isError: false,
     isSuccess: false,
     isLoading: false,
@@ -47,6 +48,21 @@ export const getProducts = createAsyncThunk(
   }
 )
 
+export const searchProducts = createAsyncThunk(
+  'prod/searchProducts',
+  async(searchKey, thunkAPI)=>{
+    try {
+      return await productService.searchProducts(searchKey)
+    } catch (error) {
+      const message =
+          (error.response && error.response.data && error.response.data.message) ||
+          error.message ||
+          error.toString()
+      return thunkAPI.rejectWithValue(message) 
+    }
+  }
+)
+
 export const productSlice = createSlice({
     name: 'products',
     initialState,
@@ -55,9 +71,10 @@ export const productSlice = createSlice({
     },
     extraReducers: (builder) => {
       builder
-      //Convert Product CSV Data to JSON Data
+      // Convert Product CSV Data to JSON Data
         .addCase(createProductDataJSON.pending, (state) => {
           state.isLoading = true
+          state.noMatch = false
         })
         .addCase(createProductDataJSON.fulfilled, (state, action) => {
           state.isLoading = false
@@ -73,13 +90,36 @@ export const productSlice = createSlice({
       // Get products
       .addCase(getProducts.pending, (state) => {
         state.isLoading = true
+        state.noMatch = false
       })
       .addCase(getProducts.fulfilled, (state, action) => {
         state.isLoading = false
         state.isSuccess = true
         state.productData = action.payload
+        if(action.payload.length===0){
+          state.noMatch = true
+        }
       })
       .addCase(getProducts.rejected, (state, action) => {
+        state.isLoading = false
+        state.isError = true
+        state.message = action.payload
+      })
+
+      // Search Products
+      .addCase(searchProducts.pending, (state) => {
+        state.isLoading = true
+        state.noMatch = false
+      })
+      .addCase(searchProducts.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.productData = action.payload
+        if(action.payload.length===0){
+          state.noMatch = true
+        }
+      })
+      .addCase(searchProducts.rejected, (state, action) => {
         state.isLoading = false
         state.isError = true
         state.message = action.payload

@@ -62,28 +62,12 @@ const createProductDataJSON = (csvFileData) => {
             metaData: metaData
           }
         })
-        // csvFileData.map((csvItem)=>{
-            
-        //     let brandCheck = "" 
-        //     for(let i=0;i<brandsList.length;i++){
-        //         if(csvItem.Name.includes(brandsList[i].brandName)){
-        //             brandCheck = brandsList[i].brandName
-        //         }
-        //     }
-            
-        //     return { 
-        //         productName: csvItem.Name,
-        //         productBrand: brandCheck,
-        //         productType: csvItem.ProductType,
-        //         price: csvItem.Price 
-        //     }
-        // })
     }
 
     return returnData
   }
 
-  //Get Products
+  // Get Products
   const getProducts = async (itemData) => {
     const response = await axios.get(prod_URI + `${itemData.itemCode}`)
     // if(response.data){
@@ -92,9 +76,17 @@ const createProductDataJSON = (csvFileData) => {
     return response.data
   } 
 
+  // Search Products
+  const searchProducts = async (searchKey) => {
+    const response = await axios.get(prod_URI +`search/${searchKey}`)
+
+    return response.data
+  } 
+
   const productService = {
     createProductDataJSON,  
-    getProducts
+    getProducts,
+    searchProducts
   }
   
   export default productService

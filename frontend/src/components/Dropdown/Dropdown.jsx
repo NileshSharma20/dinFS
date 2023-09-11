@@ -23,7 +23,7 @@ function Dropdown({dataList, passItemCode}) {
   return (
     <div className="drop-down-container">
         <div className="drop-down-item selected-drop-down" onClick={()=>handleClick()}>
-            <p>{selectedItem===""?`Select an Item`:selectedItem}</p>
+            <p>{selectedItem===""?`Select a Cateogry`:selectedItem}</p>
         </div>     
 
         {isActive && 

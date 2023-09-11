@@ -32,35 +32,6 @@ function UserForm({initialValue, setFlag}) {
         }))
     }
 
-    const handleCheck=(e)=>{
-        const {value, checked} = e.target
-        console.log(`value:${value},\nchecked:${checked}`)
-
-        if(checked && !checkList.includes(value)){
-            if(value==="Admin"){
-                setCheckList(["Admin","Manager","Employee"])
-            }else if(value==="Manager"){
-                setCheckList(["Manager","Employee"])
-            }else{
-                setCheckList(["Employee"])
-            }
-            // setCheckList(prev=>[...prev, value])
-        }else if(!checked){
-            if(value==="Admin"){
-                setCheckList(["Manager","Employee"])
-            }else if(value==="Manager" && !checkList.includes("Admin")){
-                setCheckList(["Employee"])
-            }else if(value==="Employee" && !checkList.includes("Admin") && !checkList.includes("Manager") ){
-                setCheckList(["Employee"])
-                setFormData((prevState)=>({
-                    ...prevState,
-                    active:false
-                }))
-            }
-            // setCheckList(prev=>prev.filter(role => role!==value))
-        }
-    }
-
     const handleRoles=(e)=>{
         if(e.target.value==="admin"){
             setCheckList(["Admin","Manager","Employee"])
@@ -78,12 +49,13 @@ function UserForm({initialValue, setFlag}) {
             !Array.isArray(roles)){
             console.log(`Please enter valid data`)
         }else{
+            // console.log(`formData:${JSON.stringify(formData,null,4)}`)
             const userInfo = {
                 id,
                 username,
                 firstname,
                 lastname,
-                active: active?true:false,
+                active: active==="true"?true:false,
                 roles
             }
             
@@ -97,6 +69,7 @@ function UserForm({initialValue, setFlag}) {
     
     useEffect(()=>{
         setFormData((prevState)=>({...prevState, roles:checkList}))
+        // console.log(`formData:${JSON.stringify(formData,null,4)}`)
     },[checkList])
 
     useEffect(()=>{

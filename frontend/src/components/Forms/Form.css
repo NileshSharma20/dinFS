@@ -76,6 +76,8 @@
 }
 
 .submit-btn{
+    font-size: 1rem;
+
     background-color: var(--formBgColor);
     border: none;
     box-shadow: 2px 2px black;

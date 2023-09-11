@@ -1,33 +1,38 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from 'react-router-dom';
-import { getProducts, resetProducts} from "../../features/products/productSlice"
+import { getProducts, searchProducts, resetProducts} from "../../features/products/productSlice"
 // import Papa from 'papaparse'
+import debouce from "lodash.debounce";
 
 import "./Products.css"
 import Dropdown from '../../components/Dropdown/Dropdown';
 import Loader from '../../components/Loader/Loader';
-import { healthCheck, logOutUser } from '../../features/auth/authSlice';
+import { logOutUser } from '../../features/auth/authSlice';
+
+import { AiOutlineSearch } from "react-icons/ai"
 
 function Products() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const {productData, isLoading} =useSelector(
+  const {productData, isLoading, noMatch} =useSelector(
     (state)=>state.product
   )
 
-  const {token,verified, isError} = useSelector((state)=>state.auth)
+  const {token, isError} = useSelector((state)=>state.auth)
 
   const [showSKUFlag, setShowSKUFlag] = useState(false)
   const [prodNavFlag, setProdNavFlag] = useState(false)
 
+  const [searchInput, setSearchInput] = useState("");
+
   const [itemData, setItemData] = useState({
-    saveFile: false,
+    // saveFile: false,
     itemCode:""
   })
   
-  const {saveFile, itemCode} = itemData
+  const { itemCode } = itemData
 
   const prodCodeList = [{
     name:"Shocker",
@@ -75,35 +80,25 @@ function Products() {
   //////// Functions /////////////////////////////
   ////////////////////////////////////////////////
 
-  // const handleCSVFile=(e)=>{
-  //     Papa.parse(e.target.files[0],{
-  //     header:true,
-  //     skipEmptyLines: true,
-  //     complete: function(res){
-  //       setCsvData(res.data)
-  //       }
-  //     })
-  //   }
-
-  // const onChange=(e)=>{
-  //   setItemData((prevState)=>({
-  //       ...prevState,
-  //       [e.target.name]:e.target.value
-  //   }))
-  // }
-
   const handleProductClick = (sku) =>{
     if(prodNavFlag){
       dispatch(resetProducts())
       navigate(`${sku}`)
-      // console.log(`edit data ${sku}`)
     }
   }
-    
+
+  const handleSearchChange = (e) => {
+    setSearchInput(e.target.value);
+  }
+
+  // Debounce function
+  const debouncedResults = debouce(handleSearchChange, 800)
+  
+  // Get Products API call 
   const onSubmit=(e)=>{
     e.preventDefault()
       
-    if(itemCode==="" || saveFile===null){
+    if(itemCode===""){
       alert(`Please enter Item`)
     }else{
       dispatch(getProducts(itemData))
@@ -114,44 +109,57 @@ function Products() {
   //////// Hooks /////////////////////////////////
   ////////////////////////////////////////////////
 
-  useEffect(()=>{
-    // let id =async()=>{ setInterval(dispatch(healthCheck()),10*1000)}
-    // id()
-    
+  // Logout on Bad Token
+  useEffect(()=>{    
     if(isError || !token){
-      // clearInterval(id)s
       dispatch(logOutUser())
-      navigate("/")
+      navigate("/login")
     }
 
     dispatch(resetProducts())
   },[])
 
+  // Debounce Search
+  useEffect(() => {
+    return () => {
+      debouncedResults.cancel();
+    };
+  });
+
+  // Search API call
+  useEffect(()=>{
+    if (searchInput!=="") {
+      dispatch(searchProducts(searchInput))
+    }
+  },[searchInput])
+
   return (
     <>
     {isLoading && <Loader />}
     <div className='data-container'>
-
+      
       <div className="controlbox-container" >
         
         {/* Load Product Controls */}
         <form onSubmit={onSubmit}>
+        
+        {/* Search Input */}
+        <label style={{fontWeight:"bold"}}>Search</label>
+        <div className="search-bar">
+          <AiOutlineSearch className='search-icon'/>
+          <input
+            type="text"
+            name="search"
+            placeholder="Search for Product"
+            onChange={debouncedResults}
+            autoComplete='off'
+            />
+        </div>
 
         <div className="controlbox">
 
-          {/* <div className="form-group">
-
-            <label>File</label>
-            <input className='file-input'
-            type="file"
-            name="file"
-            accpet=".csv"
-            onChange={handleCSVFile}
-              ></input>
-            </div> */}
-
           <div className="control-section">
-            <label>Item</label>
+            <label>Product Category</label>
 
             <Dropdown  
               dataList={prodCodeList} 
@@ -161,7 +169,7 @@ function Products() {
 
           <div className="form-group">
             <button type="submit" className="submit-btn">
-                Submit
+                Search
             </button>
           </div>
 
@@ -192,6 +200,10 @@ function Products() {
 
 
       </div>
+
+      {noMatch &&  
+        <h3>No Match</h3>
+      }
 
       <div className='grid'>
         <div className="productCol-conatiner">
