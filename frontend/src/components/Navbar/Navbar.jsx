@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from 'react-router-dom'
-import "./Navbar.css"
+import { BiLogOut, BiMenu } from "react-icons/bi"
 import { logOutUser } from '../../features/auth/authSlice';
+
+import "./Navbar.css"
 
 function Navbar() {
   const navigate = useNavigate();
@@ -21,9 +22,9 @@ function Navbar() {
 
   return (
     <div className='navbar-container' style={token?{}:{justifyContent:`center`}}> 
-        {token && <h3>Menu</h3>}
+        {token && <div className='menu-btn'><BiMenu /></div>}
         <h1 onClick={()=>handleClick()}>Din</h1>
-        {token && <div className='logout-btn' onClick={()=>handleLogout()}> Logout</div>}
+        {token && <div className='logout-btn' onClick={()=>handleLogout()}> <BiLogOut/></div>}
     </div>
   )
 }

@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import "./Landing.css"
 import { useSelector } from 'react-redux';
 import useAuth from '../../hooks/useAuth';
+
+import "./Landing.css"
 
 function Landing() {
     const navigate = useNavigate();
@@ -21,6 +22,10 @@ function Landing() {
         pathname:"user-management",
         name:"User Management",
         accessLevel:["Admin"]
+    },{
+        pathname:"demand-slip-generator",
+        name:"Demand Slip Generator",
+        accessLevel:["Admin","Manager","Employee"]
     }]
 
     const handleNavigation=(pathname)=>{
@@ -37,7 +42,6 @@ function Landing() {
 
   return (
     <div>
-       {/* {token? */}
        <>
        {pathList.filter(path=> path.accessLevel.includes(status)).map((item,index)=>
         <div className="path-options" key={index} 

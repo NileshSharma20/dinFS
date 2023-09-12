@@ -17,6 +17,7 @@
     - [x] Protected Middleware
     - [x] Product Search (with Debouncing)
     - [x] Product Search (SKU)
+    - [ ] Individual Product Page Update
 
 - [ ] Clocked Functions
     - [ ] Account for Time Differences in Server and set to IST
