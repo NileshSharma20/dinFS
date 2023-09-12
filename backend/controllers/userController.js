@@ -70,11 +70,11 @@ const createNewUser = asyncHandler( async(req,res)=>{
 //@route PATCH /api/users
 //@access PRIVATE
 const updateUser = asyncHandler(async(req,res)=>{
-    const { id, username, roles, active, password } = req.body
+    const { id, username, firstname, lastname, roles, active, password } = req.body
     const rolesAccess = req.roles
 
     //Confirm data
-    if(!id || !username || !Array.isArray(roles) || 
+    if(!id || !username || !firstname ||!lastname || !Array.isArray(roles) || 
        !roles.length || typeof active !== 'boolean'){
             res.status(400)
             throw new Error(`All fields are required`)
@@ -104,6 +104,8 @@ const updateUser = asyncHandler(async(req,res)=>{
     }
 
     user.username = username
+    user.firstname = firstname
+    user.lastname = lastname
     user.roles = roles
     user.active = active
 

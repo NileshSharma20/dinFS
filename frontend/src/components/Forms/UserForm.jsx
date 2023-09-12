@@ -55,7 +55,7 @@ function UserForm({initialValue, setFlag}) {
                 username,
                 firstname,
                 lastname,
-                active: active==="true"?true:false,
+                active:active===true||active==="true"?true:false,
                 roles
             }
             
@@ -132,7 +132,7 @@ function UserForm({initialValue, setFlag}) {
                         <input type="radio" 
                             name="active" 
                             id={`${initialValue.username} active true`} 
-                            value="true"
+                            value={`true`}
                             defaultChecked={initialValue.active?true:false}
                             onChange={onChange} />
                         <label htmlFor={`${initialValue.username} active true`}>Yes</label>
@@ -144,7 +144,7 @@ function UserForm({initialValue, setFlag}) {
                         <input type="radio" 
                             name="active" 
                             id={`${initialValue.username} active false`} 
-                            value="false"
+                            value={`false`}
                             defaultChecked={initialValue.active?false:true}
                             onChange={onChange} />
                         <label htmlFor={`${initialValue.username} active false`}>No</label>

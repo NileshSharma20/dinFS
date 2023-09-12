@@ -16,6 +16,7 @@
     - [x] Make POST /api/prod/:itemCode dynamic
     - [x] Protected Middleware
     - [x] Product Search (with Debouncing)
+    - [x] Product Search (SKU)
 
 - [ ] Clocked Functions
     - [ ] Account for Time Differences in Server and set to IST
@@ -31,3 +32,4 @@
 
 - [ ] Frontend
     - [ ] Revisit UI/UX
+    - [ ] Clean logic for Input Tags in Product Search

@@ -83,10 +83,18 @@ const createProductDataJSON = (csvFileData) => {
     return response.data
   } 
 
+  // Search Products
+  const searchSKUProducts = async (itemData) => {
+    const response = await axios.post(prod_URI +`search/sku`, itemData)
+
+    return response.data
+  } 
+
   const productService = {
     createProductDataJSON,  
     getProducts,
-    searchProducts
+    searchProducts,
+    searchSKUProducts
   }
   
   export default productService

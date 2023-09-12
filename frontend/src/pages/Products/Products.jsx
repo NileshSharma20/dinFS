@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from 'react-router-dom';
-import { getProducts, searchProducts, resetProducts} from "../../features/products/productSlice"
+import { getProducts, searchProducts, resetProducts, searchSKUProducts} from "../../features/products/productSlice"
 // import Papa from 'papaparse'
 import debouce from "lodash.debounce";
 
@@ -16,7 +16,7 @@ function Products() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const {productData, isLoading, noMatch} =useSelector(
+  const {productData,noMatch, isErrorProd, isLoading } =useSelector(
     (state)=>state.product
   )
 
@@ -30,6 +30,13 @@ function Products() {
   const [itemData, setItemData] = useState({
     // saveFile: false,
     itemCode:""
+  })
+
+  const [skuData, setSKUData] = useState({
+    itemCode:"",
+    vehicleModel:"",
+    brandCompany:"",
+    partNum:""
   })
   
   const { itemCode } = itemData
@@ -91,6 +98,13 @@ function Products() {
     setSearchInput(e.target.value);
   }
 
+  const onSKUChange=(e)=>{
+    setSKUData((prevState)=>({
+        ...prevState,
+        [e.target.name]:e.target.value
+    }))
+}
+
   // Debounce function
   const debouncedResults = debouce(handleSearchChange, 800)
   
@@ -101,7 +115,19 @@ function Products() {
     if(itemCode===""){
       alert(`Please enter Item`)
     }else{
+      setSearchInput("")
       dispatch(getProducts(itemData))
+    }
+  }
+
+  // Get SKU Products API call 
+  const onSKUSubmit=(e)=>{
+    e.preventDefault()
+      
+    if(skuData.itemCode===""){
+      alert(`Please Enter Item Code`)
+    }else{
+      dispatch(searchSKUProducts(skuData))
     }
   }
 
@@ -141,20 +167,85 @@ function Products() {
       <div className="controlbox-container" >
         
         {/* Load Product Controls */}
+        <div className="controlbox" style={{width:"80%"}}>
+
+          <label style={{fontWeight:"bold"}}>Search</label>
+          <div className="search-bar">
+            <AiOutlineSearch className='search-icon'/>
+            <input
+              type="text"
+              name="search"
+              placeholder="Search for Product"
+              onChange={debouncedResults}
+              autoComplete='off'
+              />
+
+        </div>
+        </div>
+
+        <form onSubmit={onSKUSubmit}>
+
+          <label style={{fontWeight:"bold"}}>Search by SKU</label>
+          <div className="form-group">
+                {/* <label htmlFor={`itemCode sku`}>Item Code</label> */}
+                <input type="text" 
+                    className='form-control'
+                    name= 'itemCode'
+                    id={`itemCode sku`}
+                    value = {skuData.itemCode}
+                    placeholder="Item Code"
+                    autoComplete='off'
+                    onChange={onSKUChange} />
+            </div>
+
+            <div className="form-group">
+                {/* <label htmlFor={`vehicleModel sku`}>Vehicle Model</label> */}
+                <input type="text" 
+                    className='form-control'
+                    name= 'vehicleModel'
+                    id={`vehicleModel sku`}
+                    value = {skuData.vehicleModel}
+                    placeholder="Vehicle Model"
+                    autoComplete='off'
+                    onChange={onSKUChange} />
+            </div>
+
+            <div className="form-group">
+                {/* <label htmlFor={`brandCompany sku`}>Brand Company</label> */}
+                <input type="text" 
+                    className='form-control'
+                    name= 'brandCompany'
+                    id={`brandCompany sku`}
+                    value = {skuData.brandCompany}
+                    placeholder="Brand Company"
+                    autoComplete='off'
+                    onChange={onSKUChange} />
+            </div>
+
+            <div className="form-group">
+                {/* <label htmlFor={`partNum sku`}>Part Number</label> */}
+                <input type="text" 
+                    className='form-control'
+                    name= 'partNum'
+                    id={`partNum sku`}
+                    value = {skuData.partNum}
+                    placeholder="Part Number"
+                    autoComplete='off'
+                    onChange={onSKUChange} />
+            </div>
+
+            <div className="form-group">
+            <button type="submit" className="submit-btn">
+                Search
+            </button>
+          </div>
+        </form>
+        
+
+        
         <form onSubmit={onSubmit}>
         
         {/* Search Input */}
-        <label style={{fontWeight:"bold"}}>Search</label>
-        <div className="search-bar">
-          <AiOutlineSearch className='search-icon'/>
-          <input
-            type="text"
-            name="search"
-            placeholder="Search for Product"
-            onChange={debouncedResults}
-            autoComplete='off'
-            />
-        </div>
 
         <div className="controlbox">
 
