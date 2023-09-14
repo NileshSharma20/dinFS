@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import productService from './productService'
+import { refreshToken } from '../auth/authSlice'
 
 // Get user from localStorage
 // const productData = JSON.parse(localStorage.getItem('productData'))
@@ -19,8 +20,6 @@ export const createProductDataJSON = createAsyncThunk(
     'createProductDataJSON',
     async(csvFileData, thunkAPI) =>{
         try {
-            // const brandsList = thunkAPI.getState().product.brandsList
-            // console.log(`brands:${JSON.stringify(brandsList,null,4)}`)
             return await productService.createProductDataJSON(csvFileData)
         } catch (error) {
             const message =
@@ -48,6 +47,7 @@ export const getProducts = createAsyncThunk(
   }
 )
 
+// Search Products
 export const searchProducts = createAsyncThunk(
   'prod/searchProducts',
   async(searchKey, thunkAPI)=>{
@@ -63,11 +63,42 @@ export const searchProducts = createAsyncThunk(
   }
 )
 
+// Search by SKU
 export const searchSKUProducts = createAsyncThunk(
   'prod/searchSKUProducts',
   async(itemData, thunkAPI)=>{
     try {
       return await productService.searchSKUProducts(itemData)
+    } catch (error) {
+      const message =
+          (error.response && error.response.data && error.response.data.message) ||
+          error.message ||
+          error.toString()
+      return thunkAPI.rejectWithValue(message) 
+    }
+  }
+)
+
+// Update Product Data
+export const updateProduct = createAsyncThunk(
+  'prod/updateProduct',
+  async(itemData, thunkAPI)=>{
+    try { 
+      try {
+            
+        const token = thunkAPI.getState().auth.token
+        return await productService.updateProduct({itemData,token})
+
+      } catch (err) {
+        
+        if(err.response.status === 403){
+          await thunkAPI.dispatch(refreshToken())
+
+          const token = thunkAPI.getState().auth.token
+          return await productService.updateProduct({itemData,token}) 
+        }
+      }
+        
     } catch (error) {
       const message =
           (error.response && error.response.data && error.response.data.message) ||
@@ -105,6 +136,7 @@ export const productSlice = createSlice({
       // Get products /////////////////////////////
       .addCase(getProducts.pending, (state) => {
         state.isLoading = true
+        state.message = ""
         state.noMatch = false
       })
       .addCase(getProducts.fulfilled, (state, action) => {
@@ -124,6 +156,7 @@ export const productSlice = createSlice({
       // Search Products /////////////////////////////
       .addCase(searchProducts.pending, (state) => {
         state.isLoading = true
+        state.message = ""
         state.noMatch = false
       })
       .addCase(searchProducts.fulfilled, (state, action) => {
@@ -143,6 +176,7 @@ export const productSlice = createSlice({
       // Search SKU Products /////////////////////////////
       .addCase(searchSKUProducts.pending, (state) => {
         state.isLoading = true
+        state.message = ""
         state.noMatch = false
       })
       .addCase(searchSKUProducts.fulfilled, (state, action) => {
@@ -154,6 +188,25 @@ export const productSlice = createSlice({
         }
       })
       .addCase(searchSKUProducts.rejected, (state, action) => {
+        state.isLoading = false
+        state.isError = true
+        state.message = action.payload
+      })
+
+      // Update Product Data /////////////////////////////
+      .addCase(updateProduct.pending, (state) => {
+        state.isLoading = true
+        state.isError = false
+        state.isSuccess = false
+        state.noMatch = false
+        state.message = ""
+      })
+      .addCase(updateProduct.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.message = action.payload.message
+      })
+      .addCase(updateProduct.rejected, (state, action) => {
         state.isLoading = false
         state.isError = true
         state.message = action.payload

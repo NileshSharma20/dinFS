@@ -195,45 +195,15 @@ function UserForm({initialValue, setFlag}) {
                         <label htmlFor={`${initialValue.username} role employee`}>Employee</label>
                         </div>
                     </div>
-                    {/* /////////////////////// */}
-                    {/* <div className="form-checkbox">
-                        <input type="checkbox"
-                            name="role-checkbox"
-                            id={`Admin ${initialValue.username}`}
-                            value="Admin"
-                            defaultChecked={initialValue.roles.includes("Admin")?true:false}
-                            onChange={handleCheck} />
-                        <label>Admin</label>
-                    </div>
-
-                    <div className="form-checkbox">
-                        <input type="checkbox" 
-                            name="role-checkbox"
-                            id={`Manager ${initialValue.username}`}
-                            value="Manager"
-                            defaultChecked={initialValue.roles.includes("Manager")||roles.includes("Admin")?true:false}
-                            onChange={handleCheck} />
-                        <label>Manager</label>
-                    </div>
-
-                    <div className="form-checkbox">
-                        <input type="checkbox"  
-                            name="role-checkbox"
-                            id={`Employee ${initialValue.username}`}
-                            value="Employee"
-                            defaultChecked={initialValue.roles.includes("Employee")?true:false} 
-                            onChange={handleCheck} />
-                        <label>Employee</label>
-                    </div> */}
                 
                 </div>
 
                 <div className="form-group">
                     <button type="submit" className="submit-btn">
                         Update
-                </button>
-
-            </div>
+                    </button>
+                </div>
+                
         </form>
     </div>
   )

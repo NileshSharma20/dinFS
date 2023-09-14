@@ -175,6 +175,7 @@
 
 /* Product Page CSS */
 .product-container{
+  position: relative;
   width: 80%;
   min-height: 50vh;
 

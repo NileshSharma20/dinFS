@@ -75,6 +75,63 @@
     padding: 0 0 0.5rem;
 }
 
+.model-input-container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 30vw;
+}
+
+.add-btn{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    align-self: center;
+
+    /* position: absolute;
+    top: 0.5rem;
+    right: 0.5rem; */
+
+    width: 1.5rem;
+    height: 1.5rem;
+
+    padding: 0.1rem 0.3rem;
+    font-size: 1rem;
+
+    background-color: var(--formBgColor);
+    border: none;
+    box-shadow: 2px 2px black;
+    cursor: pointer;
+
+    z-index: 5;
+
+    transition: 0.3s ease-in-out;
+}
+
+.add-btn:hover,.delete-btn:hover{
+    transition: 0.3s ease-in-out;
+    background-color: #c6cec9;
+}
+
+.delete-btn{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 1.5rem;
+    height: 1.5rem;
+
+    padding: 0.1rem 0.3rem;
+    font-size: 1rem;
+
+    cursor: pointer;
+
+    transition: 0.3s ease-in-out;
+
+}
+
 .submit-btn{
     font-size: 1rem;
 

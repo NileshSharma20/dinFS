@@ -90,11 +90,29 @@ const createProductDataJSON = (csvFileData) => {
     return response.data
   } 
 
+  // Update Products
+  const updateProduct = async ({itemData,token}) => {
+    const config = {
+      headers: {
+          Authorization: `Bearer ${token}`
+      }
+    }
+
+    // console.log(`itemData SKU:${itemData.sku}`)
+    // console.log(`itemData prodInfo:${JSON.stringify(itemData.prodInfo,null,4)}`)
+
+    const response = await axios.patch(prod_URI +`${itemData.sku}`, itemData.prodInfo, config)
+
+    return response.data
+    // return itemData.sku
+  } 
+
   const productService = {
     createProductDataJSON,  
     getProducts,
     searchProducts,
-    searchSKUProducts
+    searchSKUProducts,
+    updateProduct
   }
   
   export default productService

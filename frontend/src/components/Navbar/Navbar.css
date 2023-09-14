@@ -39,12 +39,6 @@
 }
 
 .logout-btn{
-    /* position: absolute;
-    right: 0;
-    top: 0;
-    transform: translateY(50%);
-    transform-origin: (0,50%); */
-
     display: flex;
     justify-self: flex-end;
 

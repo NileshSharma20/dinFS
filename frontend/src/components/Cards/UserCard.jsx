@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { FiEdit2 } from 'react-icons/fi'
 import { AiOutlineClose } from 'react-icons/ai'
 

@@ -1,9 +1,7 @@
-import axios from 'axios'
-
 
 // Form Submit
 const formSubmit = (formRes) => {
-    var returnData = {}
+    let returnData = {}
     if(formRes.customer_name===null 
         || formRes.pricePerUnit===null 
         || formRes.unit===null){

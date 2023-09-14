@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from 'react-router-dom';
 import { getProducts, searchProducts, resetProducts, searchSKUProducts} from "../../features/products/productSlice"
@@ -16,7 +16,7 @@ function Products() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const {productData,noMatch, isErrorProd, isLoading } =useSelector(
+  const {productData,noMatch, isLoading } =useSelector(
     (state)=>state.product
   )
 
@@ -326,6 +326,7 @@ function Products() {
                   showSKUFlag?
                   item
                   :
+                  // Write logic for when whole list isnt loaded
                   productData.filter(prod=>prod.sku===item).map(prod=>prod.vehicleModel+" "+prod.brandCompany)
                 }
                 </p>})}

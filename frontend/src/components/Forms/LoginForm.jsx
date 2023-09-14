@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useDispatch } from "react-redux"
 import "./Form.css"
-import {refreshToken, resetAuth, setUserCredentials} from "../../features/auth/authSlice"
+import {resetAuth, setUserCredentials} from "../../features/auth/authSlice"
 
 function LoginForm() {
     const dispatch = useDispatch(); 

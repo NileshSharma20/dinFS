@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from "react-redux"
 import { getAllUsers } from '../../features/users/usersSlice'
+
+import "./User.css"
+
 import LoginAgainModal from '../../components/Modals/LoginAgainModal'
 import useAuth from '../../hooks/useAuth'
 import Loader from '../../components/Loader/Loader'
-
-import "./User.css"
 import UserCard from '../../components/Cards/UserCard'
 
 function Users() {
