@@ -199,6 +199,13 @@ const setManyProd = asyncHandler(async (req,res)=>{
 // @route  PATCH /api/prod/:sku
 // @access Private
 const updateProd = asyncHandler(async (req,res)=>{
+    const { roles } = req
+
+    if(!roles.includes("Admin")){
+        res.status(403)
+        throw new Error("Forbidden")
+    }
+
     let dbCollection, jsonList=[]
     jsonList.push(req.body)
     const cleanedJSON = cleanJsonData(jsonList)[0]
@@ -220,10 +227,10 @@ const updateProd = asyncHandler(async (req,res)=>{
         throw new Error('Specify Collection')
     }
 
-    const result = await dbCollection.updateOne({sku:sku}, prod,{upsert: true})
+    await dbCollection.updateOne({sku:sku}, prod,{upsert: true})
     await Products.updateOne({sku:sku}, prod,{upsert: true})
 
-    res.status(200).json({message:`${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`})
+    res.status(200).json({message:`Updated ${sku}`})
 })
 
 // @desc   Delete specific Product
