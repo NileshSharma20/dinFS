@@ -11,13 +11,16 @@
 
 - [ ] Product Functions
     - [x] Build Product search
-    - [ ] Update Products patch
+    - [x] Update Products patch
     - [x] Update Products in product collection logic
     - [x] Make POST /api/prod/:itemCode dynamic
     - [x] Protected Middleware
     - [x] Product Search (with Debouncing)
     - [x] Product Search (SKU)
-    - [ ] Individual Product Page Update
+    - [x] Individual Product Page Update
+    - [x] Add Search and Add UI for Product Page Edit (Compatible Models Input)
+    - [ ] Compatible Products Name logic for when searching by SKU or individual search
+    - [ ] Compatible Products Input Safety Logic
 
 - [ ] Clocked Functions
     - [ ] Account for Time Differences in Server and set to IST
@@ -34,3 +37,24 @@
 - [ ] Frontend
     - [ ] Revisit UI/UX
     - [ ] Clean logic for Input Tags in Product Search
+
+## Product Object Structure
+- itemCode {String}
+- vehicleModel {String}
+- brandCompany {String}
+- partNum {String}
+- sku {Sttring} [Auto Generated]
+- mrp {String}
+- qty {String} [to be added]
+- compatibleModels {Array}
+- metaData {Object}
+
+## DemandSlip Object Structure
+- ticketNumber {String - xxxddmmyy} [Auto Generated]
+- employeeId {Mongo ObjectId} [Logged-in User ID]
+- deliveryPartnerName {String}
+- distributorName {String}
+- status {String, default-"pending"}
+- totalCost {Number, default-0}
+- orderedProductList {Array}
+- recievedProductList {Array}
