@@ -84,8 +84,8 @@ const createProductDataJSON = (csvFileData) => {
   } 
 
   // Search Products
-  const searchSKUProducts = async (itemData) => {
-    const response = await axios.post(prod_URI +`search/sku`, itemData)
+  const searchSKUProducts = async (itemData,skuOnlyFlag) => {
+    const response = await axios.post(prod_URI +`search/sku/${skuOnlyFlag}`, itemData)
 
     return response.data
   } 

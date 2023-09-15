@@ -146,3 +146,13 @@
     transition: 0.3s ease-in-out;
     background-color: #c6cec9;
 }
+
+.sku-list-item{
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+.sku-list-item:hover{
+    color: blue;
+    transition: 0.3s ease-in-out;
+}

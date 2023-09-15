@@ -7,6 +7,7 @@ import { refreshToken } from '../auth/authSlice'
 
 const initialState = {
     productData: [],
+    productSKUData:[],
     noMatch: false,
     isError: false,
     isSuccess: false,
@@ -68,7 +69,23 @@ export const searchSKUProducts = createAsyncThunk(
   'prod/searchSKUProducts',
   async(itemData, thunkAPI)=>{
     try {
-      return await productService.searchSKUProducts(itemData)
+      return await productService.searchSKUProducts(itemData,itemData.skuOnlyFlag)
+    } catch (error) {
+      const message =
+          (error.response && error.response.data && error.response.data.message) ||
+          error.message ||
+          error.toString()
+      return thunkAPI.rejectWithValue(message) 
+    }
+  }
+)
+
+// Search by SKU
+export const searchSKUProductsOnly = createAsyncThunk(
+  'prod/searchSKUProductsOnly',
+  async(itemData, thunkAPI)=>{
+    try {
+      return await productService.searchSKUProducts(itemData,itemData.skuOnlyFlag)
     } catch (error) {
       const message =
           (error.response && error.response.data && error.response.data.message) ||
@@ -120,6 +137,7 @@ export const productSlice = createSlice({
       // Convert Product CSV Data to JSON Data //////
         .addCase(createProductDataJSON.pending, (state) => {
           state.isLoading = true
+          state.productSKUData=[]
           state.noMatch = false
         })
         .addCase(createProductDataJSON.fulfilled, (state, action) => {
@@ -136,6 +154,7 @@ export const productSlice = createSlice({
       // Get products /////////////////////////////
       .addCase(getProducts.pending, (state) => {
         state.isLoading = true
+        state.productSKUData=[]
         state.message = ""
         state.noMatch = false
       })
@@ -156,6 +175,7 @@ export const productSlice = createSlice({
       // Search Products /////////////////////////////
       .addCase(searchProducts.pending, (state) => {
         state.isLoading = true
+        state.productSKUData=[]
         state.message = ""
         state.noMatch = false
       })
@@ -176,6 +196,7 @@ export const productSlice = createSlice({
       // Search SKU Products /////////////////////////////
       .addCase(searchSKUProducts.pending, (state) => {
         state.isLoading = true
+        state.productSKUData=[]
         state.message = ""
         state.noMatch = false
       })
@@ -193,9 +214,31 @@ export const productSlice = createSlice({
         state.message = action.payload
       })
 
+      // Search SKU Products SKU only /////////////////////////////
+      .addCase(searchSKUProductsOnly.pending, (state) => {
+        state.isLoading = true
+        state.productSKUData=[]
+        state.message = ""
+        state.noMatch = false
+      })
+      .addCase(searchSKUProductsOnly.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.productSKUData = action.payload
+        if(action.payload.length===0){
+          state.noMatch = true
+        }
+      })
+      .addCase(searchSKUProductsOnly.rejected, (state, action) => {
+        state.isLoading = false
+        state.isError = true
+        state.message = action.payload
+      })
+
       // Update Product Data /////////////////////////////
       .addCase(updateProduct.pending, (state) => {
         state.isLoading = true
+        state.productSKUData=[]
         state.isError = false
         state.isSuccess = false
         state.noMatch = false

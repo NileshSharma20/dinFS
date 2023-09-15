@@ -1,7 +1,7 @@
 # din
 
 ## ToDo List
-- [ ] User Functions
+- [x] User Functions
     - [x] Activate and Deactivate Users
     - [x] Manager and Admin access to update user data
     - [x] Fix Client Side rendering after multiple user updates
@@ -20,7 +20,7 @@
     - [x] Individual Product Page Update
     - [x] Add Search and Add UI for Product Page Edit (Compatible Models Input)
     - [ ] Compatible Products Name logic for when searching by SKU or individual search
-    - [ ] Compatible Products Input Safety Logic
+    - [x] Compatible Products Input Safety Logic
 
 - [ ] Clocked Functions
     - [ ] Account for Time Differences in Server and set to IST

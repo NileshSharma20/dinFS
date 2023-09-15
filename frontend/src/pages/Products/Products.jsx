@@ -36,7 +36,8 @@ function Products() {
     itemCode:"",
     vehicleModel:"",
     brandCompany:"",
-    partNum:""
+    partNum:"",
+    skuOnlyFlag:"false"
   })
   
   const { itemCode } = itemData
@@ -103,7 +104,7 @@ function Products() {
         ...prevState,
         [e.target.name]:e.target.value
     }))
-}
+  }
 
   // Debounce function
   const debouncedResults = debouce(handleSearchChange, 800)

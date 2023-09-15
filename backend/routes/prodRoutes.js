@@ -4,6 +4,7 @@ const {getAllProd,
        getSKUProd,
        pushToProduct,
        searchAll,
+       searchAllSKU,
        setProd,
        setManyProd,
        updateProd,
@@ -17,7 +18,8 @@ router.route('/:itemCode').get(getAllProd).post(setProd)
 
 router.delete('/deleteAll',verifyJWT, deleteAllProd)
 
-router.route('/search/sku').post(getSKUProd)
+router.route('/search/sku/:skuOnlyFlag').post(getSKUProd)
+// router.route('/search/skuOnly').post(searchAllSKU)
 router.route('/search/:searchKey').get(searchAll)
 
 router.post('/upload/multiple',verifyJWT, setManyProd)

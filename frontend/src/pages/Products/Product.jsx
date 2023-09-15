@@ -34,7 +34,8 @@ function Product() {
             itemCode:params.sku.split("-")[0],
             vehicleModel:params.sku.split("-")[1],
             brandCompany:params.sku.split("-")[2],
-            partNum:params.sku.split("-")[3]
+            partNum:params.sku.split("-")[3],
+            skuOnlyFlag:"false"
           }))        
     },[])
 
@@ -44,7 +45,8 @@ function Product() {
                 itemCode:params.sku.split("-")[0],
                 vehicleModel:params.sku.split("-")[1],
                 brandCompany:params.sku.split("-")[2],
-                partNum:params.sku.split("-")[3]
+                partNum:params.sku.split("-")[3],
+                skuOnlyFlag:"false"
               }))   
         }
     },[editFlag])

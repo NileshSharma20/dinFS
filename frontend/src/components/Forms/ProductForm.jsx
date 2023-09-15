@@ -1,12 +1,12 @@
 import React,{ useState, useEffect } from 'react'
 import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai"
 import { useDispatch, useSelector } from "react-redux"
-import { updateProduct } from '../../features/products/productSlice';
+import { updateProduct, searchSKUProducts, searchSKUProductsOnly } from '../../features/products/productSlice';
 
 function ProductForm({initialValue, setFlag}) {
     const dispatch = useDispatch();
 
-    const {isSuccess, message} = useSelector((state)=>state.product)
+    const {productSKUData, noMatch, isSuccess, message} = useSelector((state)=>state.product)
 
     const [formData, setFormData] = useState({
         itemCode: initialValue.itemCode,
@@ -20,6 +20,14 @@ function ProductForm({initialValue, setFlag}) {
         metaData: initialValue?.metaData
     })
 
+    const [skuData, setSKUData] = useState({
+        itemCode:`${initialValue.itemCode.split("-")[0]}`,
+        vehicleModel:"",
+        brandCompany:"",
+        partNum:"",
+        skuOnlyFlag:"true"
+      })
+
     const [updatedMetaData, setUpdatedMetaData] = useState({...initialValue?.metaData})
     const [updatedModels, setUpdatedModels] = useState([...initialValue.compatibleModels])
 
@@ -28,6 +36,10 @@ function ProductForm({initialValue, setFlag}) {
     /////////////////////////////////////////////////
     //////// Functions /////////////////////////////
     ////////////////////////////////////////////////
+
+    const copyText=(text)=>{
+        navigator.clipboard.writeText(text.slice(4))
+    }
 
     const onChange=(e)=>{
         setFormData((prevState)=>({
@@ -51,7 +63,7 @@ function ProductForm({initialValue, setFlag}) {
     }
 
     const handleAddItem=()=>{
-        const modelList = [...updatedModels,""]
+        const modelList = [...updatedModels,`${sku.split("-")[0]}-`]
         setUpdatedModels(modelList)
     }
 
@@ -85,6 +97,24 @@ function ProductForm({initialValue, setFlag}) {
         }
     }
 
+    const onSKUChange=(e)=>{
+        setSKUData((prevState)=>({
+            ...prevState,
+            [e.target.name]:e.target.value
+        }))
+    }
+
+    // Get SKU Products API call 
+    const onSKUSubmit=(e)=>{
+        e.preventDefault()
+        
+        if(skuData.itemCode===""){
+        alert(`Please Enter Item Code`)
+        }else{
+        dispatch(searchSKUProductsOnly(skuData))
+        }
+    }
+
     /////////////////////////////////////////////////
     //////// Hooks //////////////////////////////////
     ////////////////////////////////////////////////
@@ -95,7 +125,7 @@ function ProductForm({initialValue, setFlag}) {
     },[message])
 
   return (
-    <div className='card-container' style={{padding:"0", border:"none"}}>
+    <div className='card-container card-grid' style={{padding:"0", border:"none"}}>
         <form onSubmit={onSubmit}>
             
             <div className="form-group">
@@ -198,6 +228,8 @@ function ProductForm({initialValue, setFlag}) {
                     <AiOutlinePlus />
                 </div>
 
+
+
             </div>
             
             {initialValue?.metaData &&
@@ -218,7 +250,6 @@ function ProductForm({initialValue, setFlag}) {
                                     placeholder={field}
                                     autoComplete='off'
                                     onChange={onMetaDataChange} />
-                            {/* <p>{field}:{initialValue?.metaData[field]}</p>  */}
                             </React.Fragment>
                             )
                         })}
@@ -232,6 +263,82 @@ function ProductForm({initialValue, setFlag}) {
                 </button>
             </div>
         
+        </form>
+
+        <form onSubmit={onSKUSubmit}>
+
+          <label style={{fontWeight:"bold"}}>Search by SKU</label>
+          <div className="form-group">
+                <input type="text" 
+                    className='card-form-control'
+                    name= 'itemCode'
+                    id={`itemCode sku`}
+                    value = {initialValue.itemCode}
+                    placeholder="Item Code"
+                    autoComplete='off'
+                    // onChange={onSKUChange} 
+                    />
+            </div>
+
+            <div className="form-group">
+                <input type="text" 
+                    className='card-form-control'
+                    name= 'vehicleModel'
+                    id={`vehicleModel sku`}
+                    value = {skuData.vehicleModel}
+                    placeholder="Vehicle Model"
+                    autoComplete='off'
+                    onChange={onSKUChange} />
+            </div>
+
+            <div className="form-group">
+                <input type="text" 
+                    className='card-form-control'
+                    name= 'brandCompany'
+                    id={`brandCompany sku`}
+                    value = {skuData.brandCompany}
+                    placeholder="Brand Company"
+                    autoComplete='off'
+                    onChange={onSKUChange} />
+            </div>
+
+            <div className="form-group">
+                <input type="text" 
+                    className='card-form-control'
+                    name= 'partNum'
+                    id={`partNum sku`}
+                    value = {skuData.partNum}
+                    placeholder="Part Number"
+                    autoComplete='off'
+                    onChange={onSKUChange} />
+            </div>
+
+            <div className="form-group">
+                <button type="submit" className="submit-btn">
+                    Search
+                </button>
+            </div>
+
+            {productSKUData.length!==0 && !noMatch && 
+            <div className="form-group">
+                <label>SKU</label>
+                <div className="card-form-control"
+                    style={{display:"flex", flexDirection:"column", alignItems:"flex-start"}}
+                >
+                    {productSKUData.map((item,i)=>{
+                        return (
+                        <p className='sku-list-item'
+                        onClick={()=>copyText(item.sku)}
+                        >
+                            {item.sku}
+                        </p>
+                        )
+                    })}
+                </div>
+            </div>}
+            
+            {noMatch && <p>No Match Found</p>  }
+
         </form>
     </div>
   )

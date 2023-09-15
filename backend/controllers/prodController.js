@@ -69,7 +69,7 @@ const pushToProduct = asyncHandler(async (req,res)=>{
 
 
 // @desc   Find Specific SKU Product
-// @route  POST /api/prod/search/sku
+// @route  POST /api/prod/search/sku/:skuOnlyFlag
 // @access Public
 const getSKUProd = asyncHandler(async (req,res)=>{
     const iC = req.body.itemCode?req.body.itemCode.toUpperCase():""
@@ -79,6 +79,8 @@ const getSKUProd = asyncHandler(async (req,res)=>{
     const spaceRemovedPN = req.body.partNum?req.body.partNum.replace(/ /g,""):""
     const cleanedPN = spaceRemovedPN.replace(/-/g,"") 
     const pN = cleanedPN.toUpperCase()
+
+    const { skuOnlyFlag } = req.params
 
     let prod, dbCollection
 
@@ -91,12 +93,26 @@ const getSKUProd = asyncHandler(async (req,res)=>{
         throw new Error('Specify Collection')
     }
 
-    prod = await dbCollection.find({ $and:[
-        {sku: { $regex: iC}}, 
-        {sku: { $regex: vM}}, 
-        {sku: { $regex: bC}}, 
-        {sku: { $regex: pN}}
-    ]},{__v:0}).lean()
+    if(skuOnlyFlag==="true"){
+        prod = await dbCollection.find({ $and:[
+            {sku: { $regex: iC}}, 
+            {sku: { $regex: vM}}, 
+            {sku: { $regex: bC}}, 
+            {sku: { $regex: pN}}
+        ]})
+        .select('sku -_id')
+        .lean()
+    }else if(skuOnlyFlag==="false"){
+        prod = await dbCollection.find({ $and:[
+            {sku: { $regex: iC}}, 
+            {sku: { $regex: vM}}, 
+            {sku: { $regex: bC}}, 
+            {sku: { $regex: pN}}
+        ]},{__v:0})
+        
+        .lean()
+    }
+
 
     res.status(200).json(prod)
 })
@@ -116,11 +132,6 @@ const searchAll = asyncHandler(async(req,res)=>{
     ]})
     .lean()
     // .select('sku -_id')
-
-    // if(response.length===0){
-    //     res.status(204)
-    //     throw new Error('No Content')
-    // }
     
     res.status(200).json(response)
 })
