@@ -28,6 +28,7 @@ app.use('/api/users', require('./routes/userRoutes'))
 app.use('/api/auth', require('./routes/authRoutes'))
 app.use('/api/prod', require('./routes/prodRoutes'))
 app.use('/api/order', require('./routes/orderRoutes'))
+app.use('/api/aws', require('./routes/awsRoutes'))
 
 app.use(errorHandler)
 
