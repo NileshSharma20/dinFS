@@ -19,6 +19,7 @@ const upload = multer({
         s3: s3,
         acl: "public-read",
         key: (req, file, cb)=>{
+            console.log(`file:${file}`)
             cb(null, file.originalname)
         }
     })

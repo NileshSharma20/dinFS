@@ -2,6 +2,8 @@ const fs = require("fs")
 const PDFDocument = require("./pdfkit-tables")
 const asyncHandler = require('express-async-handler')
 const Counter = require('../models/counterModel')
+// const { uploadS3File } = require("../controllers/awsUploadController")
+// const path = require('path');
 
 // @desc   Genearet Ticket number for Demand Slip
 const generateTicket = asyncHandler(async()=>{
@@ -17,6 +19,9 @@ const generateTicket = asyncHandler(async()=>{
         count.counterNumber = 1
         count.date = ticketDate
     }
+    if(ticketDate<10){
+        ticketDate = `0${ticketDate}`
+    }
 
     if(ticketMonth<10){
         ticketMonth = `0${ticketMonth}`
@@ -25,7 +30,7 @@ const generateTicket = asyncHandler(async()=>{
     const counter = count.counterNumber 
     
     
-    const fullDate = ticketDate+ ticketMonth+ ticketYear
+    const fullDate = `${ticketDate}${ticketMonth}${ticketYear}`
     const date = `${ticketDate}-${ticketMonth}-${ticketYear}` 
     
     const ticketNumber = counter.toString().padStart(3, '0')+fullDate
@@ -62,12 +67,21 @@ const generateDemandReciept=(ticketNumber, distributorName, date, prodData)=>{
         date
     }
 
-    doc.moveDown().table(table,100,150, {width:400}, headerInfo);
+    doc.moveDown().table(table,100,150, {width:288}, headerInfo);
+                
+    // doc.on('end', function () {
+        // fs.unlink(`../DemandSlips/DemandSlip-${ticketNumber}.pdf`, (err => { 
+        //     if (err) console.log(err)
+        //     else { 
+        //       console.log(`\nDeleted file: DemandSlip-${ticketNumber}.pdf`); 
+        //     }
+        // }))
+    // })
 
-    doc.end();
+    doc.end();  
 }
 
 module.exports = {
     generateTicket,
-    generateDemandReciept
+    generateDemandReciept,
 }

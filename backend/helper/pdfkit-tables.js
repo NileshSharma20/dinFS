@@ -64,14 +64,14 @@ class PDFDocumentWithTables extends PDFDocument {
 
         // Print Header for First Page
         this.font("Helvetica")
+            .fontSize(8)
+            .text("Demand Reciept",30,65)
+            .text(`${info.distributorName}`,30,80)
             .fontSize(10)
-            .text("Demand Reciept",55,65)
-            .text(`${info.distributorName}`,55,80)
-            .fontSize(20)
-            .text("Dinesh Auto Spares",100,57,{ align: 'center', width: 400 })
-            .fontSize(10)
-            .text(`TID: ${info.ticketNumber}`,200,65,{align:'right'})
-            .text(`${info.date}`,200,80,{align:'right'})
+            .text("Dinesh Auto Spares",50,57,{ align: 'center', width: 288 })
+            .fontSize(8)
+            .text(`TID: ${info.ticketNumber}`,60,65,{align:'right'})
+            .text(`${info.date}`,60,80,{align:'right'})
             .moveDown();
 
         // Check to have enough room for header and first rows

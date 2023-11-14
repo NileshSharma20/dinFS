@@ -32,7 +32,7 @@
     - [ ] Create Day based Demand Slip Backup
     - [x] Protected Routes (Manager and Admin Access)
     - [ ] Demand Slip Panel
-    - [ ] S3 Bucket Storage and Retrival
+    - [ ] Create Frontend for New Routes
 
 - [ ] Frontend
     - [ ] Revisit UI/UX

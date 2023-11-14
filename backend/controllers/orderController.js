@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler')
 const { generateTicket, generateDemandReciept } = require("../helper/orderHelper")
+const fs = require("fs")
 
 const Demandslip = require("../models/demandslipModel")
 const DemandslipHistory = require('../models/demandslipHistoryModel')
@@ -35,14 +36,87 @@ const createNewDemandSlip = asyncHandler(async (req,res)=>{
     const demandSlip = await Demandslip.create(newDemandSlip)
     const demandHistory =  await DemandslipHistory.create(newDemandSlip)
 
-    await generateDemandReciept(ticketNumber,distributorName,date,orderedProductList)
-
     if(demandSlip && demandHistory){
-        res.status(201).json({message:`New Demand Slip ${ticketNumber} created`})
+        res.status(201).json({demandSlipData: newDemandSlip})
     }else{
         res.status(400)
         throw new Error(`Failure`)
     }
+})
+
+// @desc   Get all Demand Slips
+// @route  GET /api/order/
+// @access Private
+const getAllDemandSlips =asyncHandler(async(req,res)=>{
+    const { roles } = req
+
+    // Check for Admin status
+    if(!roles.includes("Admin")){
+        res.status(403)
+        throw new Error("Forbidden")
+    }
+
+    orders = await Demandslip?.find().lean()
+    res.status(200).json(orders)
+})
+
+// @desc   Get date filtered Demand Slips
+// @route  POST /api/order/filter/:date
+// @access Private
+const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
+    const { date } = req.params
+    const { employeeId, status } = req.body
+    const { roles } = req
+    
+    var orders
+
+    // Check if User exists
+    if(employeeId){
+        const user = await User.findById({_id:employeeId}).lean().exec()
+        
+        if(!user){
+            res.status(400)
+            throw new Error('User not found')
+        }
+    }
+    
+
+    if( status && !(status==="pending" || status==="fulfilled" 
+        || status==="failed" || status==="partial")
+        ){
+            res.status(400)
+            throw new Error('Bad Request')
+    }
+
+    // Check for Admin and Manager status
+    if((roles.includes("Admin") || roles.includes("Manager")) 
+        && !employeeId){
+        
+        if(status){
+            orders = await Demandslip.find({ticketNumber:{ $regex:date}, status}).lean()
+        }else{
+            orders = await Demandslip.find({ticketNumber:{ $regex:date}}).lean()
+        }
+    }else{
+        // For Employee status
+        if(status){
+            orders = await Demandslip.find({ 
+                status,
+                employeeId,
+                ticketNumber:{ $regex: date}
+            
+            }).lean()
+        }else{
+            orders = await Demandslip.find({
+                    employeeId,
+                    ticketNumber:{ $regex: date}
+                
+            }).lean()
+        }
+    }
+
+
+    res.status(200).json(orders)
 })
 
 // @desc   Update pending Demand Slip (Admin can update closed tickets)
@@ -54,7 +128,8 @@ const updateAfterDelivery = asyncHandler(async(req,res)=>{
     
     const demandSlip = await Demandslip.findOne({ticketNumber:ticketNumber}).exec()
 
-    if(!employeeId || !status || (status!=="failed" && !totalCost)){
+    if(!employeeId || !status || (status!=="failed" && !totalCost)
+        ){
         res.status(400)
         throw new Error('All fields are requied')
     }
@@ -134,7 +209,7 @@ const deleteDemandSlip = asyncHandler(async(req,res)=>{
 
     // Check for existing ticket
     if(!demandSlip){
-        res.status(400)
+        res.status(400) 
         throw new Error(`Demand Slip ${ticketNumber} not found`)
     }
 
@@ -157,8 +232,46 @@ const deleteDemandSlip = asyncHandler(async(req,res)=>{
     res.status(200).json({message})
 })
 
+// @desc   Delete All Demand Slips (Admin access only)
+// @route  DELETE /api/order
+// @access Private
+const deleteAllDemandSlip = asyncHandler(async(req,res)=>{
+    const { roles } = req
+
+    // Check for Admin status
+    if(!roles.includes("Admin")){
+        res.status(403)
+        throw new Error("Forbidden")
+    }
+
+    await Demandslip.deleteMany({})
+    res.status(200).json({message:`Deleted all orders from Demand Slip Collection`})
+})
+
+// @desc   Delete All Demand Slip History (Admin access only)
+// @route  DELETE /api/order/reset
+// @access Private
+const deleteAllDemandHistory = asyncHandler(async(req,res)=>{
+    const { roles } = req
+
+    // Check for Admin status
+    if(!roles.includes("Admin")){
+        res.status(403)
+        throw new Error("Forbidden")
+    }
+
+    await DemandslipHistory.deleteMany({})
+    res.status(200).json({message:`Deleted all orders from Demand History Collection`})
+})
+
+
+
 module.exports={
     createNewDemandSlip,
+    getAllDemandSlips,
+    getFilteredDemandSlips,
     updateAfterDelivery,
+    deleteAllDemandSlip,
+    deleteAllDemandHistory,
     deleteDemandSlip
 }

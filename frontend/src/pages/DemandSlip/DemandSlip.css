@@ -1,0 +1,11 @@
+.pdf-btn{
+    width: auto;
+    height: auto;
+
+    padding: 1rem;
+    background-color: var(--formBgColor);
+
+    border-radius: 20px;
+
+    cursor: pointer;
+}
