@@ -16,7 +16,7 @@ function Products() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const {productData,noMatch, isLoading } =useSelector(
+  const { productData, noMatch, isLoading } = useSelector(
     (state)=>state.product
   )
 
@@ -43,44 +43,44 @@ function Products() {
   const { itemCode } = itemData
 
   const prodCodeList = [{
-    name:"Shocker",
-    code:"SKR",
+    productName:"Shocker",
+    itemCode:"SKR",
   },
   {
-    name:"Brake-Shoe",
-    code:"BSH",
+    productName:"Brake-Shoe",
+    itemCode:"BSH",
   },
   {
-    name:"Disc-Pad",
-    code:"DPD",
+    productName:"Disc-Pad",
+    itemCode:"DPD",
   },
   {
-    name:"Mobil-Filter",
-    code:"MOF",
+    productName:"Mobil-Filter",
+    itemCode:"MOF",
   },
   {
-    name:"Ball-Racer",
-    code:"RSR",
+    productName:"Ball-Racer",
+    itemCode:"RSR",
   },
   {
-    name:"Bendex",
-    code:"BDX",
+    productName:"Bendex",
+    itemCode:"BDX",
   },
   {
-    name:"Foot-Rest",
-    code:"FTR",
+    productName:"Foot-Rest",
+    itemCode:"FTR",
   },
   {
-    name:"Air-Filter",
-    code:"ARF",
+    productName:"Air-Filter",
+    itemCode:"ARF",
   },
   {
-    name:"Side-Stand",
-    code:"SSN",
+    productName:"Side-Stand",
+    itemCode:"SSN",
   },
   {
-    name:"Main-Stand",
-    code:"MSN",
+    productName:"Main-Stand",
+    itemCode:"MSN",
   },
   ]
 
@@ -328,7 +328,9 @@ function Products() {
                   item
                   :
                   // Write logic for when whole list isnt loaded
-                  productData.filter(prod=>prod.sku===item).map(prod=>prod.vehicleModel+" "+prod.brandCompany)
+                  productData.filter(prod=>prod.sku===item).map(prod=>
+                    prod.productName+" "+ prod.vehicleModel+" "+prod.brandCompany
+                  )
                 }
                 </p>})}
               </h3>

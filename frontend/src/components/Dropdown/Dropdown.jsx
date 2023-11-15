@@ -12,11 +12,11 @@ function Dropdown({dataList, passItemCode}) {
     const handleItemClick=(prod)=>{
         const data = {
             saveFile:false,
-            itemCode: prod.code
+            itemCode: prod.itemCode
         }
 
         passItemCode(data)
-        setSelectedItem(prod.name)
+        setSelectedItem(prod.productName)
         setIsActive(!isActive)
     }
 
@@ -32,7 +32,7 @@ function Dropdown({dataList, passItemCode}) {
             <div className="drop-down-item" key={index}
                 onClick={()=>handleItemClick(item)}
             >
-                <p>{item.name}</p>
+                <p>{item.productName}</p>
             </div>
             )
             }

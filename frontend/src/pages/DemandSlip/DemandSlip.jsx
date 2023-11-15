@@ -85,21 +85,58 @@ function DemandSlip() {
     addHeaderAndFooter(doc)
 
     doc.output('dataurlnewwindow',{filename:`DemandSlip${testData.ticketID}`})
-    // doc.save(`DemandSlip${testData.ticketID}`)
+    doc.save(`DemandSlip${testData.ticketID}`)
   }
 
   return (
-    <div className='data-container'>
-    
-        <h3>Demand Slip</h3>
-        <br />
+    <div className='container' style={{border:'1px solid red', justifyContent:"flex-start"}}>
+      <div className="ds-filter-container">
         
-        <div className="pdf-btn"
-          onClick={(e)=>handlePDFGenerate()}
-        >
-          Generate PDF
+        <div className="ds-filter-btn">
+          Create          
         </div>
+
+        <div className="ds-filter-btn ds-filer-btn-active">
+          All
+        </div>
+        <div className="ds-filter-btn">
+          Pending
+        </div>
+        <div className="ds-filter-btn">
+          Failed
+        </div>
+        <div className="ds-filter-btn">
+          Fulfilled        
+        </div>
+
+
+      </div>
+
+      <div className="ds-filter-data-container">
+
+        <div className="ds-content">
+
+          <h3>Demand Slip</h3>
+          <br />
+          
+          {
+            <>
+            <div className="pdf-btn"
+              onClick={(e)=>handlePDFGenerate()}
+              >
+              Generate PDF
+            </div>
+            </>
+          }
+        </div>
+
+        <div className="ds-search-container">
+            <h1>Search Box</h1>
+        </div>
+
     
+      </div>
+
     </div>
   )
 } 
