@@ -4,6 +4,10 @@ const shockerSchema = mongoose.Schema({
     itemCode:{
         type: String,
         required: [true, 'Please add the Item Code']
+    },
+    productName:{
+        type: String,
+        default: "SHOCKER",
     },   
     vehicleModel:{
         type: String,

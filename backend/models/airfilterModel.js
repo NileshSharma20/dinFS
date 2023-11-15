@@ -5,6 +5,10 @@ const airfilterSchema = mongoose.Schema({
         type: String,
         required: [true, 'Please add the Item Code']
     },   
+    productName:{
+        type: String,
+        default: "AIR-FILTER",
+    },  
     vehicleModel:{
         type: String,
         required: [true, 'Please add the Model/s']

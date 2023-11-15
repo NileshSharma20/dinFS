@@ -6,6 +6,7 @@ const {cleanJsonData, localCSVtoJSON } = require("../helper/prodHelper")
 // const Discpad = require('../models/discpadModel')
 // const Mobilfilter = require('../models/mobilFilterModel')
 const Products = require('../models/productsModel')
+const ItemCodeIndex = require('../models/itemCodeIndexModel')
 
 const dbCollectionList ={
     "SKR":"shockerModel",
@@ -40,6 +41,53 @@ const getAllProd = asyncHandler(async (req,res)=>{
 
     res.status(200).json(prod)
 })
+
+// @desc   Get Product Name from Item Code 
+// @route  GET /api/index/:itemCode
+// @access Public
+const getItemCodeIndex = asyncHandler(async(req,res)=>{
+    const { itemCode } = req.params
+    
+    const prodName = await ItemCodeIndex
+                                .findOne({
+                                    itemCode:itemCode.toUpperCase()
+                                    },'-_id -__v')
+                                .lean()
+
+    if(!prodName){
+        res.status(404)
+        throw new Error('Invalid Item Code')
+    }
+
+    res.status(200).json(prodName)
+})
+
+// @desc   Set Product Name from Item Code 
+// @route  SET /api/index/:itemCode
+// @access Public
+const setItemCodeIndex =asyncHandler(async(req,res)=>{
+    const { itemCode } = req.params 
+    const { productName } = req.body
+
+    const indexClone = await ItemCodeIndex
+                            .findOne({itemCode: itemCode.toUpperCase()})
+                            .lean()
+
+    if(indexClone){
+        res.status(409)
+        throw new Error(`Item Code Already Exists`)
+    }
+
+    const indexData = {
+        itemCode:itemCode.toUpperCase(), 
+        productName: productName.toUpperCase()
+    }
+
+    await ItemCodeIndex.create(indexData) 
+    
+    res.status(200).json(indexData)
+})
+
 
 // @desc   Push to Products Collection 
 // @route  POST /api/prod/
@@ -285,7 +333,7 @@ const deleteAllProd = asyncHandler(async (req,res)=>{
 
     // Finding right Collection
     const dbKeys = Object.keys(dbCollectionList)
-    if(dbKeys.includes(itemCode.toUpperCase() )){
+    if(dbKeys.includes( itemCode.toUpperCase() )){
         dbCollection = require(`../models/${dbCollectionList[itemCode.toUpperCase()]}`) 
     }else{
         res.status(400)
@@ -301,6 +349,8 @@ const deleteAllProd = asyncHandler(async (req,res)=>{
 module.exports = {
     getAllProd,
     getSKUProd,
+    getItemCodeIndex,
+    setItemCodeIndex,
     pushToProduct,
     searchAll,
     setProd,

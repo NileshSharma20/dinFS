@@ -5,6 +5,10 @@ const sidestandSchema = mongoose.Schema({
         type: String,
         required: [true, 'Please add the Item Code']
     },   
+    productName:{
+        type: String,
+        default: "SIDE-STAND",
+    },  
     vehicleModel:{
         type: String,
         required: [true, 'Please add the Model/s']

@@ -5,6 +5,10 @@ const productsSchema = mongoose.Schema({
         type: String,
         required: [true, 'Please add the Item Code']
     },   
+    productName:{
+        type: String,
+        required: [true, 'Please add Product Name']
+    },  
     vehicleModel:{
         type: String,
         required: [true, 'Please add the Model/s']

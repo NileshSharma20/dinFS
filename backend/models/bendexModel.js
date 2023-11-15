@@ -4,6 +4,10 @@ const bendexSchema = mongoose.Schema({
     itemCode:{
         type: String,
         required: [true, 'Please add the Item Code']
+    },  
+    productName:{
+        type: String,
+        default: "BENDEX",
     },   
     vehicleModel:{
         type: String,

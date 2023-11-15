@@ -4,7 +4,11 @@ const discpadSchema = mongoose.Schema({
     itemCode:{
         type: String,
         required: [true, 'Please add the Item Code']
-    },   
+    }, 
+    productName:{
+        type: String,
+        default: "DISC-PAD",
+    },    
     vehicleModel:{
         type: String,
         required: [true, 'Please add the Model/s']

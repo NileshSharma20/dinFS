@@ -32,12 +32,21 @@ const createNewDemandSlip = asyncHandler(async (req,res)=>{
         distributorName,
         orderedProductList,
     }
+
+    const clientDemandSlip = {
+        ticketNumber,
+        date,
+        employeeId,
+        deliveryPartnerName,
+        distributorName,
+        orderedProductList,
+    }
     
     const demandSlip = await Demandslip.create(newDemandSlip)
     const demandHistory =  await DemandslipHistory.create(newDemandSlip)
 
     if(demandSlip && demandHistory){
-        res.status(201).json({demandSlipData: newDemandSlip})
+        res.status(201).json({demandSlipData: clientDemandSlip})
     }else{
         res.status(400)
         throw new Error(`Failure`)

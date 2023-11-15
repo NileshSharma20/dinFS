@@ -5,6 +5,10 @@ const ballracerSchema = mongoose.Schema({
         type: String,
         required: [true, 'Please add the Item Code']
     },   
+    productName:{
+        type: String,
+        default: "BALL-RACER",
+    },  
     vehicleModel:{
         type: String,
         required: [true, 'Please add the Model/s']

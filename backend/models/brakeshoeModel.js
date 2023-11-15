@@ -5,6 +5,10 @@ const brakeshoeSchema = mongoose.Schema({
         type: String,
         required: [true, 'Please add the Item Code']
     },   
+    productName:{
+        type: String,
+        default: "BREAK-SHOE",
+    },  
     vehicleModel:{
         type: String,
         required: [true, 'Please add the Model/s']

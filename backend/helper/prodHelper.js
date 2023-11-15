@@ -85,10 +85,13 @@ const cleanJsonData = (rawJson) => {
         cleanedData=[]
     }else{
 
-    cleanedData = rawJson.filter((item=>item.itemCode && item.vehicleModel && item.brandCompany && item.partNum && item.mrp)).map((prod)=>{
+    cleanedData = rawJson.filter((item=>item.itemCode && item.productName && item.vehicleModel && item.brandCompany && item.partNum && item.mrp)).map((prod)=>{
         // console.log(`rawJSON:${JSON.stringify(rawJson)}`)
         var sku=""
         var metaData = []
+
+        const cleanedProdName = prod.productName.toUpperCase()
+        var prodName = cleanedProdName.replace(/ /g,'-')
 
         //itemCode cleanup
         const cleanedIC = prod.itemCode.toUpperCase()
@@ -147,6 +150,7 @@ const cleanJsonData = (rawJson) => {
         
         return {
             itemCode: iC,
+            productName: prodName,
             vehicleModel: spaceRemovedVM,
             brandCompany: spaceRemovedBC,
             partNum: spaceRemovedPN,
