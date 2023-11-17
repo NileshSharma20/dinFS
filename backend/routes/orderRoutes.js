@@ -9,20 +9,21 @@ const { createNewDemandSlip,
         deleteAllDemandHistory } =  require("../controllers/orderController")
 const verifyJWT = require('../middleware/verifyJWT')
 
+router.use(verifyJWT)
 
 router.route("/")
         .post(createNewDemandSlip)
-        .get(verifyJWT, getAllDemandSlips)
-        .delete(verifyJWT,deleteAllDemandSlip)
+        .get(getAllDemandSlips)
+        .delete(deleteAllDemandSlip)
 
 router.route("/:ticketNumber")
         .patch(updateAfterDelivery)
-        .delete(verifyJWT,deleteDemandSlip)
+        .delete(deleteDemandSlip)
 
 router.route("/filter/:date")
-        .post(verifyJWT,getFilteredDemandSlips)
+        .post(getFilteredDemandSlips)
 
 router.route("/reset/history")
-        .delete(verifyJWT,deleteAllDemandHistory)
+        .delete(deleteAllDemandHistory)
 
 module.exports = router

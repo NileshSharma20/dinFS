@@ -10,6 +10,10 @@ const demandsliphistorySchema = mongoose.Schema({
         required: true,
         ref:"User"
     },
+    username:{
+        type: String,
+        required: true
+    },
     deliveryPartnerName:{
         type: String,
     },

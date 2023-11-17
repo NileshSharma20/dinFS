@@ -33,6 +33,7 @@
     - [x] Protected Routes (Manager and Admin Access)
     - [ ] Demand Slip Panel
     - [ ] Create Frontend for New Routes
+    - [ ] Update updateTicket logic for username and ticket number check
 
 - [ ] Frontend
     - [ ] Revisit UI/UX

@@ -10,10 +10,21 @@ const User = require("../models/userModel")
 // @route  POST /api/order/
 // @access Private
 const createNewDemandSlip = asyncHandler(async (req,res)=>{
-    const {employeeId,
-           deliveryPartnerName,
+    const {deliveryPartnerName,
            distributorName,
            orderedProductList } = req.body
+    
+    const { username } = req
+
+    const employeeExists = await User.findOne({username}).select('-password').lean()
+
+    // Check if User exists and Active
+    if(!employeeExists || !employeeExists.active){
+        res.status(403)
+        throw new Error('Unauthorized')
+    }
+
+    const employeeId = employeeExists._id
 
     if(!employeeId || !deliveryPartnerName || !distributorName ||
         !orderedProductList ||
@@ -28,6 +39,7 @@ const createNewDemandSlip = asyncHandler(async (req,res)=>{
     const newDemandSlip = {
         ticketNumber,
         employeeId,
+        username: employeeExists.username,
         deliveryPartnerName,
         distributorName,
         orderedProductList,
@@ -37,6 +49,7 @@ const createNewDemandSlip = asyncHandler(async (req,res)=>{
         ticketNumber,
         date,
         employeeId,
+        username: employeeExists.username,
         deliveryPartnerName,
         distributorName,
         orderedProductList,
@@ -57,7 +70,15 @@ const createNewDemandSlip = asyncHandler(async (req,res)=>{
 // @route  GET /api/order/
 // @access Private
 const getAllDemandSlips =asyncHandler(async(req,res)=>{
-    const { roles } = req
+    const { username, roles } = req
+
+    const employeeExists = await User.findOne({username}).select('-password').lean()
+
+    // Check if User exists and Active
+    if(!employeeExists || !employeeExists.active){
+        res.status(403)
+        throw new Error('Unauthorized')
+    }
 
     // Check for Admin status
     if(!roles.includes("Admin")){
@@ -74,21 +95,20 @@ const getAllDemandSlips =asyncHandler(async(req,res)=>{
 // @access Private
 const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
     const { date } = req.params
-    const { employeeId, status } = req.body
-    const { roles } = req
+    const { status } = req.body
+    const { username, roles } = req
+
+    const employeeExists = await User.findOne({username}).select('-password').lean()
+
+    // Check if User exists and Active
+    if(!employeeExists || !employeeExists.active){
+        res.status(403)
+        throw new Error('Unauthorized')
+    }
+
+    // const employeeId = employeeExists._id
     
     var orders
-
-    // Check if User exists
-    if(employeeId){
-        const user = await User.findById({_id:employeeId}).lean().exec()
-        
-        if(!user){
-            res.status(400)
-            throw new Error('User not found')
-        }
-    }
-    
 
     if( status && !(status==="pending" || status==="fulfilled" 
         || status==="failed" || status==="partial")
@@ -97,33 +117,38 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
             throw new Error('Bad Request')
     }
 
-    // Check for Admin and Manager status
-    if((roles.includes("Admin") || roles.includes("Manager")) 
-        && !employeeId){
-        
-        if(status){
-            orders = await Demandslip.find({ticketNumber:{ $regex:date}, status}).lean()
-        }else{
-            orders = await Demandslip.find({ticketNumber:{ $regex:date}}).lean()
-        }
-    }else{
-        // For Employee status
-        if(status){
-            orders = await Demandslip.find({ 
-                status,
-                employeeId,
-                ticketNumber:{ $regex: date}
-            
-            }).lean()
-        }else{
-            orders = await Demandslip.find({
-                    employeeId,
+    // Check for minimum Managaer Level Access
+    if(!roles?.length || !Array.isArray(roles) ||
+        !roles.includes("Manager")){
+
+            // Employee Level Access
+            if(status){
+                orders = await Demandslip.find({ 
+                    status,
+                    employeeId: employeeExists._id.toString(),
+                    username:username,
                     ticketNumber:{ $regex: date}
                 
-            }).lean()
-        }
+                },'-_id -__v -employeeId -createdAt -updatedAt').lean()
+            }else{
+                orders = await Demandslip.find({
+                        username:username,
+                        employeeId: employeeExists._id.toString(),
+                        ticketNumber:{ $regex: date}
+                    
+                },'-_id -__v -employeeId -createdAt -updatedAt').lean()
+            }
+        
+        }else{
+            // Manager and Admin Level Access
+            if(status){
+                orders = await Demandslip.find({ticketNumber:{ $regex:date}, status}
+                                ,'-_id -__v').lean()
+            }else{
+                orders = await Demandslip.find({ticketNumber:{ $regex:date}}
+                                ,'-_id -__v ').lean()
+            }
     }
-
 
     res.status(200).json(orders)
 })
@@ -132,8 +157,20 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
 // @route  PATCH /api/order/:ticketNumber
 // @access Private
 const updateAfterDelivery = asyncHandler(async(req,res)=>{
-    const { employeeId, status, recievedProductList,totalCost } = req.body
+    const { status, recievedProductList,totalCost } = req.body
     const { ticketNumber } = req.params
+
+    const { username, roles } = req
+
+    const employeeExists = await User.findOne({username}).select('-password').lean()
+
+    // Check if User exists and Active
+    if(!employeeExists || !employeeExists.active){
+        res.status(403)
+        throw new Error('Unauthorized')
+    }
+
+    const employeeId = employeeExists._id
     
     const demandSlip = await Demandslip.findOne({ticketNumber:ticketNumber}).exec()
 
@@ -143,26 +180,20 @@ const updateAfterDelivery = asyncHandler(async(req,res)=>{
         throw new Error('All fields are requied')
     }
 
-    // Check if User exists
-    const user = await User.findById({_id:employeeId}).lean().exec()
-    
-    if(!user){
-        res.status(400)
-        throw new Error('User not found')
-    }
-
     // Check for existing ticket
     if(!demandSlip){
         res.status(400)
         throw new Error("Demand Slip not found")
     }
 
-    // Check if ticket status is pending or if User has Admin access
-    if(user)
-    if(demandSlip.status!=="pending" && !user.roles.includes("Admin") || 
-        (employeeId!==demandSlip.employeeId.toString() && !user.roles.includes("Admin"))){
-        res.status(403)
-        throw new Error("Forbidden")
+    // Check if ticket status is pending or if Different User has Admin access
+    if((demandSlip.status!=="pending" && !roles.includes("Admin")) 
+        || 
+        (employeeId.toString()!==demandSlip.employeeId.toString() 
+        && username!==demandSlip.username 
+        && !roles.includes("Admin"))){
+            res.status(403)
+            throw new Error("Forbidden")
     }
 
     // Status Logic
@@ -181,7 +212,8 @@ const updateAfterDelivery = asyncHandler(async(req,res)=>{
     }
     const demandBackup = {
         ticketNumber: demandSlip.ticketNumber,
-        employeeId: demandSlip.employeeId,
+        employeeId,
+        username: employeeExists.username,
         deliveryPartnerName: demandSlip.deliveryPartnerName,
         distributorName: demandSlip.distributorName,
         status: demandSlip.status,
@@ -205,8 +237,18 @@ const updateAfterDelivery = asyncHandler(async(req,res)=>{
 // @route  DELETE /api/order/:ticketNumber
 // @access Private
 const deleteDemandSlip = asyncHandler(async(req,res)=>{
-    const { username, roles } = req
     const { ticketNumber } = req.params
+    const { username, roles } = req
+
+    const employeeExists = await User.findOne({username}).select('-password').lean()
+
+    // Check if User exists and Active
+    if(!employeeExists || !employeeExists.active){
+        res.status(403)
+        throw new Error('Unauthorized')
+    }
+
+    const employeeId = employeeExists._id
 
     // Check for Admin status
     if(!roles.includes("Admin")){
@@ -224,7 +266,8 @@ const deleteDemandSlip = asyncHandler(async(req,res)=>{
 
     const demandBackup = {
         ticketNumber: demandSlip.ticketNumber,
-        employeeId: demandSlip.employeeId,
+        employeeId: employeeId,
+        username: employeeExists.username,
         deliveryPartnerName: demandSlip.deliveryPartnerName,
         distributorName: demandSlip.distributorName,
         status: `deleted by Admin ${username}`,
@@ -245,10 +288,20 @@ const deleteDemandSlip = asyncHandler(async(req,res)=>{
 // @route  DELETE /api/order
 // @access Private
 const deleteAllDemandSlip = asyncHandler(async(req,res)=>{
-    const { roles } = req
+    const { username, roles } = req
+
+    const employeeExists = await User.findOne({username}).select('-password').lean()
+
+    // Check if User exists and Active
+    if(!employeeExists || !employeeExists.active){
+        res.status(403)
+        throw new Error('Unauthorized')
+    }
+
 
     // Check for Admin status
-    if(!roles.includes("Admin")){
+    if(!roles?.length || !Array.isArray(roles) ||
+        !roles.includes("Admin")){
         res.status(403)
         throw new Error("Forbidden")
     }
@@ -261,10 +314,19 @@ const deleteAllDemandSlip = asyncHandler(async(req,res)=>{
 // @route  DELETE /api/order/reset
 // @access Private
 const deleteAllDemandHistory = asyncHandler(async(req,res)=>{
-    const { roles } = req
+    const { username, roles } = req
+
+    const employeeExists = await User.findOne({username}).select('-password').lean()
+
+    // Check if User exists and Active
+    if(!employeeExists || !employeeExists.active){
+        res.status(403)
+        throw new Error('Unauthorized')
+    }
 
     // Check for Admin status
-    if(!roles.includes("Admin")){
+    if(!roles?.length || !Array.isArray(roles) ||
+        !roles.includes("Admin")){
         res.status(403)
         throw new Error("Forbidden")
     }
