@@ -86,8 +86,12 @@ const createProductDataJSON = (csvFileData) => {
   // Search Products
   const searchSKUProducts = async (itemData,skuOnlyFlag) => {
     const response = await axios.post(prod_URI +`search/sku/${skuOnlyFlag}`, itemData)
-
-    return response.data
+    const res = response.data.map((item)=>{
+      var productFullName = item.productName+" "+item.vehicleModel+" "+item.brandCompany
+      return {...item, productFullName:productFullName} 
+    })
+    // console.log(JSON.stringify(res,null,4))
+    return res
   } 
 
   // Update Products

@@ -52,6 +52,15 @@
     border: 1px solid blue;
 }
 
+.ds-slip-box{
+    width: 99%;
+    min-height: 10vh;
+
+    border-radius: 20px;
+    background-color: var(--formBgColor);
+    margin-bottom: 0.5rem;
+}
+
 .pdf-btn{
     width: auto;
     height: auto;
