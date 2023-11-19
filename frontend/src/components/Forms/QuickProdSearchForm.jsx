@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from "react-redux"
 import { searchSKUProductsOnly } from '../../features/products/productSlice';
 
@@ -98,18 +98,23 @@ function QuickProdSearchForm() {
 
         {productSKUData.length!==0 && !noMatch && 
         <div className="form-group">
-            <label>SKU</label>
+            <label>Results</label>
             <div className="card-form-control"
                 style={{display:"flex", flexDirection:"column", alignItems:"flex-start"}}
             >
                 {productSKUData.map((item,i)=>{
                     return (
-                    <p className='sku-list-item'
-                    key={i}
-                    onClick={()=>copyText(item.sku)}
-                    >
-                        {item.sku}
-                    </p>
+                        <React.Fragment>
+
+                        <p className='sku-list-item'
+                        key={i}
+                        onClick={()=>copyText(item.sku)}
+                        >
+                            {item.sku}
+                        </p>
+                        <p>{item.productFullName}</p>
+                        <br />
+                        </React.Fragment>
                     )
                 })}
             </div>

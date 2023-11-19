@@ -1,14 +1,29 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
 import "./DemandSlip.css"
 import QuickProdSearchForm from '../../components/Forms/QuickProdSearchForm'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { getFilteredDemandSlips } from '../../features/orders/orderSlice'
 
 function DemandSlip() {
   const dispatch = useDispatch()
+
+  const { orderData } = useSelector((state)=>state.orders)
+
+  const [pendingOrderList, setPendingOrderList] = useState(orderData.filter((item)=>item.status==="pending"))
+  const [partialOrderList, setPartialOrderList] = useState(orderData.filter((item)=>item.status==="partial"))
+  const [failedOrderList, setFailedOrderList] = useState(orderData.filter((item)=>item.status==="failed"))
+  const [fulfilledOrderList, setFulfilledOrderList] = useState(orderData.filter((item)=>item.status==="fulfilled"))
+
+  const [allFlag, setAllFlag] = useState(true)
+  const [pendingFlag, setPendingFlag] = useState(false)
+  const [fulfilledFlag, setFulfilledFlag] = useState(false)
+  const [failedFlag, setFailedFlag] = useState(false)
+  const [partialFlag, setPartialFlag] = useState(false)
+
+  const [displayList, setDisplayList] = useState(orderData)
 
   const testData = {
     ticketID:"00718082023",
@@ -19,6 +34,52 @@ function DemandSlip() {
   }
 
   const date = testData.ticketID.slice(3,5)+"-"+testData.ticketID.slice(5,7)+"-"+testData.ticketID.slice(7) 
+
+  const handleAllClick=()=>{
+    setAllFlag(true)
+
+    setFailedFlag(false)
+    setPartialFlag(false)
+    setPendingFlag(false)
+    setFulfilledFlag(false)
+    
+  }
+
+  const handlePendingClick=()=>{
+    setPendingFlag(true)
+
+    setAllFlag(false)
+    setFailedFlag(false)
+    setPartialFlag(false)
+    setFulfilledFlag(false)
+  }
+
+  const handlePartialClick=()=>{
+    setPartialFlag(true)
+    
+    setAllFlag(false)
+    setPendingFlag(false)
+    setFailedFlag(false)
+    setFulfilledFlag(false)
+  }
+
+  const handleFailedClick=()=>{
+    setFailedFlag(true)
+    
+    setAllFlag(false)
+    setPendingFlag(false)
+    setPartialFlag(false)
+    setFulfilledFlag(false)
+  }
+
+  const handleFulfilledClick=()=>{
+    setFulfilledFlag(true)
+    
+    setAllFlag(false)
+    setPendingFlag(false)
+    setFailedFlag(false)
+    setPartialFlag(false)
+  }
 
   const addHeaderAndFooter = doc => {
     const pageCount = doc.internal.getNumberOfPages()
@@ -93,51 +154,123 @@ function DemandSlip() {
     doc.save(`DemandSlip${testData.ticketID}`)
   }
 
+  useEffect(()=>{
+    dispatch(getFilteredDemandSlips())
+  },[])
+
+  useEffect(()=>{
+    setPendingOrderList(orderData.filter((item)=>item.status==="pending"))
+    setFailedOrderList(orderData.filter((item)=>item.status==="failed"))
+    setPartialOrderList(orderData.filter((item)=>item.status==="partial"))
+    setFulfilledOrderList(orderData.filter((item)=>item.status==="fulfilled"))
+  },[orderData])
+
+  useEffect(()=>{
+    if(allFlag){
+      setDisplayList(orderData)
+    }
+    if(pendingFlag){
+      setDisplayList(pendingOrderList)
+    }else if(failedFlag){
+      setDisplayList(failedOrderList)
+    }else if(partialFlag){
+      setDisplayList(partialOrderList)
+    }else if(fulfilledFlag){
+      setDisplayList(fulfilledOrderList)
+    }
+
+  },[allFlag, pendingFlag, failedFlag, partialFlag, fulfilledFlag, orderData])
+  
+  // useEffect(()=>{
+  //   console.log(`dL:${JSON.stringify(displayList,null,4)}`)
+  // },[displayList])
+
+
   return (
-    <div className='container' style={{border:'1px solid red', justifyContent:"flex-start"}}>
+    <div className='container' 
+      style={{
+        // border:'1px solid red', 
+        justifyContent:"flex-start",
+        
+      }}
+    >
       <div className="ds-filter-container">
         
         <div className="ds-filter-btn">
           Create          
         </div>
 
-        <div className="ds-filter-btn ds-filer-btn-active">
+        <div className={`ds-filter-btn ${allFlag?"ds-filer-btn-active":""}`}
+          onClick={()=>handleAllClick()}
+        >
           All
         </div>
-        <div className="ds-filter-btn">
+        
+        <div className={`ds-filter-btn ${pendingFlag?"ds-filer-btn-active":""}`}
+          onClick={()=>handlePendingClick()}
+        >
           Pending
         </div>
-        <div className="ds-filter-btn">
+        
+        <div className={`ds-filter-btn ${partialFlag?"ds-filer-btn-active":""}`}
+          onClick={()=>handlePartialClick()}
+        >
+          Partial
+        </div>
+
+        <div className={`ds-filter-btn ${failedFlag?"ds-filer-btn-active":""}`}
+          onClick={()=>handleFailedClick()}
+        >
           Failed
         </div>
-        <div className="ds-filter-btn">
+        
+        <div className={`ds-filter-btn ${fulfilledFlag?"ds-filer-btn-active":""}`}
+          onClick={()=>handleFulfilledClick()}
+        >
           Fulfilled        
         </div>
 
 
       </div>
 
-      <div className="ds-filter-data-container">
+      <div className="ds-filter-data-container"
+      >
 
-        <div className="ds-content">
-          <div className="ds-slip-box">
+        <div className="ds-content"
+        style={{gridColumn:"1 / span 2"}}
+        >
+            {displayList.map((order,key)=>{
+                return (
+                <div className="ds-slip-box" key={key}>
+                  <p>{order.ticketNumber}</p>
+                  <p>{order.status}</p>
+                  <p>{order.deliveryPartnerName}</p>
+                  <p>{order.distributorName}</p>
+                  <div>{order.orderedProductList.map((prod,k)=>{
+                      return (
+                        <div key={k}>
+
+                        <span>
+                          {prod.sku ? prod.sku:prod.productFullName}
+                        </span>
+                        <br />
+                        <span>{prod.quantity}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+                )
+              })}
+              {/* <h3>Single Slip</h3> */}
+
+          {/* <div className="ds-slip-box">
               <h3>Single Slip</h3>
-          </div>
-
-          <div className="ds-slip-box">
-              <h3>Single Slip</h3>
-          </div>
-
-          <h3>Demand Slip</h3>
+          </div> */}
           <br />
           
           {
             <>
-            <div className="pdf-btn"
-              onClick={()=>dispatch(getFilteredDemandSlips())}
-            >
-              Get Slip Data
-            </div>
 
             <div className="pdf-btn"
               onClick={(e)=>handlePDFGenerate()}
@@ -148,9 +281,9 @@ function DemandSlip() {
           }
         </div>
 
-        <div className="ds-search-container">
+        {/* <div className="ds-search-container">
             <QuickProdSearchForm />
-        </div>
+        </div> */}
 
     
       </div>

@@ -148,7 +148,7 @@ const getSKUProd = asyncHandler(async (req,res)=>{
             {sku: { $regex: bC}}, 
             {sku: { $regex: pN}}
         ]})
-        .select('sku productName vehicleModel brandCompany -_id')
+        .select('sku productName vehicleModel brandCompany partNum -_id')
         .lean()
     }else if(skuOnlyFlag==="false"){
         prod = await dbCollection.find({ $and:[
@@ -157,7 +157,6 @@ const getSKUProd = asyncHandler(async (req,res)=>{
             {sku: { $regex: bC}}, 
             {sku: { $regex: pN}}
         ]},{__v:0})
-        
         .lean()
     }
 
