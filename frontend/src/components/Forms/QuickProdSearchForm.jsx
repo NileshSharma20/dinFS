@@ -2,11 +2,16 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from "react-redux"
 import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai"
 import { searchSKUProductsOnly } from '../../features/products/productSlice';
+import { generateDemandSlip, getFilteredDemandSlips, resetAfterNewDemandSlip, resetOrders } from '../../features/orders/orderSlice';
+import Loader from '../Loader/Loader';
 
-function QuickProdSearchForm() {
+function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
     const dispatch = useDispatch();
 
-    const {productSKUData, noMatch, isSuccess, message} = useSelector((state)=>state.product)
+    const {productSKUData, noMatch } = useSelector((state)=>state.product)
+    const { newDemandSlip, isSuccess, isLoading, message } = useSelector((state)=>state.orders)
+
+    const [newDSFlag, setNewDSFlag] = useState(false)
 
     const [formData, setFormData] = useState({
         deliveryPartnerName: "",
@@ -18,11 +23,6 @@ function QuickProdSearchForm() {
         }]
     })
 
-    const [orderedProductList, setOrderedProductList] = useState([{
-        sku:"",
-        productFullName:"",
-        quantity:""
-    }])
     const [updatedOrderList, setUpdatedOrderList] = useState([{
         sku:"",
         productFullName:"",
@@ -53,6 +53,10 @@ function QuickProdSearchForm() {
             productFullName: item.productFullName,
             quantity:""
         }
+
+        // const duplicateList = [...updatedOrderList]
+
+
         
         // Check for Duplicates
         var duplicateCheck = []
@@ -62,7 +66,6 @@ function QuickProdSearchForm() {
             return alert('Item Already Exists')
         }
 
-        // console.log(`newItem:${JSON.stringify(newItem,null,4)}`)
         setUpdatedOrderList((prevState)=>([
             ...prevState,
             newItem
@@ -85,14 +88,11 @@ function QuickProdSearchForm() {
     }
 
     const onOrderItemChange=(e,i)=>{
-        // e.preventDefault()
-        var orderList = [...updatedOrderList]
-        var orderItem = orderList[i]
-        // console.log(`test0:${JSON.stringify(orderItem,null,4)}`)
+        let orderList = [...updatedOrderList]
+        let orderItem = orderList[i]
         orderItem[e.target.name] = e.target.value
-        console.log(`test:${JSON.stringify(orderItem,null,4)}`)
+
         setUpdatedOrderList(orderList)
-        console.log(`ordeList:${JSON.stringify(orderList,null,4)}`)
     }
 
     const handleAddItem=()=>{
@@ -103,30 +103,36 @@ function QuickProdSearchForm() {
     const handleItemDelete = (index)=>{
         const modelList = [...updatedOrderList]
         modelList.splice(index,1)
-        // console.log(modelList)
+
         setUpdatedOrderList(modelList)
     }
 
     const onSubmit = (e) =>{
         e.preventDefault()
 
+        let emptyOrderListObj = []
+        emptyOrderListObj = updatedOrderList.filter(prod=>(prod.sku===""
+                                                    ||prod.productFullName===""
+                                                    ||prod.quantity===""))
+
+        if(emptyOrderListObj.length>0){
+            return alert('Empty Field/s')
+        }
+
         if(deliveryPartnerName==="" || distributorName==="" || updatedOrderList.length===0 
             || !Array.isArray(updatedOrderList)){
-            console.log(`Please enter valid data`)
+            return alert(`Please enter valid data`)
         }else{
             const orderInfo = {
                 deliveryPartnerName,
                 distributorName,
                 orderedProductList:updatedOrderList,
-                // partNum,
-                // compatibleModels:updatedModeOrderList.join(","),
-                // mrp,
-                // ...updatedMetaData
             }
             
-            console.log(`formData:${JSON.stringify(orderInfo,null,4)}`)
+            // console.log(`formData:${JSON.stringify(orderInfo,null,4)}`)
             
-            // dispatch(updateProduct({prodInfo,sku}))
+            dispatch(generateDemandSlip(orderInfo))
+            
         }
     }
 
@@ -135,18 +141,60 @@ function QuickProdSearchForm() {
         e.preventDefault()
         
         if(skuData.itemCode===""){
-        alert(`Please Enter Item Code`)
+            return alert(`Please Enter Item Code`)
         }else{
-        dispatch(searchSKUProductsOnly(skuData))
+            dispatch(searchSKUProductsOnly(skuData))
         }
     }
 
-    useEffect(()=>{
-        console.log(`updatedList:${JSON.stringify(updatedOrderList,null,4)}`)
-    },[updatedOrderList])
+    /////////////////////////////////////////////////
+    //////// Hooks //////////////////////////////////
+    ////////////////////////////////////////////////
 
+    useEffect(()=>{
+        if(isSuccess && message!==""){
+            // dispatch(resetOrders())
+            dispatch(getFilteredDemandSlips())
+
+            if(isSuccess){
+                setFormData({
+                    deliveryPartnerName: "",
+                    distributorName: "",
+                    orderedProductList: [{
+                        sku:"",
+                        productFullName:"",
+                        quantity:""
+                    }]
+                })
+
+                setSKUData({
+                    itemCode:"",
+                    vehicleModel:"",
+                    brandCompany:"",
+                    partNum:"",
+                    skuOnlyFlag:"true"
+                })
+                dispatch(resetAfterNewDemandSlip())
+
+                // passNextFlag(true)
+                // setToggleFlag(false)
+            }
+        }
+    },[isSuccess])
+
+    // useEffect(()=>{
+    //     dispatch(resetOrders())
+    // },[])
 
   return (
+    <>
+    {isLoading && <Loader/>}
+    {/* {newDSFlag && 
+        <div>
+            <p>{`ticketNumber:${newDemandSlip.ticketNumber} created`}</p>
+
+        </div>
+    } */}
     <div className='card-container card-grid' style={{padding:"0", border:"none"}}>
         <form onSubmit={onSubmit}>
             <div className="form-group">
@@ -319,6 +367,7 @@ function QuickProdSearchForm() {
 
         </form>
     </div>
+    </>
   )
 }
 

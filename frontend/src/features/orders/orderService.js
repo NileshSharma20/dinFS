@@ -40,9 +40,24 @@ const getFilteredDemandSlips = async(token)=>{
     return response.data
 }
 
+const generateDemandSlip = async({demandSlipData, token})=>{
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }
+
+    // API Call
+    const response = await axios.post(order_URI, demandSlipData, config) 
+    // console.log(`response:${JSON.stringify(response.data.demandSlipData,null,4)}`)
+    return response.data.demandSlipData
+}
+
+
 const orderService = {
     getAllDemandSlips,
     getFilteredDemandSlips,
+    generateDemandSlip,
 }
 
 export default orderService

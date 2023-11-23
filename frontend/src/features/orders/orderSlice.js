@@ -4,6 +4,7 @@ import { refreshToken } from '../auth/authSlice'
 
 const initialState = {
     orderData:[],
+    newDemandSlip:{},
     isLoading:false,
     isError:false,
     isSuccess:false,
@@ -68,11 +69,47 @@ export const getFilteredDemandSlips = createAsyncThunk(
   }
 )
 
+export const generateDemandSlip = createAsyncThunk(
+  'orders/generateDemandSlip',
+  async(demandSlipData,thunkAPI)=>{
+    try {
+      try {
+            
+        const token = thunkAPI.getState().auth.token
+        return await orderService.generateDemandSlip({demandSlipData,token})
+        // await thunkAPI.dispatch(getFilteredDemandSlips()) 
+
+      } catch (err) {
+        
+        if(err.response.status === 403){
+          await thunkAPI.dispatch(refreshToken())
+
+          const token = thunkAPI.getState().auth.token
+          return await orderService.generateDemandSlip({demandSlipData,token})
+          // await thunkAPI.dispatch(getFilteredDemandSlips()) 
+        }
+      }
+    } catch (error) {
+      const message =
+          (error.response && error.response.data && error.response.data.message) ||
+          error.message ||
+          error.toString()
+      return thunkAPI.rejectWithValue(message)
+    }
+  }
+)
+
 export const orderSlice = createSlice({
     name: 'orders',
     initialState,
     reducers: {
-      resetOrders: (state) => initialState
+      resetOrders: (state) => initialState,
+      resetAfterNewDemandSlip: (state)=>({...state,
+        isError:false,
+        isLoading:false,
+        isSuccess:false,
+        message:""
+      })
     },
     extraReducers: (builder) => {
       builder
@@ -91,6 +128,7 @@ export const orderSlice = createSlice({
           state.isError = true
           state.message = action.payload
         })
+      
         // Get User and Date Filtered Demand Slip Data //////
         .addCase(getFilteredDemandSlips.pending, (state) => {
           state.isLoading = true
@@ -106,8 +144,31 @@ export const orderSlice = createSlice({
           state.isError = true
           state.message = action.payload
         })
+
+      // Generate New Demand Slip //////
+      .addCase(generateDemandSlip.pending, (state) => {
+        state.isLoading = true
+        state.isSuccess = false
+        state.isError = false
+        state.newDemandSlip = {}
+        // state.orderData=[]
+      })
+      .addCase(generateDemandSlip.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.isError = false
+        state.isSuccess = true
+        state.newDemandSlip = action.payload
+        state.message = `New Demand Reciept ${action.payload.ticketNumber} created`
+      })
+      .addCase(generateDemandSlip.rejected, (state, action) => {
+        state.isLoading = false
+        state.isSuccess = false
+        state.isError = true
+        state.message = action.payload
+      })
     }
 })
 
-export const { resetOrders } = orderSlice.actions
+export const { resetOrders,
+              resetAfterNewDemandSlip } = orderSlice.actions
 export default orderSlice.reducer

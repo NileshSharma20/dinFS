@@ -172,6 +172,7 @@ const searchAll = asyncHandler(async(req,res)=>{
 
     const response = await Products.find({$or:[
         {itemCode:{$regex: searchKey}},
+        {productName:{$regex: searchKey}},
         {vehicleModel:{$regex: searchKey}},
         {brandCompany:{$regex: searchKey}},
         {partNum:{$regex: searchKey}},

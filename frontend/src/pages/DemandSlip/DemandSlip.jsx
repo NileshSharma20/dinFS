@@ -1,22 +1,25 @@
 import React, { useEffect, useState } from 'react'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import { FiEdit2 } from 'react-icons/fi'
 
 import "./DemandSlip.css"
 import QuickProdSearchForm from '../../components/Forms/QuickProdSearchForm'
 import { useDispatch, useSelector } from 'react-redux'
 import { getFilteredDemandSlips } from '../../features/orders/orderSlice'
 import Loader from '../../components/Loader/Loader'
+import LoginAgainModal from '../../components/Modals/LoginAgainModal'
 
 function DemandSlip() {
   const dispatch = useDispatch()
 
+  const {token} = useSelector((state)=>state.auth)
   const { orderData, isLoading } = useSelector((state)=>state.orders)
 
-  const [pendingOrderList, setPendingOrderList] = useState(orderData.filter((item)=>item.status==="pending"))
-  const [partialOrderList, setPartialOrderList] = useState(orderData.filter((item)=>item.status==="partial"))
-  const [failedOrderList, setFailedOrderList] = useState(orderData.filter((item)=>item.status==="failed"))
-  const [fulfilledOrderList, setFulfilledOrderList] = useState(orderData.filter((item)=>item.status==="fulfilled"))
+  const [pendingOrderList, setPendingOrderList] = useState(orderData?.filter((item)=>item.status==="pending"))
+  const [partialOrderList, setPartialOrderList] = useState(orderData?.filter((item)=>item.status==="partial"))
+  const [failedOrderList, setFailedOrderList] = useState(orderData?.filter((item)=>item.status==="failed"))
+  const [fulfilledOrderList, setFulfilledOrderList] = useState(orderData?.filter((item)=>item.status==="fulfilled"))
 
   const [createFlag, setCreateFlag] = useState(true)
   const [allFlag, setAllFlag] = useState(false)
@@ -205,6 +208,7 @@ function DemandSlip() {
 
   return (
     <>
+    {!token && <LoginAgainModal />}
     {isLoading && <Loader/>}
     <div className='container' 
       style={{
@@ -259,23 +263,27 @@ function DemandSlip() {
         {createFlag?
         <>
         <div className="ds-content"
-           style={{gridColumn:"1 / span 2"}}
+          //  style={{gridColumn:"1 / span 2"}}
         >
           {/* Create Demand Slip */}
         <div className="ds-search-container">
-            <QuickProdSearchForm />
+            <QuickProdSearchForm setToggleFlag={setCreateFlag} passNextFlag={setPendingFlag} />
         </div>
         </div>
 
         </>
         :
         <>
-        <div className="ds-content"
-        style={{gridColumn:"1 / span 2"}}
+        <div className="ds-content ds-card-content"
+        // style={{gridColumn:"1 / span 2"}}
         >
             {displayList.map((order,key)=>{
                 return (
                 <div className="ds-slip-box" key={key}>
+                  {pendingFlag && <div className="edit-btn">
+                    <FiEdit2 />
+                  </div>}
+
                   <p>{order.ticketNumber}</p>
                   <p>{order.status}</p>
                   <p>{order.deliveryPartnerName}</p>
@@ -303,7 +311,7 @@ function DemandSlip() {
           </div> */}
           <br />
           
-          {
+          {/* {
             <>
 
             <div className="pdf-btn"
@@ -312,7 +320,7 @@ function DemandSlip() {
               Generate PDF
             </div>
             </>
-          }
+          } */}
         </div>
         </>
         }
