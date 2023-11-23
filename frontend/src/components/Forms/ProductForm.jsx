@@ -1,7 +1,7 @@
 import React,{ useState, useEffect } from 'react'
 import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai"
 import { useDispatch, useSelector } from "react-redux"
-import { updateProduct, searchSKUProducts, searchSKUProductsOnly } from '../../features/products/productSlice';
+import { updateProduct, searchSKUProductsOnly } from '../../features/products/productSlice';
 
 function ProductForm({initialValue, setFlag}) {
     const dispatch = useDispatch();

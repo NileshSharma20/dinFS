@@ -6,18 +6,20 @@ import "./DemandSlip.css"
 import QuickProdSearchForm from '../../components/Forms/QuickProdSearchForm'
 import { useDispatch, useSelector } from 'react-redux'
 import { getFilteredDemandSlips } from '../../features/orders/orderSlice'
+import Loader from '../../components/Loader/Loader'
 
 function DemandSlip() {
   const dispatch = useDispatch()
 
-  const { orderData } = useSelector((state)=>state.orders)
+  const { orderData, isLoading } = useSelector((state)=>state.orders)
 
   const [pendingOrderList, setPendingOrderList] = useState(orderData.filter((item)=>item.status==="pending"))
   const [partialOrderList, setPartialOrderList] = useState(orderData.filter((item)=>item.status==="partial"))
   const [failedOrderList, setFailedOrderList] = useState(orderData.filter((item)=>item.status==="failed"))
   const [fulfilledOrderList, setFulfilledOrderList] = useState(orderData.filter((item)=>item.status==="fulfilled"))
 
-  const [allFlag, setAllFlag] = useState(true)
+  const [createFlag, setCreateFlag] = useState(true)
+  const [allFlag, setAllFlag] = useState(false)
   const [pendingFlag, setPendingFlag] = useState(false)
   const [fulfilledFlag, setFulfilledFlag] = useState(false)
   const [failedFlag, setFailedFlag] = useState(false)
@@ -35,9 +37,20 @@ function DemandSlip() {
 
   const date = testData.ticketID.slice(3,5)+"-"+testData.ticketID.slice(5,7)+"-"+testData.ticketID.slice(7) 
 
+  const handleCreateClick=()=>{
+    setCreateFlag(true)
+
+    setAllFlag(false)
+    setFailedFlag(false)
+    setPartialFlag(false)
+    setPendingFlag(false)
+    setFulfilledFlag(false)
+  }
+
   const handleAllClick=()=>{
     setAllFlag(true)
-
+    
+    setCreateFlag(false)
     setFailedFlag(false)
     setPartialFlag(false)
     setPendingFlag(false)
@@ -48,6 +61,7 @@ function DemandSlip() {
   const handlePendingClick=()=>{
     setPendingFlag(true)
 
+    setCreateFlag(false)
     setAllFlag(false)
     setFailedFlag(false)
     setPartialFlag(false)
@@ -57,6 +71,7 @@ function DemandSlip() {
   const handlePartialClick=()=>{
     setPartialFlag(true)
     
+    setCreateFlag(false)
     setAllFlag(false)
     setPendingFlag(false)
     setFailedFlag(false)
@@ -66,6 +81,7 @@ function DemandSlip() {
   const handleFailedClick=()=>{
     setFailedFlag(true)
     
+    setCreateFlag(false)
     setAllFlag(false)
     setPendingFlag(false)
     setPartialFlag(false)
@@ -75,6 +91,7 @@ function DemandSlip() {
   const handleFulfilledClick=()=>{
     setFulfilledFlag(true)
     
+    setCreateFlag(false)
     setAllFlag(false)
     setPendingFlag(false)
     setFailedFlag(false)
@@ -187,6 +204,8 @@ function DemandSlip() {
 
 
   return (
+    <>
+    {isLoading && <Loader/>}
     <div className='container' 
       style={{
         // border:'1px solid red', 
@@ -196,7 +215,9 @@ function DemandSlip() {
     >
       <div className="ds-filter-container">
         
-        <div className="ds-filter-btn">
+        <div className={`ds-filter-btn ${createFlag?"ds-filer-btn-active":""}`}
+          onClick={()=>handleCreateClick()}
+        >
           Create          
         </div>
 
@@ -235,7 +256,20 @@ function DemandSlip() {
 
       <div className="ds-filter-data-container"
       >
+        {createFlag?
+        <>
+        <div className="ds-content"
+           style={{gridColumn:"1 / span 2"}}
+        >
+          {/* Create Demand Slip */}
+        <div className="ds-search-container">
+            <QuickProdSearchForm />
+        </div>
+        </div>
 
+        </>
+        :
+        <>
         <div className="ds-content"
         style={{gridColumn:"1 / span 2"}}
         >
@@ -280,15 +314,17 @@ function DemandSlip() {
             </>
           }
         </div>
+        </>
+        }
 
-        {/* <div className="ds-search-container">
-            <QuickProdSearchForm />
-        </div> */}
+
+        
 
     
       </div>
 
     </div>
+    </>
   )
 } 
 
