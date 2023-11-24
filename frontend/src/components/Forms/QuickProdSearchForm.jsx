@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from "react-redux"
 import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai"
-import { searchSKUProductsOnly } from '../../features/products/productSlice';
+import { resetSearchProducts, searchSKUProductsOnly } from '../../features/products/productSlice';
 import { generateDemandSlip, getFilteredDemandSlips, resetAfterNewDemandSlip, resetOrders } from '../../features/orders/orderSlice';
 import Loader from '../Loader/Loader';
 
@@ -47,16 +47,38 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
     //     navigator.clipboard.writeText(text)
     // }
 
+    const handleModalClose =()=>{
+        setNewDSFlag(false)
+        setUpdatedOrderList([{
+            sku:"",
+            productFullName:"",
+            quantity:""
+        }])
+        setFormData({
+            deliveryPartnerName: "",
+            distributorName: "",
+            orderedProductList: [{
+                sku:"",
+                productFullName:"",
+                quantity:""
+            }]
+        })
+
+        dispatch(resetSearchProducts())
+    }
+
+    const handleNumField = (e) => {
+        const value = e.target.value.replace(/\D/g, "");
+        setFormData((prevState)=>({...prevState, 
+            [e.target.name]:value}));
+    };
+
     const addItemfromSearch=(item)=>{
         const newItem = {
             sku: item.sku,
             productFullName: item.productFullName,
             quantity:""
         }
-
-        // const duplicateList = [...updatedOrderList]
-
-
         
         // Check for Duplicates
         var duplicateCheck = []
@@ -90,7 +112,12 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
     const onOrderItemChange=(e,i)=>{
         let orderList = [...updatedOrderList]
         let orderItem = orderList[i]
-        orderItem[e.target.name] = e.target.value
+        if(e.target.name==="quantity"){
+            const numValue = e.target.value.replace(/\D/g, "")
+            orderItem[e.target.name] = numValue
+        }else{
+            orderItem[e.target.name] = e.target.value
+        }
 
         setUpdatedOrderList(orderList)
     }
@@ -175,7 +202,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                     skuOnlyFlag:"true"
                 })
                 dispatch(resetAfterNewDemandSlip())
-
+                setNewDSFlag(true)
                 // passNextFlag(true)
                 // setToggleFlag(false)
             }
@@ -183,18 +210,57 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
     },[isSuccess])
 
     // useEffect(()=>{
-    //     dispatch(resetOrders())
-    // },[])
+    //     console.log(`uOL:${JSON.stringify(updatedOrderList,null,4)}`)
+    // },[updatedOrderList])
+
+    // useEffect(()=>{
+    //     console.log(`oL:${JSON.stringify(newDemandSlip.orderedProductList,null,4)}`)
+    // },[newDemandSlip])
 
   return (
     <>
     {isLoading && <Loader/>}
-    {/* {newDSFlag && 
-        <div>
-            <p>{`ticketNumber:${newDemandSlip.ticketNumber} created`}</p>
+    {newDSFlag &&
+    <>
+    <div className="modal-backdrop"></div> 
+        <div className='modal-container'>
+            <div className="edit-btn"
+                onClick={()=>handleModalClose()}
+            >
+            <AiOutlineClose />
+            </div>
+            <div className='ds-new-box'>
+
+                <div className='ds-new-col'>
+
+                <p><span>Ticket Number: </span>{`${newDemandSlip.ticketNumber}`}</p>
+                <p><span>Date: </span>{`${newDemandSlip.date}`}</p>
+                <br />
+
+                <p><span>Delivery Partner Name: </span>{`${newDemandSlip.deliveryPartnerName}`}</p>
+                <p><span>Distributor Name: </span>{`${newDemandSlip.distributorName}`}</p>
+                {/* <br /> */}
+                </div>
+
+                <div className='ds-new-col'>
+                <p>{`Prodcuts:`}</p>
+
+                 {newDemandSlip.orderedProductList?.map((item,index)=>{
+                     return(
+                    <div className='ds-col-prod-list' key={index}>
+                        <p><span>SKU: </span> {`${item.sku}`}</p>
+                        <p><span>Product Full Name: </span> {`${item.productFullName}`}</p>
+                        <p><span>Quantity: </span> {`${item.quantity}`}</p>
+                        <br />
+                    </div>
+                    )
+                })}
+                </div>
+            </div>
 
         </div>
-    } */}
+    </>
+    }
     <div className='card-container card-grid' style={{padding:"0", border:"none"}}>
         <form onSubmit={onSubmit}>
             <div className="form-group">

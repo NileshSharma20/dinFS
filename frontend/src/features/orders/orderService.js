@@ -53,11 +53,24 @@ const generateDemandSlip = async({demandSlipData, token})=>{
     return response.data.demandSlipData
 }
 
+// PATCH /:ticketNumber
+const updateDemandSlip = async({updatedData, token})=>{
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }
+    // API Call
+    const response = await axios.patch(order_URI+updatedData.ticketNumber, updatedData, config) 
+    // console.log(`response:${JSON.stringify(response.data.demandSlipData,null,4)}`)
+    return response.data
+}
 
 const orderService = {
     getAllDemandSlips,
     getFilteredDemandSlips,
     generateDemandSlip,
+    updateDemandSlip,
 }
 
 export default orderService

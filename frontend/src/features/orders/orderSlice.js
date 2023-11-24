@@ -4,7 +4,12 @@ import { refreshToken } from '../auth/authSlice'
 
 const initialState = {
     orderData:[],
+    pendingOrderList: [],
+    partialOrderList: [],
+    failedOrderList: [],
+    fulfilledOrderList: [],
     newDemandSlip:{},
+    updatedDataFlag:false,
     isLoading:false,
     isError:false,
     isSuccess:false,
@@ -99,6 +104,36 @@ export const generateDemandSlip = createAsyncThunk(
   }
 )
 
+export const updateDemandSlip = createAsyncThunk(
+  'orders/updateDemandSlip',
+  async(updatedData,thunkAPI)=>{
+    try {
+      try {
+            
+        const token = thunkAPI.getState().auth.token
+        return await orderService.updateDemandSlip({updatedData,token})
+        // await thunkAPI.dispatch(getFilteredDemandSlips()) 
+
+      } catch (err) {
+        
+        if(err.response.status === 403){
+          await thunkAPI.dispatch(refreshToken())
+
+          const token = thunkAPI.getState().auth.token
+          return await orderService.updateDemandSlip({updatedData,token})
+          // await thunkAPI.dispatch(getFilteredDemandSlips()) 
+        }
+      }
+    } catch (error) {
+      const message =
+          (error.response && error.response.data && error.response.data.message) ||
+          error.message ||
+          error.toString()
+      return thunkAPI.rejectWithValue(message)
+    }
+  }
+)
+
 export const orderSlice = createSlice({
     name: 'orders',
     initialState,
@@ -107,6 +142,7 @@ export const orderSlice = createSlice({
       resetAfterNewDemandSlip: (state)=>({...state,
         isError:false,
         isLoading:false,
+        updatedDataFlag:false,
         isSuccess:false,
         message:""
       })
@@ -116,12 +152,22 @@ export const orderSlice = createSlice({
       // Get All Demand Slip Data //////
         .addCase(getAllDemandSlips.pending, (state) => {
           state.isLoading = true
+          state.updatedDataFlag=false
           state.orderData=[]
+          state.pendingOrderList=[]
+          state.partialOrderList=[]
+          state.failedOrderList=[]
+          state.fulfilledOrderList=[]
         })
         .addCase(getAllDemandSlips.fulfilled, (state, action) => {
           state.isLoading = false
           state.isSuccess = true
           state.orderData = action.payload
+          state.pendingOrderList = action.payload.filter((order)=>order.status==="pending")
+          state.partialOrderList = action.payload.filter((order)=>order.status==="partial")
+          state.failedOrderList = action.payload.filter((order)=>order.status==="failed")
+          state.fulfilledOrderList = action.payload.filter((order)=>order.status==="fulfilled")
+        
         })
         .addCase(getAllDemandSlips.rejected, (state, action) => {
           state.isLoading = false
@@ -129,15 +175,24 @@ export const orderSlice = createSlice({
           state.message = action.payload
         })
       
-        // Get User and Date Filtered Demand Slip Data //////
+      // Get User and Date Filtered Demand Slip Data //////
         .addCase(getFilteredDemandSlips.pending, (state) => {
           state.isLoading = true
+          state.updatedDataFlag=false
           state.orderData=[]
+          state.pendingOrderList=[]
+          state.partialOrderList=[]
+          state.failedOrderList=[]
+          state.fulfilledOrderList=[]
         })
         .addCase(getFilteredDemandSlips.fulfilled, (state, action) => {
           state.isLoading = false
           state.isSuccess = true
           state.orderData = action.payload
+          state.pendingOrderList = action.payload.filter((order)=>order.status==="pending")
+          state.partialOrderList = action.payload.filter((order)=>order.status==="partial")
+          state.failedOrderList = action.payload.filter((order)=>order.status==="failed")
+          state.fulfilledOrderList = action.payload.filter((order)=>order.status==="fulfilled")
         })
         .addCase(getFilteredDemandSlips.rejected, (state, action) => {
           state.isLoading = false
@@ -146,26 +201,44 @@ export const orderSlice = createSlice({
         })
 
       // Generate New Demand Slip //////
-      .addCase(generateDemandSlip.pending, (state) => {
-        state.isLoading = true
-        state.isSuccess = false
-        state.isError = false
-        state.newDemandSlip = {}
-        // state.orderData=[]
-      })
-      .addCase(generateDemandSlip.fulfilled, (state, action) => {
-        state.isLoading = false
-        state.isError = false
-        state.isSuccess = true
-        state.newDemandSlip = action.payload
-        state.message = `New Demand Reciept ${action.payload.ticketNumber} created`
-      })
-      .addCase(generateDemandSlip.rejected, (state, action) => {
-        state.isLoading = false
-        state.isSuccess = false
-        state.isError = true
-        state.message = action.payload
-      })
+        .addCase(generateDemandSlip.pending, (state) => {
+          state.isLoading = true
+          state.updatedDataFlag=false
+          state.isSuccess = false
+          state.isError = false
+          state.newDemandSlip = {}
+          // state.orderData=[]
+        })
+        .addCase(generateDemandSlip.fulfilled, (state, action) => {
+          state.isLoading = false
+          state.isError = false
+          state.isSuccess = true
+          state.newDemandSlip = action.payload
+          state.message = `New Demand Reciept ${action.payload.ticketNumber} created`
+        })
+        .addCase(generateDemandSlip.rejected, (state, action) => {
+          state.isLoading = false
+          state.isSuccess = false
+          state.isError = true
+          state.message = action.payload
+        })
+
+      // Update Demand Slip Data //////
+        .addCase(updateDemandSlip.pending, (state) => {
+          state.isLoading = true
+          state.updatedDataFlag=false
+        })
+        .addCase(updateDemandSlip.fulfilled, (state, action) => {
+          state.isLoading = false
+          state.isSuccess = true
+          state.updatedDataFlag=true
+          state.message = action.payload
+        })
+        .addCase(updateDemandSlip.rejected, (state, action) => {
+          state.isLoading = false
+          state.isError = true
+          state.message = action.payload
+        })
     }
 })
 

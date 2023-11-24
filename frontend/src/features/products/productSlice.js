@@ -130,7 +130,11 @@ export const productSlice = createSlice({
     name: 'products',
     initialState,
     reducers: {
-      resetProducts: (state) => initialState
+      resetProducts: (state) => initialState,
+      resetSearchProducts: (state)=>({...state,
+        productSKUData:[],
+        noMatch: false,
+      })
     },
     extraReducers: (builder) => {
       builder
@@ -257,5 +261,6 @@ export const productSlice = createSlice({
     },
 })
 
-export const { resetProducts } = productSlice.actions
+export const { resetProducts,
+               resetSearchProducts } = productSlice.actions
 export default productSlice.reducer
