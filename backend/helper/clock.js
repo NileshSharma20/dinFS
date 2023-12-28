@@ -5,7 +5,7 @@ const asyncHandler = require("express-async-handler")
 
 // @desc   setInterval function to be called at Top level 
 const clockInterval = ()=>{
-    setInterval(clockEvents, 30*60*1000)
+    setInterval(clockEvents, 11.5*60*60*1000)
 }
 
 // @desc   Time triggered functions

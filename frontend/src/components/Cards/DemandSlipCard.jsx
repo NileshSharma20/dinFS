@@ -11,12 +11,13 @@ function DemandSlipCard({info}) {
     const pdfBodyData = info.orderedProductList.map((order)=>{
       return [order.productFullName,order.quantity]
     })
+
+    const ticketDate = info.ticketNumber.slice(3,5)+"-"+info.ticketNumber.slice(5,7)+"-"+info.ticketNumber.slice(7) 
     
-    
-    // useEffect(()=>{
-      // console.log(Array.isArray(pdfBodyData))
-      // console.log(`\npdfBodyData:${JSON.stringify(pdfBodyData,null,4)}`)
-    // },[])
+    useEffect(()=>{
+      console.log(Array.isArray(pdfBodyData))
+      console.log(`\npdfBodyData:${JSON.stringify(info,null,4)}`)
+    },[])
 
     const addHeaderAndFooter = doc => {
       const pageCount = doc.internal.getNumberOfPages()
@@ -24,14 +25,14 @@ function DemandSlipCard({info}) {
       for (var i = 1; i <= pageCount; i++) {
         doc.setPage(i)
         doc.setFontSize(17)
-        doc.text('Nilam Auto Spares',doc.internal.pageSize.width/2,40,{align:"center"})
+        doc.text('NAS',doc.internal.pageSize.width/2,40,{align:"center"})
         
         doc.setFontSize(10)
         doc.text('Demand Reciept / Quotation',doc.internal.pageSize.width/2,55,{align:"center"})
         
         doc.text(20,75,`TID: ${info.ticketNumber}`)
       
-        doc.text(20,90,`Date: ${info.date}`)
+        doc.text(20,90,`Date: ${ticketDate}`)
         
         // doc.text(20,105,`Dist.: ${testData.distributorName}`)
   

@@ -15,7 +15,7 @@ const app = express()
 
 // app.use(cors(corsOptions))
 
-// setInterval(clockEvents(),60*1000)
+// setInterval(clockEvents(),11.5*60*60*1000)
 clockInterval()
 
 app.set('trust proxy', 1) // For express-rate-limit error message
