@@ -13,7 +13,7 @@ connectDB()
 
 const app = express()
 
-// app.use(cors(corsOptions))
+app.use(cors())
 
 // setInterval(clockEvents(),11.5*60*60*1000)
 clockInterval()

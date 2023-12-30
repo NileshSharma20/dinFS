@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const prod_URI = '/api/prod/'
+const prod_URI = 'https://api.dimotoindia.com/api/prod/'
 
 // Convert Product CSV Data to JSON Data
 const createProductDataJSON = (csvFileData) => {
