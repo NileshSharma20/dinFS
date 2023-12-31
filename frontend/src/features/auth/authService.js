@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const auth_URI = 'https://api.dimotoindia.com/api/auth'
+const auth_URI = 'https://api.dinmotoindia.com/api/auth'
 
 // Polling Function to check for Validity of Access Token
 const healthCheck = async(token)=> {

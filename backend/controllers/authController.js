@@ -26,14 +26,14 @@ const login = asyncHandler(async(req,res)=>{
 
     if(!foundUser || !foundUser.active){
         res.status(401)
-        throw new Error(`Unauthorized`)
+        throw new Error(`Unauthorized: User not found`)
     }
 
     const passwordMatch = await bcrypt.compare(password, foundUser.password)
 
     if(!passwordMatch){
         res.status(401)
-        throw new Error(`Unauthorized`)
+        throw new Error(`Unauthorized: Incorrect password`)
     }
 
     // Create Tokens for Authorization on Successful Login

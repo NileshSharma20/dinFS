@@ -14,10 +14,10 @@ function DemandSlipCard({info}) {
 
     const ticketDate = info.ticketNumber.slice(3,5)+"-"+info.ticketNumber.slice(5,7)+"-"+info.ticketNumber.slice(7) 
     
-    useEffect(()=>{
-      console.log(Array.isArray(pdfBodyData))
-      console.log(`\npdfBodyData:${JSON.stringify(info,null,4)}`)
-    },[])
+    // useEffect(()=>{
+    //   console.log(Array.isArray(pdfBodyData))
+    //   console.log(`\npdfBodyData:${JSON.stringify(info,null,4)}`)
+    // },[])
 
     const addHeaderAndFooter = doc => {
       const pageCount = doc.internal.getNumberOfPages()

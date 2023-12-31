@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const users_URI = 'https://api.dimotoindia.com/api/users/'
+const users_URI = 'https://api.dinmotoindia.com/api/users/'
 
 const getAllUsers = async(token)=>{
   const config = {

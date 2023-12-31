@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const order_URI = 'https://api.dimotoindia.com/api/order/'
+const order_URI = 'https://api.dinmotoindia.com/api/order/'
 
 const getAllDemandSlips = async(token)=>{
     const config = {
