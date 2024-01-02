@@ -29,13 +29,13 @@ function App() {
         <Route path='/products/:sku' element={<Product /> }/> 
         <Route path='/user-management' element={<Users />} />
         <Route path='/demand-slip-generator' element={<DemandSlip />} />
-          {/* <Route path=''/> */}
 
         <Route path='*' element={<NotFound /> } />
       </Routes>
 
       <Footer />
     </div>
+    
     </Router>
     </>
   );
