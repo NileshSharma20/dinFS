@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, HashRouter, Routes, Route } from 'react-router-dom'
 
 import Navbar from './components/Navbar/Navbar';
 import QuickRes from './pages/IndiaMartRes/QuickRes';
@@ -16,7 +16,7 @@ import DemandSlip from './pages/DemandSlip/DemandSlip';
 function App() {
   return (
     <>
-    <Router>
+    <HashRouter>
 
     <div className="container">
       <Navbar />
@@ -36,7 +36,7 @@ function App() {
       <Footer />
     </div>
     
-    </Router>
+    </HashRouter>
     </>
   );
 }

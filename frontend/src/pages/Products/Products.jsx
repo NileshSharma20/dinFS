@@ -181,7 +181,7 @@ function Products() {
               autoComplete='off'
               />
 
-        </div>
+          </div>
         </div>
 
         <form onSubmit={onSKUSubmit}>

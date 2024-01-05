@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from "react-redux"
-import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai"
-import { resetSearchProducts, searchSKUProductsOnly } from '../../features/products/productSlice';
+import { AiOutlinePlus, AiOutlineClose,AiOutlineSearch } from "react-icons/ai"
+import { resetSearchProducts,searchProducts, searchSKUProductsOnly } from '../../features/products/productSlice';
 import { generateDemandSlip, getFilteredDemandSlips, resetAfterNewDemandSlip, resetOrders } from '../../features/orders/orderSlice';
 import Loader from '../Loader/Loader';
+
+import debouce from "lodash.debounce";
 
 function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
     const dispatch = useDispatch();
@@ -12,6 +14,8 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
     const { newDemandSlip, isSuccess, isLoading, message } = useSelector((state)=>state.orders)
 
     const [newDSFlag, setNewDSFlag] = useState(false)
+
+    const [searchInput, setSearchInput] = useState("");
 
     const [formData, setFormData] = useState({
         deliveryPartnerName: "",
@@ -46,6 +50,12 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
     // const copyText=(text)=>{
     //     navigator.clipboard.writeText(text)
     // }
+    const handleSearchChange = (e) => {
+        setSearchInput(e.target.value);
+    }
+
+    // Debounce function
+    const debouncedResults = debouce(handleSearchChange, 800)
 
     const handleModalClose =()=>{
         setNewDSFlag(false)
@@ -170,6 +180,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
         if(skuData.itemCode===""){
             return alert(`Please Enter Item Code`)
         }else{
+            setSearchInput("")
             dispatch(searchSKUProductsOnly(skuData))
         }
     }
@@ -177,6 +188,13 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
     /////////////////////////////////////////////////
     //////// Hooks //////////////////////////////////
     ////////////////////////////////////////////////
+
+    // Search API call
+    useEffect(()=>{
+        if (searchInput!=="") {
+        dispatch(searchProducts(searchInput))
+        }
+    },[searchInput])
 
     useEffect(()=>{
         if(isSuccess && message!==""){
@@ -222,7 +240,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
     {isLoading && <Loader/>}
     {newDSFlag &&
     <>
-    <div className="modal-backdrop"></div> 
+    <div className="modal-backdrop" ></div> 
         <div className='modal-container'>
             <div className="edit-btn"
                 onClick={()=>handleModalClose()}
@@ -287,13 +305,13 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                     onChange={onChange} />
             </div>
 
-            <div className="form-group" 
-                style={{display:"flex", flexDirection:"column", justifyContent:"center"}}
-            >
+            <div className="form-group-flex" style={{marginBottom:`1rem`}}>
                 <label>Products</label>
                 {updatedOrderList.map((prod,index)=>{
                     return(
                         <div className='model-input-container' key={index}>
+                            <section>
+
                             <input
                                 className='card-form-control'
                                 type='text'
@@ -304,7 +322,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                                 placeholder="Prod SKU"
                                 autoComplete='off'
                                 onChange={(e)=>onOrderItemChange(e,index)}
-                            />
+                                />
                              <input
                                 className='card-form-control'
                                 type='text'
@@ -315,7 +333,20 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                                 placeholder="Prod Full Name"
                                 autoComplete='off'
                                 onChange={(e)=>onOrderItemChange(e,index)}
-                            />
+                                />
+                            </section>
+
+                            <div style={{display:`flex`, 
+                                flexDirection:`column`,
+                                alignSelf:`flex-end`
+                                }}
+                            >
+
+                            <div className="delete-btn" 
+                                onClick={()=>handleItemDelete(index)}
+                                >
+                                <AiOutlineClose />
+                            </div>
                              <input
                                 className='card-form-control'
                                 type='text'
@@ -323,16 +354,13 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                                 name= {`quantity`}
                                 id={`quantity ${index}`}
                                 value = {prod.quantity}
-                                placeholder="Prod Quantity"
+                                placeholder="Qty"
                                 autoComplete='off'
                                 onChange={(e)=>onOrderItemChange(e,index)}
-                            />
+                                />
 
-                            <div className="delete-btn" 
-                                onClick={()=>handleItemDelete(index)}
-                            >
-                                <AiOutlineClose />
                             </div>
+
                         </div >
                     )
                 })}
@@ -352,9 +380,25 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
         </form>
         {/* /////////////////////////////// */}
         <form onSubmit={onSKUSubmit}>
+            {/* Load Product Controls */}
+            {/* <div className="controlbox" style={{width:"80%"}}>
+
+            <label style={{fontWeight:"bold"}}>Search</label>
+            <div className="search-bar">
+            <AiOutlineSearch className='search-icon'/>
+            <input
+                type="text"
+                name="search"
+                placeholder="Search for Product"
+                onChange={debouncedResults}
+                autoComplete='off'
+                />
+
+            </div>
+            </div> */}
 
         <label style={{fontWeight:"bold"}}>Search by SKU</label>
-        <div className="form-group">
+        <div className="form-group" >
             <input type="text" 
                 className='card-form-control'
                 name= 'itemCode'
@@ -407,25 +451,33 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
 
         {productSKUData.length!==0 && !noMatch && 
         <div className="form-group">
-            <label>Results</label>
-            <div className="card-form-control"
-                style={{display:"flex", flexDirection:"column", alignItems:"flex-start"}}
-            >
+            <label>Results {`(${productSKUData.length})`}</label>
+            <div className="search-result-container">
+
+            <div 
+            // className="card-form-control"
+                // style={{display:"flex", flexDirection:"column", alignItems:"flex-start"}}
+                >
                 {productSKUData.map((item,i)=>{
                     return (
                         <div className='sku-list-item'
-                            key={i}
-                            onClick={()=>addItemfromSearch(item)}
+                        key={i}
+                        onClick={()=>addItemfromSearch(item)}
                         >
-
-                        <p>
-                            {item.sku}
-                        </p>
-                        <p>{item.productFullName}</p>
-                        <br />
+                            <p>{i+1}</p>
+                            
+                            <section>
+                                <p>
+                                    {item.sku}
+                                </p>
+                                {/* <br /> */}
+                                <p style={{fontWeight:"bold"}}>{item.productFullName}</p>
+                            </section>
+                        {/* <br /> */}
                         </div>
                     )
                 })}
+            </div>
             </div>
         </div>}
         

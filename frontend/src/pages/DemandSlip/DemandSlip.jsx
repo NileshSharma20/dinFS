@@ -27,8 +27,8 @@ function DemandSlip() {
   // const [failedOrderList, setFailedOrderList] = useState(orderData?.filter((item)=>item.status==="failed"))
   // const [fulfilledOrderList, setFulfilledOrderList] = useState(orderData?.filter((item)=>item.status==="fulfilled"))
 
-  const [createFlag, setCreateFlag] = useState(false)
-  const [allFlag, setAllFlag] = useState(true)
+  const [createFlag, setCreateFlag] = useState(true)
+  const [allFlag, setAllFlag] = useState(false)
   const [pendingFlag, setPendingFlag] = useState(false)
   const [fulfilledFlag, setFulfilledFlag] = useState(false)
   const [failedFlag, setFailedFlag] = useState(false)
