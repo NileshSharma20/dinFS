@@ -27,7 +27,9 @@ const clockEvents = asyncHandler(async() => {
         count.date = date
     }
 
-    console.log(`Counter:${count.counterNumber}`)
+    // Fail all pending demand slips
+
+    // console.log(`Counter:${count.counterNumber}`)
     const updateCounter = await count.save()
     // await generateTicket()
 
