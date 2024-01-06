@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from "react-redux"
 import { AiOutlinePlus, AiOutlineClose,AiOutlineSearch } from "react-icons/ai"
-import { resetSearchProducts,searchProducts, searchSKUProductsOnly } from '../../features/products/productSlice';
+import { resetSearchProducts,searchProducts, searchSKUProducts,searchSKUProductsOnly } from '../../features/products/productSlice';
 import { generateDemandSlip, getFilteredDemandSlips, resetAfterNewDemandSlip, resetOrders } from '../../features/orders/orderSlice';
 import Loader from '../Loader/Loader';
 
@@ -10,7 +10,7 @@ import debouce from "lodash.debounce";
 function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
     const dispatch = useDispatch();
 
-    const {productSKUData, noMatch } = useSelector((state)=>state.product)
+    const { productData, noMatch } = useSelector((state)=>state.product)
     const { newDemandSlip, isSuccess, isLoading, message } = useSelector((state)=>state.orders)
 
     const [newDSFlag, setNewDSFlag] = useState(false)
@@ -181,7 +181,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
             return alert(`Please Enter Item Code`)
         }else{
             setSearchInput("")
-            dispatch(searchSKUProductsOnly(skuData))
+            dispatch(searchSKUProducts(skuData))
         }
     }
 
@@ -196,6 +196,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
         }
     },[searchInput])
 
+    // Success reset
     useEffect(()=>{
         if(isSuccess && message!==""){
             // dispatch(resetOrders())
@@ -219,6 +220,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                     partNum:"",
                     skuOnlyFlag:"true"
                 })
+                setSearchInput("")
                 dispatch(resetAfterNewDemandSlip())
                 setNewDSFlag(true)
                 // passNextFlag(true)
@@ -381,7 +383,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
         {/* /////////////////////////////// */}
         <form onSubmit={onSKUSubmit}>
             {/* Load Product Controls */}
-            {/* <div className="controlbox" style={{width:"80%"}}>
+            <div className="controlbox">
 
             <label style={{fontWeight:"bold"}}>Search</label>
             <div className="search-bar">
@@ -395,8 +397,9 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                 />
 
             </div>
-            </div> */}
+            </div> 
 
+            {/* Search by SKU */}
         <label style={{fontWeight:"bold"}}>Search by SKU</label>
         <div className="form-group" >
             <input type="text" 
@@ -449,16 +452,16 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
             </button>
         </div>
 
-        {productSKUData.length!==0 && !noMatch && 
+        {productData.length!==0 && !noMatch && 
         <div className="form-group">
-            <label>Results {`(${productSKUData.length})`}</label>
+            <label>Results {`(${productData.length})`}</label>
             <div className="search-result-container">
 
             <div 
             // className="card-form-control"
                 // style={{display:"flex", flexDirection:"column", alignItems:"flex-start"}}
                 >
-                {productSKUData.map((item,i)=>{
+                {productData.map((item,i)=>{
                     return (
                         <div className='sku-list-item'
                         key={i}

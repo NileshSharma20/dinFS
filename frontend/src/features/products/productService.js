@@ -80,7 +80,12 @@ const createProductDataJSON = (csvFileData) => {
   const searchProducts = async (searchKey) => {
     const response = await axios.get(prod_URI +`search/${searchKey}`)
 
-    return response.data
+    const res = response.data.map((item)=>{
+      var productFullName = item.productName+" "+item.vehicleModel+" "+item.brandCompany+" "+item.partNum
+      return {...item, productFullName:productFullName} 
+    })
+
+    return res
   } 
 
   // Search Products
