@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler')
-const {cleanJsonData, localCSVtoJSON } = require("../helper/prodHelper")
+const {cleanJsonData, localCSVtoJSON, createMongoDataBackup } = require("../helper/prodHelper")
 
 // const Shocker = require('../models/shockerModel')
 // const Brakeshoe = require('../models/brakeshoeModel')
@@ -18,7 +18,9 @@ const dbCollectionList ={
     "FTR":"footrestModel",
     "ARF":"airfilterModel",
     "SSN":"sidestandModel",
-    "MSN":"mainstandModel"
+    "MSN":"mainstandModel",
+    "CFA":"clutchassemblyModel",
+    "ACC":"acceleratorcableModel",
 }
 
 // @desc   Get All Products
@@ -38,6 +40,29 @@ const getAllProd = asyncHandler(async (req,res)=>{
     }
     
     prod = await dbCollection?.find().lean()
+
+    res.status(200).json(prod)
+})
+
+// @desc   Get Mongo Data for local Export
+// @route  GET /api/prod/exportMongoData/:itemCode
+// @access Private
+const getDataForExportProd = asyncHandler(async (req,res)=>{
+    var prod, dbCollection 
+    const { itemCode } = req.params
+
+    // Finding right Collection
+    const dbKeys = Object.keys(dbCollectionList)
+    if(dbKeys.includes(itemCode.toUpperCase())){
+        dbCollection = require(`../models/${dbCollectionList[itemCode.toUpperCase()]}`) 
+    }else{
+        res.status(400)
+        throw new Error('Specify Collection')
+    }
+    
+    prod = await dbCollection?.find().lean()
+
+    createMongoDataBackup(prod,itemCode.toUpperCase())
 
     res.status(200).json(prod)
 })
@@ -348,6 +373,7 @@ const deleteAllProd = asyncHandler(async (req,res)=>{
 
 module.exports = {
     getAllProd,
+    getDataForExportProd,
     getSKUProd,
     getItemCodeIndex,
     setItemCodeIndex,

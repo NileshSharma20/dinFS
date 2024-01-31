@@ -12,6 +12,8 @@ const filenameList ={
     "ARF":["airFilterMongo.csv", "airFilterUpdated.csv"],
     "SSN":["sideStandMongo.csv", "sideStandUpdated.csv"],
     "MSN":["mainStandMongo.csv", "mainStandUpdated.csv"],
+    "CFA":["clutchAssemblyMongo.csv","clutchAssemblyUpdated.csv"],
+    "ACC":["acceleratorCableMongo.csv","acceleratorCableUpdated.csv"],
 }
 
 // @desc   Clean Mongo Collection data and save it locally
@@ -44,7 +46,7 @@ const createMongoDataBackup = (mongoFile,iC) =>{
     const dbKeys = Object.keys(filenameList)
     if(dbKeys.includes(iC)){
         filePath = `../MongoData/${ filenameList[iC][0] }` 
-    }else{
+    }else if(iC==="ALL"){
         filePath = '../MongoData/productsMongo.csv'
     }
     
@@ -72,6 +74,8 @@ const localCSVtoJSON = (iC) => {
     const csvData = fs.readFileSync(csvFile, 'utf8');
 
     const jsonData = Papa.parse(csvData, { header: true });
+
+    console.log(`${iC}:${JSON.stringify(jsonData.data[0],null,4)}`)
 
     return jsonData.data
 }
@@ -136,6 +140,7 @@ const cleanJsonData = (rawJson) => {
 
         const prodClone = Object.assign({},prod)
         delete prodClone.itemCode
+        delete prodClone.productName
         delete prodClone.vehicleModel
         delete prodClone.brandCompany
         delete prodClone.partNum

@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const {getAllProd,
+       getDataForExportProd,
        getSKUProd,
        pushToProduct,
        searchAll,
@@ -15,7 +16,11 @@ const {getAllProd,
 const verifyJWT = require('../middleware/verifyJWT')
        
 router.route('/').post(verifyJWT, pushToProduct)
-router.route('/:itemCode').get(getAllProd).post(setProd)
+router.route('/:itemCode')
+              .get(getAllProd)
+              .post(setProd)
+
+router.route('/exportMongoData/:itemCode').get(verifyJWT, getDataForExportProd)
 
 // router.route('/index')
 router.route('/index/:itemCode')
