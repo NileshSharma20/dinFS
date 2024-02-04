@@ -5,7 +5,7 @@ const verifyJWT = (req,res,next)=>{
                         req.headers.Authorization
 
     if(!authHeader?.startsWith('Bearer ')){
-        return res.status(401).json({message:'Unauthorized'})
+        return res.status(401).json({message:'Unauthorized: Bearer token not found'})
     }
 
     const token = authHeader.split(' ')[1]

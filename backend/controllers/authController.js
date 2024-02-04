@@ -77,7 +77,7 @@ const refresh = (req,res)=>{
     if(!cookies?.jwt){
         console.log(`no cookie`)
         res.status(401)
-        throw new Error(`Unauthorized`)
+        throw new Error(`Unauthorized: Cookie not found`)
     }
 
     const refreshToken = cookies.jwt
@@ -87,14 +87,14 @@ const refresh = (req,res)=>{
         asyncHandler(async(err, decoded)=>{
             if(err){
                 res.status(403)
-                throw new Error('Forbidden')
+                throw new Error('Forbidden: Invalid token')
             }
 
             const foundUser = await User.findOne({username: decoded.username}).exec()
 
             if(!foundUser){
                 res.status(401)
-                throw new Error('Unauthorized')
+                throw new Error('Unauthorized: User not found')
             }
 
             const accessToken = jwt.sign(
