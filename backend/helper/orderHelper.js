@@ -18,7 +18,7 @@ const generateTicket = asyncHandler(async()=>{
     if(count.date !== ticketDate){
         count.counterNumber = 1
         count.date = ticketDate
-        await Demandslip.updateMany({status:"pending"},{$set:{status:"failed", recieved}})
+        await Demandslip.updateMany({status:"pending"},{$set:{status:"failed"}})
     }
     if(ticketDate<10){
         ticketDate = `0${ticketDate}`
