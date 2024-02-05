@@ -6,7 +6,7 @@ function Footer() {
     const {status} = useAuth()
   return (
     <div className='footer-container'>
-        {(status!=="" && status)?status:"Din 2023"}
+        {(status!=="" && status)?`Din 2024 | ${status}`:"Din 2024"}
     </div>
   )
 }

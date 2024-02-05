@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler')
-const { generateTicket, generateDemandReciept } = require("../helper/orderHelper")
+const { generateTicket } = require("../helper/orderHelper")
 const fs = require("fs")
 
 const Demandslip = require("../models/demandslipModel")

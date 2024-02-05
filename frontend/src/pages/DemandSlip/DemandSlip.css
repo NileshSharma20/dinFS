@@ -157,7 +157,16 @@
     padding: 1rem;
     background-color: var(--formBgColor);
 
-    border-radius: 20px;
+    border-radius: 28px;
+    border: 1px solid var(--backgroundColor);
 
     cursor: pointer;
+
+    transition: 0.3s ease-in-out;
+}
+
+.pdf-btn:hover{
+    background-color: var(--backgroundColor);
+    color: var(--formBgColor);
+    transition: 0.3s ease-in-out;
 }

@@ -31,7 +31,7 @@ function UpdateOrderForm({ initialValue, setFlag}) {
 
         const numValue = e.target.value.replace(/\D/g, "");
 
-        console.log(`nV:${numValue}`)
+        // console.log(`nV:${numValue}`)
         const intInputValue = parseInt(numValue.replace(/\D/g, ""),10)
         const intMaxValue = parseInt(initialValue.orderedProductList[i].quantity,10)
         
@@ -67,22 +67,65 @@ function UpdateOrderForm({ initialValue, setFlag}) {
         e.preventDefault()
 
         let updatedOrderList = [...formData.recievedProductList]
-        console.log(JSON.stringify(updatedOrderList,null,4))
+        // console.log(`updatedOL:${JSON.stringify(updatedOrderList,null,4)}`)
+        // console.log(`orderedList:${JSON.stringify(formData.orderedProductList,null,4)}`)
+        
         let emptyOrderListObj = []
         emptyOrderListObj = updatedOrderList.filter(prod=>(prod.sku===""
                                                     ||prod.productFullName===""
                                                     ||prod.quantity===""))
 
+        //Check for Empty Order List
         if(emptyOrderListObj.length>0){
             return alert('Empty Field/s')
         }
 
+        // Status-wise Order List update
         if(formData.status==="failed"){
             updatedOrderList = []
         }else if(formData.status==="fulfilled"){
             updatedOrderList = [...formData.orderedProductList]
         }
 
+        // Invalid Partial Status input check
+        if(formData.status==="partial"){
+            let allQtyZeroBool = true
+            let noQtyChangeBool = true
+
+            updatedOrderList.map((item,index)=>{
+                // All qty zero flag check
+                `${item.quantity}`==='0'?
+                    allQtyZeroBool=allQtyZeroBool && true 
+                    :
+                    allQtyZeroBool=allQtyZeroBool && false;
+                
+                // All qty same as ordered check
+                `${item.quantity}`===formData.orderedProductList[index].quantity?
+                    noQtyChangeBool = noQtyChangeBool && true
+                    :
+                    noQtyChangeBool = noQtyChangeBool && false;
+                }
+            )
+
+            // Partial to Failed Alert
+            if(allQtyZeroBool){
+                return alert('All prodcut quantity zero:\nSet status to Failed')
+            }
+
+            // Partial to Fulfilled Alert
+            if(noQtyChangeBool){
+                return alert('Partial status invalid:\nSet Status to Fulfilled')
+            }
+        }
+
+
+        // Total Cost Zero check for Partial and Fulfilled status
+        if(formData.status!=="failed" && `${formData.totalCost}`==='0' ){
+            return alert('Invalid Total Cost')
+        }
+
+
+        // Invalid status check
         if( formData.status==="" 
             || (formData.status!=="partial" && formData.status!=="fulfilled" && formData.status!=="failed") 
             || !Array.isArray(updatedOrderList)
@@ -94,7 +137,7 @@ function UpdateOrderForm({ initialValue, setFlag}) {
                 recievedProductList: updatedOrderList,
             }
             
-            console.log(`formData:${JSON.stringify(updatedInfo,null,4)}`)
+            // console.log(`formData:${JSON.stringify(updatedInfo,null,4)}`)
             
             dispatch(updateDemandSlip(updatedInfo))
             

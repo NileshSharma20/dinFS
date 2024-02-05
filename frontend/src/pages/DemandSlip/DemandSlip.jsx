@@ -34,16 +34,6 @@ function DemandSlip() {
   const [failedFlag, setFailedFlag] = useState(false)
   const [partialFlag, setPartialFlag] = useState(false)
 
-  const testData = {
-    ticketID:"00718082023",
-    employeeId:"",
-    deliveryPartnerName:"Suraj",
-    distributorName:"M K Auto",
-    orderedProductList:{},
-  }
-
-  const date = testData.ticketID.slice(3,5)+"-"+testData.ticketID.slice(5,7)+"-"+testData.ticketID.slice(7) 
-
   const handleCreateClick=()=>{
     setCreateFlag(true)
 
@@ -103,79 +93,6 @@ function DemandSlip() {
     setPendingFlag(false)
     setFailedFlag(false)
     setPartialFlag(false)
-  }
-
-  const addHeaderAndFooter = doc => {
-    const pageCount = doc.internal.getNumberOfPages()
-    doc.setFont('helvetica', 'normal')
-    for (var i = 1; i <= pageCount; i++) {
-      doc.setPage(i)
-      doc.setFontSize(17)
-      doc.text('Nilam Auto Spares',doc.internal.pageSize.width/2,40,{align:"center"})
-      
-      doc.setFontSize(10)
-      doc.text('Demand Reciept / Quotation',doc.internal.pageSize.width/2,55,{align:"center"})
-      
-      doc.text(20,75,`TID: ${testData.ticketID}`)
-    
-      doc.text(20,90,`Date: ${date}`)
-      
-      // doc.text(20,105,`Dist.: ${testData.distributorName}`)
-
-      doc.setFontSize(8)
-      
-      doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 2,  doc.internal.pageSize.height - 20, {
-        align: 'center'
-      })
-      doc.text('This is an auto generated quotation', doc.internal.pageSize.width / 2,  doc.internal.pageSize.height - 10, {
-        align: 'center'
-      })
-    }
-  }
-
-  const handlePDFGenerate=()=>{
-
-    const headerData = ["Product","Qty"]
-    const bodyData = [
-                  ["DPD-ACC-SUZ-59300085000","5"],
-                  ["SKR-ACT-HON-51400KWP902","2"],
-                  ["SKR-ACT-HON-51400KWP902","10"],
-                  ["SKR-ACT-HON-51400KWP902","10"],
-                  ["SKR-ACT-HON-51400KWP902","10"],
-                  ["SKR-ACT-HON-51400KWP902","10"],
-                  ["SKR-ACT-HON-51400KWP902","10"],
-                  ["SKR-ACT-HON-51400KWP902","10"],
-                  ["SKR-ACT-HON-51400KWP902","10"],
-                  ["SKR-ACT-HON-51400KWP902","10"],
-                  ["SKR-ACT-HON-51400KWP902","10"],
-                  ["SKR-ACT-HON-51400KWP902","10"],
-                  ["SKR-ACT-HON-51400KWP902","10"],
-                  ["SKR-ACT-HON-51400KWP902","10"],
-                  ["SKR-ACT-HON-51400KWP902","10"],
-                ]
-
-    var doc = new jsPDF('p','pt',[201,470])
-
-    doc.setProperties({
-        title: `DemandSlip${testData.ticketID}`
-    });    
-    
-    autoTable(doc,{
-      startY:105,
-      margin:{left:20,top:105},
-      rowPageBreak:"avoid",
-      tableWidth:161,
-      theme:"plain",
-      headStyles:{halign:"center"},
-      // bodyStyles:{lineWidth:1},
-      columnStyles: { 1: { cellWidth:50, halign:'center'} },
-      head:[headerData],
-      body:bodyData})
-
-    addHeaderAndFooter(doc)
-
-    doc.output('dataurlnewwindow',{filename:`DemandSlip${testData.ticketID}`})
-    doc.save(`DemandSlip${testData.ticketID}`)
   }
 
   useEffect(()=>{
@@ -276,14 +193,21 @@ function DemandSlip() {
         <div className="ds-content ds-card-content">
           {orderData.length>0?
             orderData.map((order,key)=>{
+                let cardBorder = `none`
+                if(order.status==="failed"){cardBorder=`#e26d5c`}
+                else if(order.status==="partial"){cardBorder=`#ffef9f`}
+                else if(order.status==="fulfilled"){cardBorder=`#a7c957`}
+                
                 return (
-                <div className="ds-slip-box" key={key}>
+                <div className="ds-slip-box" key={key}
+                  style={{backgroundColor:cardBorder}}
+                >
                   <p><span>Ticket Number: </span> {order.ticketNumber}</p>
                   <p><span>Delivery Partner Name: </span>{order.deliveryPartnerName}</p>
                   <p><span>Distributor Name: </span> {order.distributorName}</p>
                   <p><span>Status: </span> {order.status}</p>
                   <p><span>Total Cost: </span>{order.totalCost}</p>
-                  <p><span>Products: </span></p>
+                  <p><span>Ordered Products: </span></p>
                   <div className='ds-new-col'>
                       {order.orderedProductList?.map((prod,i)=>
                           <React.Fragment key={i}>
@@ -294,6 +218,21 @@ function DemandSlip() {
                           </React.Fragment>  
                       )}
                   </div>
+                  {order.status==="partial" &&
+                  <>
+                  <p><span>Recieved Products: </span></p>
+                  <div className='ds-new-col'>
+                      {order.recievedProductList?.map((prod,i)=>
+                          <React.Fragment key={i}>
+                              <p><span>SKU: </span>{prod.sku}</p>
+                              <p><span>Full Name: </span>{prod.productFullName}</p>
+                              <p><span>Qty: </span>{prod.quantity}</p>
+                              <br />
+                          </React.Fragment>  
+                      )}
+                  </div>
+                  </>}
+
                 </div>
                 )
               })
@@ -345,9 +284,20 @@ function DemandSlip() {
                   <p><span>Distributor Name: </span> {order.distributorName}</p>
                   <p><span>Status: </span> {order.status}</p>
                   <p><span>Total Cost: </span>{order.totalCost}</p>
-                  <p><span>Products: </span></p>
+                  <p><span>Ordered Products: </span></p>
                   <div className='ds-new-col'>
                       {order.orderedProductList?.map((prod,i)=>
+                          <React.Fragment key={i}>
+                              <p><span>SKU: </span>{prod.sku}</p>
+                              <p><span>Full Name: </span>{prod.productFullName}</p>
+                              <p><span>Qty: </span>{prod.quantity}</p>
+                              <br />
+                          </React.Fragment>  
+                      )}
+                  </div>
+                  <p><span>Recieved Products: </span></p>
+                  <div className='ds-new-col'>
+                      {order.recievedProductList?.map((prod,i)=>
                           <React.Fragment key={i}>
                               <p><span>SKU: </span>{prod.sku}</p>
                               <p><span>Full Name: </span>{prod.productFullName}</p>
