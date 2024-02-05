@@ -53,7 +53,7 @@ const login = asyncHandler(async(req,res)=>{
             "username": foundUser.username
         },
         process.env.REFRESH_TOKEN_SECRET,
-        {expiresIn:'3m'}
+        {expiresIn:'7d'}
     )
 
     // Create secure http cookie with refresh token
