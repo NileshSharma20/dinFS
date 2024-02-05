@@ -22,7 +22,7 @@ const clockEvents = asyncHandler(async() => {
     const count = await Counter.findOne({counterType:"DemandSlip"}).exec()
 
     // Fail all pending demand slips
-    await Demandslip.updateMany({status:"pending"},{$set:{status:"failed", recieved}})
+    await Demandslip.updateMany({status:"pending"},{$set:{status:"failed"}})
         // .select('-deliveryPartnerName -distributorName -orderedProductList -recievedProductList')
         // .lean()
     
