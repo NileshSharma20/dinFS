@@ -28,7 +28,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
     })
 
     const [updatedOrderList, setUpdatedOrderList] = useState([{
-        sku:"",
+        sku:"MANUAL",
         productFullName:"",
         quantity:""
     }])
@@ -68,7 +68,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
             deliveryPartnerName: "",
             distributorName: "",
             orderedProductList: [{
-                sku:"",
+                sku:"MANUAL",
                 productFullName:"",
                 quantity:""
             }]
@@ -77,11 +77,11 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
         dispatch(resetSearchProducts())
     }
 
-    const handleNumField = (e) => {
-        const value = e.target.value.replace(/\D/g, "");
-        setFormData((prevState)=>({...prevState, 
-            [e.target.name]:value}));
-    };
+    // const handleNumField = (e) => {
+    //     const value = e.target.value.replace(/\D/g, "");
+    //     setFormData((prevState)=>({...prevState, 
+    //         [e.target.name]:value}));
+    // };
 
     const addItemfromSearch=(item)=>{
         const newItem = {
@@ -126,14 +126,14 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
             const numValue = e.target.value.replace(/\D/g, "")
             orderItem[e.target.name] = numValue
         }else{
-            orderItem[e.target.name] = e.target.value
+            orderItem[e.target.name] = e.target.value.toUpperCase()
         }
 
         setUpdatedOrderList(orderList)
     }
 
     const handleAddItem=()=>{
-        const modelList = [...updatedOrderList,{sku:"",productFullName:"",quantity:""}]
+        const modelList = [...updatedOrderList,{sku:"MANUAL",productFullName:"",quantity:""}]
         setUpdatedOrderList(modelList)
     }
 
@@ -156,13 +156,15 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
             return alert('Empty Field/s')
         }
 
+        // if(updatedOrderList)
+
         if(deliveryPartnerName==="" || distributorName==="" || updatedOrderList.length===0 
             || !Array.isArray(updatedOrderList)){
             return alert(`Please enter valid data`)
         }else{
             const orderInfo = {
-                deliveryPartnerName,
-                distributorName,
+                deliveryPartnerName:deliveryPartnerName.toUpperCase(),
+                distributorName:distributorName.toUpperCase(),
                 orderedProductList:updatedOrderList,
             }
             

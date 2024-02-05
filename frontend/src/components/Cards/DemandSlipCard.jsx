@@ -50,23 +50,6 @@ function DemandSlipCard({info}) {
     const handlePDFGenerate=()=>{
 
       const headerData = ["Product","Qty"]
-      // const bodyData = [
-      //               ["DPD-ACC-SUZ-59300085000","5"],
-      //               ["SKR-ACT-HON-51400KWP902","2"],
-      //               ["SKR-ACT-HON-51400KWP902","10"],
-      //               ["SKR-ACT-HON-51400KWP902","10"],
-      //               ["SKR-ACT-HON-51400KWP902","10"],
-      //               ["SKR-ACT-HON-51400KWP902","10"],
-      //               ["SKR-ACT-HON-51400KWP902","10"],
-      //               ["SKR-ACT-HON-51400KWP902","10"],
-      //               ["SKR-ACT-HON-51400KWP902","10"],
-      //               ["SKR-ACT-HON-51400KWP902","10"],
-      //               ["SKR-ACT-HON-51400KWP902","10"],
-      //               ["SKR-ACT-HON-51400KWP902","10"],
-      //               ["SKR-ACT-HON-51400KWP902","10"],
-      //               ["SKR-ACT-HON-51400KWP902","10"],
-      //               ["SKR-ACT-HON-51400KWP902","10"],
-      //             ]
   
       var doc = new jsPDF('p','pt',[201,470])
   
