@@ -1,9 +1,9 @@
 const fs = require("fs")
 const PDFDocument = require("./pdfkit-tables")
 const asyncHandler = require('express-async-handler')
+
 const Counter = require('../models/counterModel')
-// const { uploadS3File } = require("../controllers/awsUploadController")
-// const path = require('path');
+const Demandslip = require('../models/demandslipModel')
 
 // @desc   Genearet Ticket number for Demand Slip
 const generateTicket = asyncHandler(async()=>{
@@ -18,6 +18,7 @@ const generateTicket = asyncHandler(async()=>{
     if(count.date !== ticketDate){
         count.counterNumber = 1
         count.date = ticketDate
+        await Demandslip.updateMany({status:"pending"},{$set:{status:"failed", recieved}})
     }
     if(ticketDate<10){
         ticketDate = `0${ticketDate}`
