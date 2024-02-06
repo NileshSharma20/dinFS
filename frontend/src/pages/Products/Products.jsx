@@ -16,7 +16,7 @@ function Products() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { productData, noMatch, isLoading } = useSelector(
+  const { prodCodeList, productData, noMatch, isLoading } = useSelector(
     (state)=>state.product
   )
 
@@ -41,58 +41,6 @@ function Products() {
   })
   
   const { itemCode } = itemData
-
-  const prodCodeList = [{
-    productName:"Air-Filter",
-    itemCode:"ARF",
-  },  
-  {
-    productName:"Ball-Racer",
-    itemCode:"RSR",
-  },
-  {
-    productName:"Bendex",
-    itemCode:"BDX",
-  },
-  {
-    productName:"Brake-Shoe",
-    itemCode:"BSH",
-  },
-  {
-    productName:"Disc-Pad",
-    itemCode:"DPD",
-  },
-  {
-    productName:"Foot-Rest",
-    itemCode:"FTR",
-  },
-  {
-    productName:"Main-Stand",
-    itemCode:"MSN",
-  },
-  {
-    productName:"Mobil-Filter",
-    itemCode:"MOF",
-  },
-  {
-    productName:"Shocker",
-    itemCode:"SKR",
-  },
-  
-  {
-    productName:"Side-Stand",
-    itemCode:"SSN",
-  },
-  {
-    productName:"Accelerator-Cable",
-    itemCode:"ACC",
-  },
-  {
-    productName:"Clutch-Asssembly",
-    itemCode:"CFA",
-  },
-  
-  ]
 
   /////////////////////////////////////////////////
   //////// Functions /////////////////////////////
@@ -312,6 +260,7 @@ function Products() {
           {/* Product Fields */}
           {productData?.length>0 &&
             <div className="productCol">
+                <h3>code</h3>
                 <h3>vehicleModel</h3>
                 <h3>brandCompany</h3>
                 <h3>sku</h3>
@@ -328,6 +277,7 @@ function Products() {
               key={index}
               onClick={()=>handleProductClick(item.sku)}
             >
+              <h3>{item.itemCode}</h3>
               <h3>{item.vehicleModel}</h3>
               <h3>{item.brandCompany}</h3>
               <h3>{item.sku}</h3>

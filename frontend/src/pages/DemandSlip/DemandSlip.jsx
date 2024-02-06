@@ -11,6 +11,8 @@ import Loader from '../../components/Loader/Loader'
 import LoginAgainModal from '../../components/Modals/LoginAgainModal'
 import DemandSlipCard from '../../components/Cards/DemandSlipCard'
 import useAuth from '../../hooks/useAuth'
+import { resetProducts } from '../../features/products/productSlice'
+import { AiOutlineClose } from 'react-icons/ai'
 
 function DemandSlip() {
   const dispatch = useDispatch()
@@ -18,6 +20,7 @@ function DemandSlip() {
   const { isAdmin, isManager } = useAuth()
 
   const {token} = useSelector((state)=>state.auth)
+  const {prodCodeList} = useSelector((state)=>state.product)
   const { orderData, 
           pendingOrderList,
           partialOrderList,
@@ -36,6 +39,8 @@ function DemandSlip() {
   const [fulfilledFlag, setFulfilledFlag] = useState(false)
   const [failedFlag, setFailedFlag] = useState(false)
   const [partialFlag, setPartialFlag] = useState(false)
+
+  const [legendFlag, setLegendFlag] = useState(false)
 
   const handleCreateClick=()=>{
     setCreateFlag(true)
@@ -98,8 +103,13 @@ function DemandSlip() {
     setPartialFlag(false)
   }
 
+  const handleLegendClick=()=>{
+    setLegendFlag(!legendFlag)
+  }
+
   useEffect(()=>{
     dispatch(getFilteredDemandSlips())
+    dispatch(resetProducts())
   },[])
 
   // useEffect(()=>{
@@ -134,6 +144,27 @@ function DemandSlip() {
         
       }}
     >
+      <>
+      {legendFlag &&
+        <>
+        <div className="modal-backdrop" ></div> 
+        <div className='modal-container'>
+            <div className="edit-btn"
+                onClick={()=>handleLegendClick()}
+            >
+            <AiOutlineClose />
+            </div>
+            <div className='ds-new-box'>
+              {prodCodeList.map((item,index)=>{
+                return(
+                  <p key={index}><span style={{fontWeight:`bold`}}>{item.itemCode}: </span>{item.productName}</p>
+                )
+              })}
+            </div>
+        </div>
+      </>
+      }
+
       <div className="ds-filter-container">
         
         <div className={`ds-filter-btn ${createFlag?"ds-filer-btn-active":""}`}
@@ -170,6 +201,12 @@ function DemandSlip() {
           onClick={()=>handleFulfilledClick()}
         >
           Fulfilled        
+        </div>
+
+        <div className={`ds-filter-btn ${legendFlag?"ds-filer-btn-active":""}`}
+          onClick={()=>handleLegendClick()}
+        >
+          Legend        
         </div>
 
 
@@ -410,7 +447,7 @@ function DemandSlip() {
 
     
       </div>
-
+        </>
     </div>
     </>
   )

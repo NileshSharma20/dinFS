@@ -1,6 +1,6 @@
-const { generateTicket } = require("./orderHelper")
+// const { generateTicket } = require("./orderHelper")
 const asyncHandler = require("express-async-handler")
-const { getFilteredDemandSlips } = require("../controllers/orderController")
+// const { getFilteredDemandSlips } = require("../controllers/orderController")
 
 const Counter = require('../models/counterModel')
 const Demandslip = require("../models/demandslipModel")
@@ -20,31 +20,25 @@ const clockEvents = asyncHandler(async() => {
     let hour = currTime.getHours()
 
     const count = await Counter.findOne({counterType:"DemandSlip"}).exec()
-
-    // Fail all pending demand slips
-    await Demandslip.updateMany({status:"pending"},{$set:{status:"failed"}})
-        // .select('-deliveryPartnerName -distributorName -orderedProductList -recievedProductList')
-        // .lean()
     
     // console.log(`pendingList:${JSON.stringify(pendingDemandSlipList,null,4)}`)
-
+    
     if(!count){
         return console.log(`No Counter found`)
     }
-
+    
     if( (date===count.date && hour>=21) 
-        // && (date==count.date && hour<19) 
+    // && (date==count.date && hour<19) 
     ){
+        await Demandslip.updateMany({status:"pending"},{$set:{status:"failed"}})
         count.counterNumber = 1
     }else if( (date!==count.date && hour<8)){
+        await Demandslip.updateMany({status:"pending"},{$set:{status:"failed"}})
         count.counterNumber = 1
         count.date = date
     }
     
-
-    // console.log(`Counter:${count.counterNumber}`)
     const updateCounter = await count.save()
-    // await generateTicket()
 
     return updateCounter
 })

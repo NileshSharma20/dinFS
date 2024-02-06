@@ -4,12 +4,17 @@ import { BiLogOut, BiMenu } from "react-icons/bi"
 import { logOutUser } from '../../features/auth/authSlice';
 
 import "./Navbar.css"
+import { useState } from "react";
 
 function Navbar() {
   const navigate = useNavigate();
   const dispatch = useDispatch()
 
   const {token} = useSelector((state)=>state.auth)
+
+  // const {prodCodeList}=useSelector((state)=>state.product)
+
+  // const [legendFlag, setLegendFlag] = useState(false)
 
   const handleClick=()=>{
     navigate("/")
@@ -19,6 +24,10 @@ function Navbar() {
     dispatch(logOutUser())
     navigate("/login")
   }
+
+  // const handleMenu=()=>{
+  //   setLegendFlag(!legendFlag)
+  // }
 
   return (
     <div className='navbar-container' style={token?{}:{justifyContent:`center`}}> 

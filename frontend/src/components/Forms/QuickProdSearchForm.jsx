@@ -209,7 +209,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                     deliveryPartnerName: "",
                     distributorName: "",
                     orderedProductList: [{
-                        sku:"",
+                        sku:"MANUAL",
                         productFullName:"",
                         quantity:""
                     }]

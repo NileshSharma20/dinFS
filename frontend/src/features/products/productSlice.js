@@ -6,6 +6,56 @@ import { refreshToken } from '../auth/authSlice'
 // const productData = JSON.parse(localStorage.getItem('productData'))
 
 const initialState = {
+    prodCodeList:[{
+      productName:"Air-Filter",
+      itemCode:"ARF",
+    },  
+    {
+      productName:"Ball-Racer",
+      itemCode:"RSR",
+    },
+    {
+      productName:"Bendex",
+      itemCode:"BDX",
+    },
+    {
+      productName:"Brake-Shoe",
+      itemCode:"BSH",
+    },
+    {
+      productName:"Disc-Pad",
+      itemCode:"DPD",
+    },
+    {
+      productName:"Foot-Rest",
+      itemCode:"FTR",
+    },
+    {
+      productName:"Main-Stand",
+      itemCode:"MSN",
+    },
+    {
+      productName:"Mobil-Filter",
+      itemCode:"MOF",
+    },
+    {
+      productName:"Shocker",
+      itemCode:"SKR",
+    },
+    
+    {
+      productName:"Side-Stand",
+      itemCode:"SSN",
+    },
+    {
+      productName:"Accelerator-Cable",
+      itemCode:"ACC",
+    },
+    {
+      productName:"Clutch-Asssembly",
+      itemCode:"CFA",
+    },
+    ],
     productData: [],
     productSKUData:[],
     noMatch: false,
