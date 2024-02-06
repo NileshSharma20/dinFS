@@ -20,7 +20,7 @@ const setUserCredentials = async (userData) => {
     if(response.data){
         sessionStorage.setItem('token', JSON.stringify(response.data))
     }
-    console.log(`response:${JSON.stringify(response.data,null,4)}`)
+    // console.log(`response:${JSON.stringify(response.data,null,4)}`)
     return response.data
 }
 

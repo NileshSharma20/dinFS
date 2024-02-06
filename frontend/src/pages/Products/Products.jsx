@@ -43,8 +43,16 @@ function Products() {
   const { itemCode } = itemData
 
   const prodCodeList = [{
-    productName:"Shocker",
-    itemCode:"SKR",
+    productName:"Air-Filter",
+    itemCode:"ARF",
+  },  
+  {
+    productName:"Ball-Racer",
+    itemCode:"RSR",
+  },
+  {
+    productName:"Bendex",
+    itemCode:"BDX",
   },
   {
     productName:"Brake-Shoe",
@@ -55,33 +63,35 @@ function Products() {
     itemCode:"DPD",
   },
   {
-    productName:"Mobil-Filter",
-    itemCode:"MOF",
-  },
-  {
-    productName:"Ball-Racer",
-    itemCode:"RSR",
-  },
-  {
-    productName:"Bendex",
-    itemCode:"BDX",
-  },
-  {
     productName:"Foot-Rest",
     itemCode:"FTR",
-  },
-  {
-    productName:"Air-Filter",
-    itemCode:"ARF",
-  },
-  {
-    productName:"Side-Stand",
-    itemCode:"SSN",
   },
   {
     productName:"Main-Stand",
     itemCode:"MSN",
   },
+  {
+    productName:"Mobil-Filter",
+    itemCode:"MOF",
+  },
+  {
+    productName:"Shocker",
+    itemCode:"SKR",
+  },
+  
+  {
+    productName:"Side-Stand",
+    itemCode:"SSN",
+  },
+  {
+    productName:"Accelerator-Cable",
+    itemCode:"ACC",
+  },
+  {
+    productName:"Clutch-Asssembly",
+    itemCode:"CFA",
+  },
+  
   ]
 
   /////////////////////////////////////////////////

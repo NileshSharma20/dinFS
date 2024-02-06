@@ -10,9 +10,12 @@ import { getFilteredDemandSlips } from '../../features/orders/orderSlice'
 import Loader from '../../components/Loader/Loader'
 import LoginAgainModal from '../../components/Modals/LoginAgainModal'
 import DemandSlipCard from '../../components/Cards/DemandSlipCard'
+import useAuth from '../../hooks/useAuth'
 
 function DemandSlip() {
   const dispatch = useDispatch()
+
+  const { isAdmin, isManager } = useAuth()
 
   const {token} = useSelector((state)=>state.auth)
   const { orderData, 
@@ -202,6 +205,9 @@ function DemandSlip() {
                 <div className="ds-slip-box" key={key}
                   style={{backgroundColor:cardBorder}}
                 >
+                  {(isAdmin||isManager) && 
+                    <p><span>Publisher: </span>{order.username}</p>
+                  }
                   <p><span>Ticket Number: </span> {order.ticketNumber}</p>
                   <p><span>Delivery Partner Name: </span>{order.deliveryPartnerName}</p>
                   <p><span>Distributor Name: </span> {order.distributorName}</p>
