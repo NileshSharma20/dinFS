@@ -9,12 +9,11 @@ const Demandslip = require("../models/demandslipModel")
 const clockInterval = ()=>{
     // console.log(`clockInterval`)
     setInterval(clockEvents, 11.5*60*60*1000)
-    // setInterval(clockEvents, 1*60*1000)
 }
 
 // @desc   Time triggered functions
 const clockEvents = asyncHandler(async() => {
-    console.log(`clockEvents`)
+    // console.log(`clockEvents`)
     const currTime = new Date()
     let date = currTime.getDate()
     let hour = currTime.getHours()
@@ -32,7 +31,7 @@ const clockEvents = asyncHandler(async() => {
     ){
         await Demandslip.updateMany({status:"pending"},{$set:{status:"failed"}})
         count.counterNumber = 1
-    }else if( (date!==count.date && hour<8)){
+    }else if( (date!==count.date && hour<9)){
         await Demandslip.updateMany({status:"pending"},{$set:{status:"failed"}})
         count.counterNumber = 1
         count.date = date

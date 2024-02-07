@@ -1,6 +1,10 @@
 import axios from 'axios'
 
+// Live URI
 const order_URI = 'https://api.dinmotoindia.com/api/order/'
+
+// Local URI
+// const order_URI = 'http://localhost:5000/api/order/'
 
 const getAllDemandSlips = async(token)=>{
     const config = {
@@ -13,27 +17,34 @@ const getAllDemandSlips = async(token)=>{
     return response.data
 }
 
-const getFilteredDemandSlips = async(token)=>{
+const getFilteredDemandSlips = async(filterDate,token)=>{
     const config = {
         headers: {
             Authorization: `Bearer ${token}`
         }
     }
 
-    let currDate = new Date()
-    let ticketDate = currDate.getDate()
-    let ticketMonth = currDate.getMonth()+1
-    let ticketYear = currDate.getFullYear()
+    let fullDate
+    // yyyy-mm-dd
 
-    if(ticketDate<10){
-        ticketDate = `0${ticketDate}`
+    if(!filterDate || filterDate===''){
+        let currDate = new Date()
+        let ticketDate = currDate.getDate()
+        let ticketMonth = currDate.getMonth()+1
+        let ticketYear = currDate.getFullYear()
+
+        if(ticketDate<10){
+            ticketDate = `0${ticketDate}`
+        }
+
+        if(ticketMonth<10){
+            ticketMonth = `0${ticketMonth}`
+        }
+
+        fullDate = `${ticketDate}${ticketMonth}${ticketYear}`
+    }else{
+        fullDate=filterDate
     }
-
-    if(ticketMonth<10){
-        ticketMonth = `0${ticketMonth}`
-    }
-
-    const fullDate = `${ticketDate}${ticketMonth}${ticketYear}`
 
     const response = await axios.post(order_URI+`filter/${fullDate}`,{}, config)
 

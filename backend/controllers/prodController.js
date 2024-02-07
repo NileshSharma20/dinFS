@@ -9,18 +9,28 @@ const Products = require('../models/productsModel')
 const ItemCodeIndex = require('../models/itemCodeIndexModel')
 
 const dbCollectionList ={
-    "SKR":"shockerModel",
-    "BSH":"brakeshoeModel",
-    "DPD":"discpadModel",
-    "MOF":"mobilfilterModel",
+    // "ALL":"productsModel",
+    "ACC":"acceleratorcableModel",
+    "ARF":"airfilterModel",
     "RSR":"ballracerModel",
     "BDX":"bendexModel",
-    "FTR":"footrestModel",
-    "ARF":"airfilterModel",
-    "SSN":"sidestandModel",
-    "MSN":"mainstandModel",
+    "BSH":"brakeshoeModel",
     "CFA":"clutchassemblyModel",
-    "ACC":"acceleratorcableModel",
+    "DPD":"discpadModel",
+    "FTR":"footrestModel",
+    "MSN":"mainstandModel",
+    "MOF":"mobilfilterModel",
+    "SKR":"shockerModel",
+    "SSN":"sidestandModel",
+    //
+    "CMA":"camshaftModel",
+    "CDI":"cdiModel",
+    "CCC":"clutchcableModel",
+    "RVM":"mirrorModel",
+    "RKR":"rockerModel",
+    "SFR":"selfcutModel",
+    "TCH":"timingchainModel",
+    "TCT":"timingchainadjusterModel",
 }
 
 // @desc   Get All Products
@@ -256,9 +266,12 @@ const setProd = asyncHandler(async (req,res)=>{
 // @access Private
 const setManyProd = asyncHandler(async (req,res)=>{
     const { itemCode } = req.body
+    
     const localJson = localCSVtoJSON(itemCode.toUpperCase())
-
+    // console.log(`localCSVtoJSON length:${localJson.length}`)
+    
     const cleanedJSON = cleanJsonData(localJson)
+    // console.log(`cleanedJSON length:${cleanedJSON.length}`)
 
     const options = { ordered: true };
 

@@ -224,3 +224,12 @@
     color: blue;
     transition: 0.3s ease-in-out;
 }
+
+.date-input-box{
+    padding: 0.4rem 0.8rem;
+
+    border-radius: 10px;
+    border: none;
+
+    cursor: pointer;
+}

@@ -55,6 +55,38 @@ const initialState = {
       productName:"Clutch-Asssembly",
       itemCode:"CFA",
     },
+    {
+      productName:"CAM-SHAFT",
+      itemCode:"CMA"
+    },
+    {
+      productName:"CDI",
+      itemCode:"CDI"
+    },
+    {
+      productName:"Clutch-Cable",
+      itemCode:"CCC"
+    },
+    {
+      productName:"Mirror",
+      itemCode:"RVM"
+    },
+    {
+      productName:"Rocker",
+      itemCode:"RKR"
+    },
+    {
+      productName:"Self-Cut",
+      itemCode:"SFR"
+    },
+    {
+      productName:"Timing-Chain",
+      itemCode:"TCH"
+    },
+    {
+      productName:"Timing-Chain-Adjuster",
+      itemCode:"TCT"
+    },
     ],
     productData: [],
     productSKUData:[],

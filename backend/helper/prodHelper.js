@@ -14,6 +14,15 @@ const filenameList ={
     "MSN":["mainStandMongo.csv", "mainStandUpdated.csv"],
     "CFA":["clutchAssemblyMongo.csv","clutchAssemblyUpdated.csv"],
     "ACC":["acceleratorCableMongo.csv","acceleratorCableUpdated.csv"],
+    //
+    "CMA":["camShaftMongo.csv","camShaftUpdated.csv"],
+    "CDI":["cdiMongo.csv","cdiUpdated.csv"],
+    "CCC":["clutchCableMongo.csv","clutchCableUpdated.csv"],
+    "RVM":["mirrorMongo.csv","mirrorUpdated.csv"],
+    "RKR":["rockerMongo.csv","rockerUpdated.csv"],
+    "SFR":["selfCutMongo.csv","selfCutUpdated.csv"],
+    "TCH":["timingChainMongo.csv","timingChainUpdated.csv"],
+    "TCT":["timingChainAdjusterMongo.csv","timingChainAdjusterUpdated.csv"],
 }
 
 // @desc   Clean Mongo Collection data and save it locally
@@ -46,7 +55,7 @@ const createMongoDataBackup = (mongoFile,iC) =>{
     const dbKeys = Object.keys(filenameList)
     if(dbKeys.includes(iC)){
         filePath = `../MongoData/${ filenameList[iC][0] }` 
-    }else if(iC==="ALL"){
+    }else if(iC.toUpperCase()==="ALL"){
         filePath = '../MongoData/productsMongo.csv'
     }
     

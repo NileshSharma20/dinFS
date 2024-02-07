@@ -81,7 +81,7 @@ const getAllDemandSlips =asyncHandler(async(req,res)=>{
     }
 
     // Check for Admin status
-    if(!roles.includes("Admin")){
+    if(!roles.includes("Manager")){
         res.status(403)
         throw new Error("Forbidden")
     }

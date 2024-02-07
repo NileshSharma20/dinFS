@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { FiEdit2 } from 'react-icons/fi'
@@ -6,7 +6,7 @@ import { FiEdit2 } from 'react-icons/fi'
 import "./DemandSlip.css"
 import QuickProdSearchForm from '../../components/Forms/QuickProdSearchForm'
 import { useDispatch, useSelector } from 'react-redux'
-import { getFilteredDemandSlips } from '../../features/orders/orderSlice'
+import { getAllDemandSlips, getFilteredDemandSlips } from '../../features/orders/orderSlice'
 import Loader from '../../components/Loader/Loader'
 import LoginAgainModal from '../../components/Modals/LoginAgainModal'
 import DemandSlipCard from '../../components/Cards/DemandSlipCard'
@@ -18,6 +18,8 @@ function DemandSlip() {
   const dispatch = useDispatch()
 
   const { isAdmin, isManager } = useAuth()
+  
+  const dateInputRef = useRef(null);
 
   const {token} = useSelector((state)=>state.auth)
   const {prodCodeList} = useSelector((state)=>state.product)
@@ -41,6 +43,13 @@ function DemandSlip() {
   const [partialFlag, setPartialFlag] = useState(false)
 
   const [legendFlag, setLegendFlag] = useState(false)
+
+  // const DatePicker = () => {
+  const [inputDate, setInputDate] = useState('');
+
+  const handleDateChange = (e) => {
+    setInputDate(e.target.value);
+  }
 
   const handleCreateClick=()=>{
     setCreateFlag(true)
@@ -107,10 +116,42 @@ function DemandSlip() {
     setLegendFlag(!legendFlag)
   }
 
+  const handleDateFilter=()=>{
+    if(inputDate!==''){
+      // Get filtered order data
+      let inputYear = inputDate.slice(0,4)
+      let inputMonth = inputDate.slice(5,7)
+      let inputDay = inputDate.slice(8)
+      let filterDate = inputDay+inputMonth+inputYear
+      console.log(`formatted Date:${inputDay+inputMonth+inputYear}`)
+      dispatch(getFilteredDemandSlips(filterDate)) 
+    }
+    else{
+      // Get all filter data
+      dispatch(getAllDemandSlips())
+    }
+  }
+
   useEffect(()=>{
-    dispatch(getFilteredDemandSlips())
+    if(isAdmin || isManager){
+      dispatch(getAllDemandSlips())
+    }else{
+      dispatch(getFilteredDemandSlips())
+    }
     dispatch(resetProducts())
   },[])
+
+  // useEffect(()=>{
+  //   if(inputDate!==''){
+  //     // Get filtered order data
+  //     let inputYear = inputDate.slice(0,4)
+  //     let inputMonth = inputDate.slice(5,7)
+  //     let inputDay = inputDate.slice(8)
+  //     let filterDate = inputDay+inputMonth+inputYear
+  //     console.log(`formatted Date:${inputDay+inputMonth+inputYear}`)
+  //     dispatch(getFilteredDemandSlips(filterDate)) 
+  //   }
+  // },[inputDate])
 
   // useEffect(()=>{
   //   if(allFlag){
@@ -212,6 +253,53 @@ function DemandSlip() {
 
       </div>
 
+      {((isAdmin || isManager)
+        && (allFlag||pendingFlag||failedFlag||partialFlag||fulfilledFlag)) 
+        &&
+        <div className="ds-filter-container"
+          style={{height:`auto`, marginBottom:`3vh`}}
+        >
+        <input
+          className='date-input-box'
+          type="date"
+          onChange={handleDateChange}
+          ref={dateInputRef}
+        />
+        {/* <p>Selected Date: {inputDate}</p> */}
+        <div className='ds-filter-btn' onClick={()=>handleDateFilter()}>Search</div>
+      </div>
+      }
+      
+      {/* All results count */}
+      {!createFlag &&
+        <div className="ds-filter-container"
+          style={{height:`auto`, marginBottom:`5vh`}}
+        >
+          {allFlag && 
+            <p style={{fontWeight:`bold`}}>Results ({orderData.length})</p>}
+          
+          {pendingFlag && 
+            <p style={{fontWeight:`bold`}}>Results ({orderData.filter((item)=>item.status==='pending').length})</p>}
+          
+          {failedFlag && 
+            <p style={{fontWeight:`bold`}}>Results ({orderData.filter((item)=>item.status==='failed').length})</p>}
+          
+          {partialFlag && 
+            <p style={{fontWeight:`bold`}}>Results ({orderData.filter((item)=>item.status==='partial').length})</p>}
+          
+          {fulfilledFlag && 
+            <p style={{fontWeight:`bold`}}>Results ({orderData.filter((item)=>item.status==='fulfilled').length})</p>}
+        
+        </div>
+      }
+
+      {
+        pendingFlag &&
+        <div className='ds-filter-container'>
+          <p></p>
+        </div>
+      }
+
       <div className="ds-filter-data-container">
         
         {/* Create Demand Slip */}
@@ -226,6 +314,7 @@ function DemandSlip() {
 
         </>
         }
+        
 
         {/* All Orders */}
         {allFlag &&
