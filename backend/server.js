@@ -20,7 +20,7 @@ const corsOptions = {
 app.use(cors(corsOptions))
 
 // const today = new Date('Feb 27, 2024')
-// const tomorrow = new Date(today.getTime()+(2*24*60*60*1000))
+// const tomorrow = new Date(today.getTime()-(2*24*60*60*1000))
 
 // console.log(`testing time: ${tomorrow}`)
 
