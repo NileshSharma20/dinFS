@@ -20,8 +20,9 @@ router.route("/:ticketNumber")
         .patch(updateAfterDelivery)
         .delete(deleteDemandSlip)
 
-router.route("/filter/:date")
-        .post(getFilteredDemandSlips)
+router.route("/filter")
+        // .post(getFilteredDemandSlips)
+        .get(getFilteredDemandSlips)
 
 router.route("/reset/history")
         .delete(deleteAllDemandHistory)

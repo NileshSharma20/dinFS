@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+import { FaAngleDown } from "react-icons/fa6";
 import "./Dropdown.css"
 
-function Dropdown({dataList, passItemCode}) {
-    const boxRef = useRef(null)
-    
+function UserDropdown({value, dataList, passUsername}) {
+    const boxRef = useRef(null) 
+
     const [isActive, setIsActive] = useState(false)
     const [selectedItem, setSelectedItem] = useState("")
 
@@ -11,16 +12,17 @@ function Dropdown({dataList, passItemCode}) {
         setIsActive(!isActive)
     }
 
-    const handleItemClick=(prod)=>{
-        const data = {
-            saveFile:false,
-            itemCode: prod.itemCode
-        }
+    const handleItemClick=(user)=>{
+        const data = user
 
-        passItemCode(data)
-        setSelectedItem(prod.productName)
+        passUsername(data)
+        setSelectedItem(user)
         setIsActive(!isActive)
     }
+
+    useEffect(()=>{
+        setSelectedItem(value)
+    },[value])
 
     // Modal close
     useEffect(()=>{
@@ -39,18 +41,21 @@ function Dropdown({dataList, passItemCode}) {
     })
 
   return (
-    <div className="drop-down-container" ref={boxRef}>
+    <div className="drop-down-container no-border-dropdown-container" ref={boxRef}>
         <div className="drop-down-item selected-drop-down" onClick={()=>handleClick()}>
-            <p>{selectedItem===""?`Select a Cateogry`:selectedItem}</p>
+            <p>{selectedItem===""?`Select a User`:selectedItem}</p>
+            <div className='arrow-container'>
+            <FaAngleDown className='down-arrow' />
+            </div>
         </div>     
 
         {isActive && 
-        <div className="drop-down-list-container">
+        <div className="drop-down-list-container no-border-dropdown-list">
             {dataList?.map((item,index)=>
             <div className="drop-down-item" key={index}
                 onClick={()=>handleItemClick(item)}
             >
-                <p>{item.productName}</p>
+                <p>{item}</p>
             </div>
             )
             }
@@ -61,4 +66,4 @@ function Dropdown({dataList, passItemCode}) {
   )
 }
 
-export default Dropdown
+export default UserDropdown

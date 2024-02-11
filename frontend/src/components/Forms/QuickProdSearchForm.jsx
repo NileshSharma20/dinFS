@@ -60,7 +60,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
     const handleModalClose =()=>{
         setNewDSFlag(false)
         setUpdatedOrderList([{
-            sku:"",
+            sku:"MANUAL",
             productFullName:"",
             quantity:""
         }])
@@ -68,7 +68,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
             deliveryPartnerName: "",
             distributorName: "",
             orderedProductList: [{
-                sku:"MANUAL",
+                sku:"",
                 productFullName:"",
                 quantity:""
             }]
@@ -209,7 +209,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                     deliveryPartnerName: "",
                     distributorName: "",
                     orderedProductList: [{
-                        sku:"MANUAL",
+                        sku:"",
                         productFullName:"",
                         quantity:""
                     }]

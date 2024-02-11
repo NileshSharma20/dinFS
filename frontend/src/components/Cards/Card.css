@@ -23,3 +23,61 @@
 .card-container>p>span{
     font-weight: bold;
 }
+
+.status-circle{
+    width: 1.5rem;
+    height: 1.5rem;
+
+    align-self: flex-end;
+    justify-self: flex-end;
+
+    border-radius: 50%;
+}
+
+.card-row{
+    width: 100%;
+    min-height: 3vh;
+
+    display: grid;
+    grid-template-columns: 50% 50%;
+    /* border: 1px solid red; */
+}
+
+.card-element{
+    display: flex;
+    flex-direction: column;
+
+    /* height: 100%; */
+    /* justify-self: center;
+    align-self: center; */
+
+    /* border: 1px solid blue; */
+}
+
+.card-grid-row{
+    width: 100%;
+
+    margin-bottom: 0.2rem;
+
+    display: grid;
+    grid-template-columns:3rem 54% calc(23% - 1.5rem) calc(23% - 1.5rem) ;
+
+    /* justify-content: space-between; */
+    align-items: center;
+
+    border-bottom: 1px solid var(--backgroundColor);
+    /* border: 1px solid red; */
+}
+
+.card-element>p{
+    font-size: 1rem;
+}
+
+.card-grid-row>p{
+    justify-self: center;
+    align-self: center;
+}
+
+.card-element>h3, .card-grid-row>h3{
+    font-size: 1rem;
+}

@@ -83,7 +83,7 @@ const getAllDemandSlips =asyncHandler(async(req,res)=>{
     // Check for Admin status
     if(!roles.includes("Manager")){
         res.status(403)
-        throw new Error("Forbidden")
+        throw new Error("Forbidden: Manager and above Access Level required")
     }
 
     orders = await Demandslip?.find().lean()
@@ -92,10 +92,11 @@ const getAllDemandSlips =asyncHandler(async(req,res)=>{
 
 // @desc   Get date filtered Demand Slips
 // @route  POST /api/order/filter/:date
+// @route  GET /api/order/filter?:date&:publisherUsername
 // @access Private
 const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
-    const { date } = req.params
-    const { status } = req.body
+    const { date, publisherUsername, status, ticketNum} = req.query
+    
     const { username, roles } = req
 
     const employeeExists = await User.findOne({username}).select('-password').lean()
@@ -114,7 +115,7 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
         || status==="failed" || status==="partial")
         ){
             res.status(400)
-            throw new Error('Bad Request')
+            throw new Error('Bad Request: Invalid DemandSlip Status')
     }
 
     // Check for minimum Managaer Level Access
@@ -122,15 +123,27 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
         !roles.includes("Manager")){
 
             // Employee Level Access
+            let searchParams = []
+
             if(status){
-                orders = await Demandslip.find({ 
-                    status,
-                    employeeId: employeeExists._id.toString(),
-                    username:username,
-                    ticketNumber:{ $regex: date}
-                
-                },'-_id -__v -employeeId -createdAt -updatedAt').lean()
-            }else{
+                searchParams=[{status:status}, ...searchParams]
+            }
+            if(ticketNum ){
+                searchParams=[{ticketNumber:{ $regex:ticketNum}},
+                    ...searchParams]
+            }
+
+            if(searchParams.length!==0){
+                orders = await Demandslip.find({$and: [
+                            ...searchParams,
+                            {ticketNumber:{ $regex:date}},
+                            {username:username},
+                            {employeeId: employeeExists._id.toString()},
+                        ]
+                },
+                    '-_id -__v -employeeId -createdAt -updatedAt').lean()
+            }
+            else{
                 orders = await Demandslip.find({
                         username:username,
                         employeeId: employeeExists._id.toString(),
@@ -141,16 +154,34 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
         
         }else{
             // Manager and Admin Level Access
-            if(status){
-                orders = await Demandslip.find({ticketNumber:{ $regex:date}, status}
-                                ,'-_id -__v').lean()
-            }else{
-                orders = await Demandslip.find({ticketNumber:{ $regex:date}}
-                                ,'-_id -__v ').lean()
-            }
+            // if(status){
+                let searchParams = []
+
+                if(date){
+                    searchParams=[{ticketNumber:{ $regex:date}}, ...searchParams]
+                }
+                if(status){
+                    searchParams=[{status:status}, ...searchParams]
+                }
+                if(publisherUsername){
+                    searchParams = [{username:publisherUsername}, ...searchParams]
+                }
+                if(ticketNum ){
+                    searchParams=[{ticketNumber:{ $regex:ticketNum}},
+                        ...searchParams]
+                }
+
+                if(!date && !status && !publisherUsername && !ticketNum){
+                    orders = await Demandslip?.find({}
+                                                ,'-id -__v').lean()
+                }else{
+                    orders = await Demandslip.find({$and: searchParams}
+                                                ,'-_id -__v').lean()
+                }
     }
 
-    res.status(200).json(orders)
+    res.status(200).json(orders) 
+    // res.status(200).json({message:`Orders ${orders.length}`})
 })
 
 // @desc   Update pending Demand Slip (Admin can update closed tickets)

@@ -233,3 +233,12 @@
 
     cursor: pointer;
 }
+
+.ds-filter-form-control{
+    padding: 0.4rem 0.8rem;
+    /* margin: 0 0.5rem; */
+
+    border-radius: 10px;
+    border: none;
+    outline: none;
+}

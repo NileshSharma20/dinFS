@@ -48,12 +48,12 @@ export const getAllDemandSlips = createAsyncThunk(
 // Get User and Date Filtered Demand Orders
 export const getFilteredDemandSlips = createAsyncThunk(
   'orders/getFilteredDemandSlips',
-  async(filterDate='', thunkAPI)=>{
+  async(filterParams={}, thunkAPI)=>{
     try {
       try {
             
         const token = thunkAPI.getState().auth.token
-        return await orderService.getFilteredDemandSlips(filterDate,token)
+        return await orderService.getFilteredDemandSlips(filterParams,token)
 
       } catch (err) {
         
@@ -61,7 +61,7 @@ export const getFilteredDemandSlips = createAsyncThunk(
           await thunkAPI.dispatch(refreshToken())
 
           const token = thunkAPI.getState().auth.token
-          return await orderService.getFilteredDemandSlips(filterDate,token) 
+          return await orderService.getFilteredDemandSlips(filterParams,token) 
         }
       }
     } catch (error) {

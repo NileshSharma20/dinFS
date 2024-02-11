@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-const users_URI = 'https://api.dinmotoindia.com/api/users/'
-// const users_URI = 'http://localhost:5000/api/users'
+// const users_URI = 'https://api.dinmotoindia.com/api/users/'
+const users_URI = 'http://localhost:5000/api/users/'
 
 const getAllUsers = async(token)=>{
   const config = {

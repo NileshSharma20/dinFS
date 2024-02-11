@@ -2,9 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from "react-redux"
 import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai"
 import { getFilteredDemandSlips, resetAfterNewDemandSlip, updateDemandSlip } from '../../features/orders/orderSlice';
+import useAuth from '../../hooks/useAuth';
 
 function UpdateOrderForm({ initialValue, setFlag}) {
     const dispatch = useDispatch();
+
+    const {isAdmin, isManager} = useAuth()
 
     const {isSuccess, updatedDataFlag} = useSelector((state)=>state.orders)
 
@@ -167,12 +170,32 @@ function UpdateOrderForm({ initialValue, setFlag}) {
 
   return (
     <>
-    <div className='card-container' style={{padding:"0", border:"none"}}>
-        <p><span>Ticket Number: </span> {initialValue.ticketNumber}</p>
-        <p><span>Delivery Partner Name: </span>{initialValue.deliveryPartnerName}</p>
-        <p><span>Distributor Name: </span> {initialValue.distributorName}</p>
-    
-        <form onSubmit={onSubmit}>
+    <div className="card-row">
+            <div className="card-element">
+
+            <h3>{initialValue.ticketNumber}</h3>
+            {(isAdmin||isManager) && 
+            <h3>{initialValue?.username}</h3>
+            }
+            </div>
+    </div>
+    <br />
+    <div className="card-row">
+        <div className="card-element">
+            <h3>Delivery Partner</h3>
+            <p>{initialValue.deliveryPartnerName}</p>
+        </div>
+
+        <div className="card-element">
+            <h3>Distributor</h3> 
+            <p>{initialValue.distributorName}</p>
+        </div>
+    </div>
+    <br />
+
+    {/* <div className='card-container' style={{padding:"0", border:"none"}}> */}
+        
+        <form onSubmit={onSubmit} style={{width:`100%`}}>
             <div className="form-group">
                     <label>Status</label>
 
@@ -225,21 +248,37 @@ function UpdateOrderForm({ initialValue, setFlag}) {
                     value = {formData.totalCost}
                     placeholder="Total Cost"
                     autoComplete='off'
-                    onChange={handleNumField} />
+                    onChange={handleNumField} 
+                    style={{width:`40%`}}
+                    />
             </div>}
 
             {formData.status==="partial" &&
 
             <div className="form-group">
-                <label>Products</label>
+                <div className="card-grid-row">
+                    <h3></h3>
+                    <label>Products</label>
+                    <h3>Ordered</h3>
+                    <h3>Recieved</h3>
+                </div>
                 {formData.recievedProductList.map((prod,k)=>{
                     return(
 
-                    <div key={k}>
-                        <p>{prod.sku}</p>
-                        {/* <br /> */}
-                        <p>{prod.productFullName}</p>
-                        {/* <br /> */}
+                    <div className="card-grid-row" key={k}>
+                        <p>{k+1}.</p>
+
+                        {/* <p>{prod.sku}</p>
+                        
+                        <p>{prod.productFullName}</p> */}
+                        <div className="card-element">
+
+                            <p style={{fontWeight:`bold`}}>{prod.productFullName}</p>
+                            <p>{prod.sku}</p>
+                        </div>
+
+                        <p>{prod.quantity}</p>
+                        
                         <input
                             type="text" 
                             className='card-form-control'
@@ -250,7 +289,7 @@ function UpdateOrderForm({ initialValue, setFlag}) {
                             autoComplete='off'
                             onChange={(e)=>onRecievedListChange(e,k)} 
                         />
-                        <br />
+                        {/* <br /> */}
                     </div>
                         )
                 })}
@@ -258,12 +297,14 @@ function UpdateOrderForm({ initialValue, setFlag}) {
             }
 
             <div className="form-group">
-                <button type="submit" className="submit-btn">
+                <button type="submit" className="submit-btn"
+                    style={{width:`50%`, justifySelf:`center`}}
+                >
                     Update
                 </button>
             </div>
         </form>
-    </div>
+    {/* </div> */}
 
     </>
   )

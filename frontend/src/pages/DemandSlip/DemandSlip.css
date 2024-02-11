@@ -9,6 +9,11 @@
     align-items: center;
 }
 
+.ds-filter-dropdown-container{
+    width: clamp(100px,10vw,10vw);
+
+    margin: 0 1rem;
+}
 
 .ds-filter-btn{
     margin: 0.4rem;
@@ -24,6 +29,55 @@
     background-color: transparent;
     outline: 2px solid var(--formBgColor);
     color: var(--formBgColor);
+}
+
+.ds-pagination-container{
+    width: auto;
+    height: auto;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 20px;
+    background-color: var(--formBgColor);
+    animation: onLoad 0.3s ease-in forwards;
+}
+
+@keyframes onLoad{
+    from{
+        opacity: 0;
+    }
+    to{
+        opacity: 1;
+    }
+}
+
+.ds-page-btn{
+    margin: 0.4rem;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+
+    transition: 0.3s ease-in-out;
+}
+
+.ds-page-inactive{
+    color: var(--inactive);
+}
+
+
+.ds-page-btn:hover{
+    color: var(--backgroundColor);
+    transition: 0.3s ease-in-out;
+}
+
+.ds-page-inactive:hover{
+    color: var(--inactive);
+    cursor: default;
+}
+
+.ds-page-btn-active{
+    color: var(--backgroundColor);
 }
 
 .ds-filter-data-container{
@@ -127,7 +181,7 @@
 
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-items: flex-start;
 
     text-align: left;
@@ -153,6 +207,9 @@
 .pdf-btn{
     width: auto;
     height: auto;
+
+    align-self: center;
+    justify-self: flex-end;
 
     padding: 1rem;
     background-color: var(--formBgColor);
