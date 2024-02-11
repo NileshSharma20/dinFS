@@ -4,10 +4,10 @@ import useAuth from '../../hooks/useAuth'
 // const prod_env = process.env.NODE_ENV
 
 // Live URI
-// const order_URI = 'https://api.dinmotoindia.com/api/order/'
+const order_URI = 'https://api.dinmotoindia.com/api/order/'
 
 // Local URI
-const order_URI = 'http://localhost:5000/api/order/'
+// const order_URI = 'http://localhost:5000/api/order/'
 
 const getAllDemandSlips = async(token)=>{
     const config = {
