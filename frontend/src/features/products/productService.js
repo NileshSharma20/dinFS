@@ -1,7 +1,10 @@
 import axios from 'axios'
 
-const prod_URI = 'https://api.dinmotoindia.com/api/prod/'
-// const prod_URI = 'http://localhost:5000/api/prod/'
+// const prod_URI = 'https://api.dinmotoindia.com/api/prod/'
+const main_URI = process.env.REACT_APP_LOCAL_URI 
+                  || `https://api.dinmotoindia.com/api/`
+
+const prod_URI = main_URI+'prod/'
 
 // Convert Product CSV Data to JSON Data
 const createProductDataJSON = (csvFileData) => {

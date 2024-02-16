@@ -39,7 +39,7 @@ const generateTicket = asyncHandler(async()=>{
     count.counterNumber = count.counterNumber+1
     await count.save()
 
-    console.log(`ticketID:${ticketNumber}`)
+    // console.log(`ticketID:${ticketNumber}`)
 
     return {ticketNumber, date}
 })

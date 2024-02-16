@@ -4,11 +4,16 @@ import { refreshToken } from '../auth/authSlice'
 
 const initialState = {
     orderData:[],
-    pendingOrderList: [],
-    partialOrderList: [],
-    failedOrderList: [],
-    fulfilledOrderList: [],
     newDemandSlip:{},
+    
+    // Pagination Params
+    pageCount: null,
+    totalDataLength: null,
+    nextPage:null,
+    prevPage:null,
+    currentPage:1,
+
+    // Network Status Params
     updatedDataFlag:false,
     isLoading:false,
     isError:false,
@@ -154,20 +159,17 @@ export const orderSlice = createSlice({
           state.isLoading = true
           state.updatedDataFlag=false
           state.orderData=[]
-          state.pendingOrderList=[]
-          state.partialOrderList=[]
-          state.failedOrderList=[]
-          state.fulfilledOrderList=[]
         })
         .addCase(getAllDemandSlips.fulfilled, (state, action) => {
           state.isLoading = false
           state.isSuccess = true
-          state.orderData = action.payload
-          state.pendingOrderList = action.payload.filter((order)=>order.status==="pending")
-          state.partialOrderList = action.payload.filter((order)=>order.status==="partial")
-          state.failedOrderList = action.payload.filter((order)=>order.status==="failed")
-          state.fulfilledOrderList = action.payload.filter((order)=>order.status==="fulfilled")
-        
+          state.orderData = action.payload.data
+          
+          state.pageCount = action.payload.pageCount
+          state.totalDataLength = action.payload.totalDataLength
+          state.nextPage = action.payload.next?.page
+          state.prevPage = action.payload.prev?.page
+          state.currentPage = action.payload.currentPage
         })
         .addCase(getAllDemandSlips.rejected, (state, action) => {
           state.isLoading = false
@@ -180,19 +182,17 @@ export const orderSlice = createSlice({
           state.isLoading = true
           state.updatedDataFlag=false
           state.orderData=[]
-          state.pendingOrderList=[]
-          state.partialOrderList=[]
-          state.failedOrderList=[]
-          state.fulfilledOrderList=[]
         })
         .addCase(getFilteredDemandSlips.fulfilled, (state, action) => {
           state.isLoading = false
           state.isSuccess = true
-          state.orderData = action.payload
-          state.pendingOrderList = action.payload.filter((order)=>order.status==="pending")
-          state.partialOrderList = action.payload.filter((order)=>order.status==="partial")
-          state.failedOrderList = action.payload.filter((order)=>order.status==="failed")
-          state.fulfilledOrderList = action.payload.filter((order)=>order.status==="fulfilled")
+          state.orderData = action.payload.data
+
+          state.pageCount = action.payload.pageCount
+          state.totalDataLength = action.payload.totalDataLength
+          state.nextPage = action.payload.next?.page
+          state.prevPage = action.payload.prev?.page
+          state.currentPage = action.payload.currentPage
         })
         .addCase(getFilteredDemandSlips.rejected, (state, action) => {
           state.isLoading = false

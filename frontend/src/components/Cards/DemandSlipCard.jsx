@@ -8,6 +8,9 @@ function DemandSlipCard({info, partialFlag=false}) {
 
     const [statusColour, setStatusColour] = useState({})
 
+    const createdTimeString = new Date(info.createdAt).toString().split(' ')[4]
+    const updatedTimeString = new Date(info.updatedAt).toString().split(' ')[4]
+    
     useEffect(()=>{
         if(info.status==='partial'){
             setStatusColour({backgroundColor:`#ffb703`})
@@ -41,6 +44,22 @@ function DemandSlipCard({info, partialFlag=false}) {
             </div>
 
         </div>
+        <br />
+
+        {(isAdmin||isManager) && 
+        <div className="card-row">
+
+            <div className="card-element">
+                <h3>Created</h3>
+                {createdTimeString}
+            </div>
+
+            <div className="card-element">
+                <h3>Updated</h3>
+                {updatedTimeString}
+            </div>
+        </div>
+        }
         {/* <div className="card-row">
         </div> */}
         
@@ -66,8 +85,8 @@ function DemandSlipCard({info, partialFlag=false}) {
     <div className="card-grid-row">
         <h3></h3>
         <h3>Products</h3>
-        <h3>Ordered</h3>
-        {partialFlag && <h3>Recieved</h3>}  
+        <h3>Ord.</h3>
+        {partialFlag && <h3>Recv.</h3>}  
     </div>
 
     {/* <div className='ds-new-col'> */}

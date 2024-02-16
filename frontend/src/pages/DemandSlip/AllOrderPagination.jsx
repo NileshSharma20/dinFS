@@ -4,48 +4,88 @@ import useAuth from '../../hooks/useAuth'
 
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
 import DemandSlipEditCard from '../../components/Cards/DemandSlipEditCard';
+import { useDispatch, useSelector } from 'react-redux';
+import { getFilteredDemandSlips } from '../../features/orders/orderSlice';
 
-function AllOrderPagination({dataList, isLoaded, pendingPageFlag=false}) {
+function AllOrderPagination({
+    dataList, 
+    isLoaded, 
+    pendingPageFlag=false,
+    cardsPerPageLimit,
+    filterParams
+}
+) {
+
+    const dispatch = useDispatch()
+    
     const { isManager } = useAuth()
+
+    const { 
+        pageCount,
+        currentPage } = useSelector((state)=>state.orders)
 
     const dots = `...`
 
-    const cardsPerPageLimit = 50
+    // const cardsPerPageLimit = 2
 
-    const [currentPage, setCurrentPage] = useState(1)
-
-    const lastIndex = currentPage * cardsPerPageLimit
-    const firstIndex = lastIndex - cardsPerPageLimit
-
-    const displayDataList = dataList.slice(firstIndex, lastIndex)
-
-    const numPages = Math.ceil(dataList.length / cardsPerPageLimit)
+    const [numPages, setNumPages] = useState(1)
 
     const nums = [...Array(numPages+1).keys()].slice(1)
 
     const [paginationArray, setPaginationArray] = useState([])
+
+    // const [filterStatusString, setfilterStatusString]=useState(null)
 
     ////////////////////////////////////////////////////
     ////////////////Functions///////////////////////////
     ////////////////////////////////////////////////////
     const handlePrevClick=()=>{
         if(currentPage!==1){
-            setCurrentPage(currentPage-1)
+            // setCurrentPage(currentPage-1)
+            dispatch(getFilteredDemandSlips({
+                ...filterParams,
+                page:currentPage-1,
+                limit:cardsPerPageLimit,
+                // filterStatus
+            }))
         }else{
-            setCurrentPage(1)
+            // setCurrentPage(1)
+            dispatch(getFilteredDemandSlips({
+                ...filterParams,
+                page:1,
+                limit:cardsPerPageLimit,
+                // filterStatus
+            }))
         }
     }
 
     const handleNextClick=()=>{
-        if(currentPage!==numPages){
-            setCurrentPage(currentPage+1)
-        }else{
-            setCurrentPage(numPages)
+        // if(currentPage!==numPages){
+        if(currentPage<pageCount){
+            dispatch(getFilteredDemandSlips({
+                ...filterParams,
+                page:currentPage+1,
+                limit:cardsPerPageLimit,
+                // filterStatus
+            }))
+        }else if(currentPage===pageCount){
+            // setCurrentPage(pageCount)
+            dispatch(getFilteredDemandSlips({
+                ...filterParams,
+                page:pageCount,
+                limit:cardsPerPageLimit,
+                // filterStatus
+            }))
         }
     }
 
     const handleCurrentClick=(pageNum)=>{
-        setCurrentPage(pageNum)
+        dispatch(getFilteredDemandSlips({
+            ...filterParams,
+            page:pageNum,
+            limit:cardsPerPageLimit,
+            // filterStatus
+        }))
     }
 
     ////////////////////////////////////////////////////
@@ -60,45 +100,39 @@ function AllOrderPagination({dataList, isLoaded, pendingPageFlag=false}) {
             setPaginationArray([...leftPageNumArray, dots, numPages])
         }
 
-        setCurrentPage(1)
+    },[isLoaded, dataList, numPages])
 
-    },[isLoaded, dataList])
-
-    useEffect(()=>{
-        // console.log(`currentPage:${currentPage}`)
-        // console.log(`lastIndex:${lastIndex}`)
-        // console.log(`firstIndex:${firstIndex}`)
-        
+    useEffect(()=>{        
         if(numPages<8){
             setPaginationArray(nums)
         }
         else{   
             if(currentPage<=3){
-                // console.log(`left`)
                 let leftPageNumArray = Array.from(Array(5), (_, i) => i+currentPage)
                 setPaginationArray([...leftPageNumArray, dots, numPages])
             }
             else if(currentPage>3 && numPages-currentPage>4 ){
-                // console.log(`mid`)
                 let middlePageNumArray = Array.from(Array(3), (_, i) => i+currentPage-1)
                 setPaginationArray([1,dots,...middlePageNumArray, dots, numPages])
-            }else if(numPages-currentPage<=4){
-                // console.log(`right`)
+            }
+            else if(numPages-currentPage<=4){
                 let rightPageNumArray = Array.from(Array(5), (_, i) => i+numPages-4)
                 setPaginationArray([1, dots, ...rightPageNumArray])
             }
         }
     },[currentPage])
-    
-    // useEffect(()=>{
-    //     console.log(JSON.stringify(paginationArray,null,4))
-    // },[paginationArray])
-    
+
+    useEffect(()=>{
+        let pC = pageCount || 1
+        setNumPages(pC)
+        // console.log(`pageCount:${pageCount}`)
+    },[pageCount])
+        
 
   return (
     <>
     {/* Pagination Bars */}
-    {numPages>1 &&
+    {numPages>1 && dataList.length!==0 &&
     <div className="ds-filter-container"
         style={{height:`auto`, 
             marginBottom:`3vh`
@@ -108,7 +142,7 @@ function AllOrderPagination({dataList, isLoaded, pendingPageFlag=false}) {
             
             {/* Previous Btn */}
             <div className={`ds-page-btn ${currentPage!==1?``:`ds-page-inactive`}`} 
-                onClick={()=>handlePrevClick()}
+                onClick={(currentPage!==1) ? (()=>handlePrevClick()): undefined}
             >
                 <FaAngleLeft style={{fontSize:`1rem`}}/>
             </div>
@@ -139,7 +173,7 @@ function AllOrderPagination({dataList, isLoaded, pendingPageFlag=false}) {
 
             {/* Next Btn */}
             <div className={`ds-page-btn ${currentPage!==numPages?``:`ds-page-inactive`}`} 
-                onClick={()=>handleNextClick()}
+                onClick={(currentPage!==pageCount) ? (()=>handleNextClick()):undefined}
             >
                 <FaAngleRight style={{fontSize:`1rem`}}/>
             </div>
@@ -151,8 +185,8 @@ function AllOrderPagination({dataList, isLoaded, pendingPageFlag=false}) {
     {/* Cards */}
     <div className="ds-filter-data-container">
         <div className="ds-content ds-card-content">
-        {displayDataList.length>0 &&
-            displayDataList.map((order,key)=>{
+        {dataList.length>0 &&
+            dataList.map((order,key)=>{
             return (
                 <React.Fragment key={key}>
                     {

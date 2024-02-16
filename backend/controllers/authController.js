@@ -76,7 +76,7 @@ const refresh = (req,res)=>{
     const cookies = req.cookies
 
     if(!cookies?.jwt){
-        console.log(`no cookie`)
+        // console.log(`no cookie`)
         res.status(401)
         throw new Error(`Unauthorized: Cookie not found`)
     }

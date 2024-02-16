@@ -227,3 +227,35 @@
     color: var(--formBgColor);
     transition: 0.3s ease-in-out;
 }
+
+/* /////////////////////1200///////////////////// */
+@media only screen and (max-width: 1200px ){
+    .ds-card-content{
+        position: relative;
+        display: grid;
+        grid-template-columns: 50% 50%;
+        column-gap: 2rem;
+    
+        row-gap: 2rem;
+
+        padding: 0 2rem;
+        
+    
+        /* border: 1px solid red; */
+    }
+}
+
+/* /////////////////////768///////////////////// */
+@media only screen and (max-width: 768px ){
+    .ds-card-content{
+        position: relative;
+        display: grid;
+        grid-template-columns: 100%;
+        /* column-gap: 2rem; */
+    
+        row-gap: 2rem;
+    
+        padding: 0 2rem;
+        /* border: 1px solid red; */
+    }
+}

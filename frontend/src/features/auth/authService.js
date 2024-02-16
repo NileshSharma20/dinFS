@@ -1,7 +1,13 @@
 import axios from 'axios'
 
-const auth_URI = 'https://api.dinmotoindia.com/api/auth/'
-// const auth_URI = 'http://localhost:5000/api/auth/'
+// Live URI
+// const auth_URI = 'https://api.dinmotoindia.com/api/auth/'
+
+// Local URI
+const main_URI = process.env.REACT_APP_LOCAL_URI 
+                  || `https://api.dinmotoindia.com/api/`
+
+const auth_URI = main_URI+'auth/'
 
 // Polling Function to check for Validity of Access Token
 const healthCheck = async(token)=> {

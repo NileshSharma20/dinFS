@@ -26,18 +26,15 @@ function DemandSlip() {
   
   const {usersList} = useSelector((state)=>state.users)
 
-  const { orderData, 
-          pendingOrderList,
-          partialOrderList,
-          failedOrderList,
-          fulfilledOrderList,
+  const { orderData,
+          totalDataLength,
           isSuccess,
           isLoading } = useSelector((state)=>state.orders)
 
   const usernameList = [`all`, ...usersList.map(user=>user.username)]
 
-  const [createFlag, setCreateFlag] = useState(false)
-  const [allFlag, setAllFlag] = useState(true)
+  const [createFlag, setCreateFlag] = useState(true)
+  const [allFlag, setAllFlag] = useState(false)
   const [pendingFlag, setPendingFlag] = useState(false)
   const [fulfilledFlag, setFulfilledFlag] = useState(false)
   const [failedFlag, setFailedFlag] = useState(false)
@@ -54,6 +51,8 @@ function DemandSlip() {
     accessLevel: isManager
   })
 
+  const pageLimit = 50
+
   const [filterUsername, setFilterUsername] = useState('')
 
   /////////////////////////////////////////////////
@@ -63,7 +62,7 @@ function DemandSlip() {
   const onFilterChange=(e)=>{
     if(e.target.name==='rawDate'){
       const fD = handleDateFilter(e.target.value)
-      console.log(`fD:${fD}`)
+      // console.log(`fD:${fD}`)
 
       setFilterParams((prevState)=>({
           ...prevState,
@@ -111,7 +110,19 @@ function DemandSlip() {
   }
 
   const handleAllClick=()=>{
-    setAllFlag(true)
+    setFilterParams((prevState)=>(
+      {...prevState, 
+        filterStatus:''
+      }))
+    
+    dispatch(getFilteredDemandSlips(
+      {...filterParams,
+        filterStatus:'',
+        page:1,
+        limit:pageLimit
+      }
+    ))
+
     
     setCreateFlag(false)
     setFailedFlag(false)
@@ -119,46 +130,87 @@ function DemandSlip() {
     setPendingFlag(false)
     setFulfilledFlag(false)
     
+    setAllFlag(true)
   }
   
   const handlePendingClick=()=>{
-    setPendingFlag(true)
+    setFilterParams((prevState)=>(
+      {...prevState, 
+        filterStatus:'pending'
+      }))
+
+    dispatch(getFilteredDemandSlips(
+      {...filterParams,
+        filterStatus:'pending',
+        page:1,
+        limit:pageLimit
+      }
+    ))
 
     setCreateFlag(false)
     setAllFlag(false)
     setFailedFlag(false)
     setPartialFlag(false)
     setFulfilledFlag(false)
+    
+    setPendingFlag(true)
   }
   
   const handlePartialClick=()=>{
-    setPartialFlag(true)
-    
-    setCreateFlag(false)
-    setAllFlag(false)
-    setPendingFlag(false)
-    setFailedFlag(false)
-    setFulfilledFlag(false)
-  }
+    setFilterParams(((prevState)=>({...prevState, filterStatus:'partial'})))
+    dispatch(getFilteredDemandSlips(
+      {...filterParams,
+        filterStatus:'partial',
+        page:1,
+        limit:pageLimit
+      }
+    ))
+      
+      setCreateFlag(false)
+      setAllFlag(false)
+      setPendingFlag(false)
+      setFailedFlag(false)
+      setFulfilledFlag(false)
+      
+      setPartialFlag(true)
+    }
   
   const handleFailedClick=()=>{
-    setFailedFlag(true)
-    
+    setFilterParams(((prevState)=>({...prevState, filterStatus:'failed'})))
+    dispatch(getFilteredDemandSlips(
+      {...filterParams,
+        filterStatus:'failed',
+        page:1,
+        limit:pageLimit
+      }
+    ))
+
     setCreateFlag(false)
     setAllFlag(false)
     setPendingFlag(false)
     setPartialFlag(false)
     setFulfilledFlag(false)
+    
+    setFailedFlag(true)
   }
   
   const handleFulfilledClick=()=>{
-    setFulfilledFlag(true)
-    
+    setFilterParams(((prevState)=>({...prevState, filterStatus:'fulfilled'})))
+    dispatch(getFilteredDemandSlips(
+      { ...filterParams,
+        filterStatus:'fulfilled',
+        page:1,
+        limit:pageLimit
+      }
+    ))
+
     setCreateFlag(false)
     setAllFlag(false)
     setPendingFlag(false)
     setFailedFlag(false)
     setPartialFlag(false)
+    
+    setFulfilledFlag(true)
   }
   
   const handleLegendClick=()=>{
@@ -193,6 +245,8 @@ function DemandSlip() {
     }
     
     dispatch(resetProducts())
+
+    // console.log(JSON.stringify(({...filterParams, filterStatus:'p'}),null,4))
     
   },[])
   
@@ -344,21 +398,7 @@ function DemandSlip() {
         <div className="ds-filter-container"
           style={{height:`auto`, marginBottom:`5vh`}}
         >
-          {allFlag && 
-            <p style={{fontWeight:`bold`}}>Results ({orderData.length})</p>}
-          
-          {pendingFlag && 
-            <p style={{fontWeight:`bold`}}>Results ({orderData.filter((item)=>item.status==='pending').length})</p>}
-          
-          {failedFlag && 
-            <p style={{fontWeight:`bold`}}>Results ({orderData.filter((item)=>item.status==='failed').length})</p>}
-          
-          {partialFlag && 
-            <p style={{fontWeight:`bold`}}>Results ({orderData.filter((item)=>item.status==='partial').length})</p>}
-          
-          {fulfilledFlag && 
-            <p style={{fontWeight:`bold`}}>Results ({orderData.filter((item)=>item.status==='fulfilled').length})</p>}
-        
+          <p style={{fontWeight:`bold`}}>Results ({totalDataLength})</p>  
         </div>
       }
 
@@ -381,29 +421,52 @@ function DemandSlip() {
 
         {/* All Orders */}
         {allFlag &&
-        <AllOrderPagination dataList={orderData} isLoaded={isSuccess}/>
+        <AllOrderPagination 
+          dataList={orderData} 
+          isLoaded={isSuccess}
+          filterParams={filterParams}
+          cardsPerPageLimit={pageLimit}
+        />
         }
 
         {/* Pending Orders */}
         {pendingFlag &&
-        <AllOrderPagination dataList={pendingOrderList} isLoaded={isSuccess}
+        <AllOrderPagination dataList={orderData} 
+          isLoaded={isSuccess}
           pendingPageFlag={true}
+          filterParams={filterParams}
+          cardsPerPageLimit={pageLimit}
         />
         }
 
         {/* Partial Orders */}
         {partialFlag &&
-        <AllOrderPagination dataList={partialOrderList} isLoaded={isSuccess}/>
+        <AllOrderPagination 
+          dataList={orderData} 
+          isLoaded={isSuccess}
+          filterParams={filterParams}
+          cardsPerPageLimit={pageLimit}
+        />
         }
 
         {/* Failed Orders */}
         {failedFlag &&
-        <AllOrderPagination dataList={failedOrderList} isLoaded={isSuccess}/>
+        <AllOrderPagination 
+          dataList={orderData} 
+          isLoaded={isSuccess}
+          filterParams={filterParams}
+          cardsPerPageLimit={pageLimit}
+        />
         }
 
         {/* Fulfilled Orders */}
         {fulfilledFlag &&
-        <AllOrderPagination dataList={fulfilledOrderList} isLoaded={isSuccess}/>
+        <AllOrderPagination 
+          dataList={orderData} 
+          isLoaded={isSuccess}
+          filterParams={filterParams}
+          cardsPerPageLimit={pageLimit}
+        />
         }
         </>
     </div>

@@ -1,13 +1,13 @@
 import axios from 'axios'
-import useAuth from '../../hooks/useAuth'
 
-// const prod_env = process.env.NODE_ENV
-
-// Live URI
-const order_URI = 'https://api.dinmotoindia.com/api/order/'
+// Live URI 
+// const order_URI = 'https://api.dinmotoindia.com/api/order/'
 
 // Local URI
-// const order_URI = 'http://localhost:5000/api/order/'
+const main_URI = process.env.REACT_APP_LOCAL_URI 
+                  || `https://api.dinmotoindia.com/api/`
+
+const order_URI = main_URI+'order/'
 
 const getAllDemandSlips = async(token)=>{
     const config = {
@@ -16,8 +16,8 @@ const getAllDemandSlips = async(token)=>{
         }
     }
 
-    // console.log(`env check:${JSON.stringify(prod_env)===JSON.stringify("developement")}`)
     const response = await axios.get(order_URI, config)
+    // console.log(`res:${JSON.stringify(response,null,4)}`)
     
     return response.data
 }
@@ -37,7 +37,7 @@ const getFilteredDemandSlips = async(filterParams,token)=>{
     if(!accessLevel){
         let filterQueryString = ''
 
-        const {filterTicketNum} = filterParams
+        const {filterTicketNum, filterStatus, page, limit} = filterParams
         
         let currDate = new Date()
         let ticketDate = currDate.getDate()
@@ -57,6 +57,16 @@ const getFilteredDemandSlips = async(filterParams,token)=>{
         if(filterTicketNum && filterTicketNum!==''){
             filterQueryString = filterQueryString+`&ticketNum=${filterTicketNum}`
         }
+        if(filterStatus && filterStatus!==''){
+            
+            filterQueryString = filterQueryString+`&status=${filterStatus}`
+        }
+        if(page){
+            filterQueryString = filterQueryString+`&page=${page}`
+        }
+        if(limit){
+            filterQueryString = filterQueryString+`&limit=${limit}`
+        }
         
 
         response = await axios.get(order_URI+`filter?date=${fullDate}${filterQueryString}`, config)
@@ -74,7 +84,10 @@ const getFilteredDemandSlips = async(filterParams,token)=>{
             const {filterDate, 
                 filterPublisherUsername, 
                 filterStatus,
-                filterTicketNum } = filterParams
+                filterTicketNum,
+                page, 
+                limit
+            } = filterParams
 
             if(filterDate && filterDate!==''){
                 fullDate = filterDate
@@ -104,6 +117,18 @@ const getFilteredDemandSlips = async(filterParams,token)=>{
                                     :
                                     filterQueryString+`&ticketNum=${filterTicketNum}`
             }
+            if(page && page!==0){
+                filterQueryString = filterQueryString[filterQueryString.length-1]==='?'?
+                                    filterQueryString+`page=${page}`
+                                    :
+                                    filterQueryString+`&page=${page}`
+            }
+            if(limit && limit!==0){
+                filterQueryString = filterQueryString[filterQueryString.length-1]==='?'?
+                                    filterQueryString+`limit=${limit}`
+                                    :
+                                    filterQueryString+`&limit=${limit}`
+                }
 
             console.log(`fQS: ${order_URI+`filter`+filterQueryString}`)
 
@@ -111,27 +136,9 @@ const getFilteredDemandSlips = async(filterParams,token)=>{
 
         }
     }
+    // console.log(`res:${JSON.stringify(response.data,null,4)}`)
     
     return response.data
-    // if(!filterDate || filterDate===''){
-    //     let currDate = new Date()
-    //     let ticketDate = currDate.getDate()
-    //     let ticketMonth = currDate.getMonth()+1
-    //     let ticketYear = currDate.getFullYear()
-        
-    //     if(ticketDate<10){
-    //         ticketDate = `0${ticketDate}`
-    //     }
-        
-    //     if(ticketMonth<10){
-    //         ticketMonth = `0${ticketMonth}`
-    //     }
-        
-    //     fullDate = `${ticketDate}${ticketMonth}${ticketYear}`
-    // }else{
-    // }
-
-    
 }
 
 const generateDemandSlip = async({demandSlipData, token})=>{

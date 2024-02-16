@@ -23,7 +23,8 @@ const clockEvents = asyncHandler(async() => {
     // console.log(`pendingList:${JSON.stringify(pendingDemandSlipList,null,4)}`)
     
     if(!count){
-        return console.log(`No Counter found`)
+        return 
+        // console.log(`No Counter found`)
     }
     
     if( (date===count.date && hour>=21) 
