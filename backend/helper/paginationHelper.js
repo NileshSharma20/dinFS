@@ -1,15 +1,13 @@
 // @desc Return Paginated data
-const paginateData =(dataList, currPage=1, recordlimit=50 )=>{
+const paginateData =(dataList, docCount, currPage=1, recordlimit=50, 
+    pageCount, firstIndex, lastIndex )=>{
     const results = {}
 
-    results.totalDataLength = dataList.length
-    results.pageCount = Math.ceil(dataList.length / recordlimit)
+    results.totalDataLength = docCount
+    results.pageCount = pageCount
     results.currentPage = currPage
 
-    const firstIndex = (currPage-1)*recordlimit
-    const lastIndex = currPage*recordlimit
-
-    if(lastIndex<dataList.length){
+    if(lastIndex<docCount){
         results.next={
             page : currPage+1
         }
@@ -21,7 +19,7 @@ const paginateData =(dataList, currPage=1, recordlimit=50 )=>{
         }  
     }
 
-    results.data = dataList.slice(firstIndex,lastIndex) 
+    results.data = dataList 
 
     return results
 }

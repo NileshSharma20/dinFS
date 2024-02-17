@@ -75,7 +75,10 @@ const getAllDemandSlips =asyncHandler(async(req,res)=>{
 
     const currPage = parseInt(req.query.page) || 1
     const recordLimit = parseInt(req.query.limit) || 50
-
+    
+    const firstIndex = (currPage-1)*recordLimit
+    const lastIndex = currPage*recordLimit
+    
     const employeeExists = await User.findOne({username}).select('-password').lean()
 
     // Check if User exists and Active
@@ -90,10 +93,26 @@ const getAllDemandSlips =asyncHandler(async(req,res)=>{
         throw new Error("Forbidden: Manager and above Access Level required")
     }
 
-    orders = await Demandslip?.find().lean()
-    const paginatedOrders = paginateData(orders, currPage, recordLimit)
+
+    // orders = await Demandslip?.find().lean()
+    const docCount = await Demandslip?.find().countDocuments()
+    orders = await Demandslip?.find()
+                            .skip(firstIndex)
+                            .limit(recordLimit)
+                            .lean().exec()
     
-    // res.status(200).json(orders)
+    const pageCount = Math.ceil(docCount / recordLimit)
+    
+    if(currPage>pageCount){
+        res.status(404)
+        throw new Error('Page not Found')
+    }
+
+    const paginatedOrders = 
+        paginateData(orders, docCount, currPage, recordLimit,
+            pageCount, firstIndex, lastIndex)
+
+    // res.status(200).json(results)
     res.status(200).json(paginatedOrders)
 })
 
@@ -111,7 +130,8 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
     const currPage = parseInt(req.query.page) || 1
     const recordLimit = parseInt(req.query.limit) || 50
 
-    // console.log(`cP:${currPage}\nrL:${recordLimit}`)
+    const firstIndex = (currPage-1)*recordLimit
+    const lastIndex = currPage*recordLimit
 
     const { username, roles } = req
 
@@ -122,10 +142,8 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
         res.status(403)
         throw new Error('Unauthorized')
     }
-
-    // const employeeId = employeeExists._id
     
-    var orders
+    var orders, docCount, pageCount
 
     if( status && !(status==="pending" || status==="fulfilled" 
         || status==="failed" || status==="partial")
@@ -134,7 +152,7 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
             throw new Error('Bad Request: Invalid DemandSlip Status')
     }
 
-    // Check for minimum Managaer Level Access
+    // Employee Level Access
     if(!roles?.length || !Array.isArray(roles) ||
         !roles.includes("Manager")){
 
@@ -152,23 +170,45 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
 
             // Find all incase of no search params
             if(searchParams.length!==0){
-                orders = await Demandslip.find({$and: [
+                docCount = await Demandslip.find({$and: [
                             ...searchParams,
                             {ticketNumber:{ $regex:date}},
                             {username:username},
                             {employeeId: employeeExists._id.toString()},
-                        ]
-                },
-                    '-_id -__v -employeeId -createdAt -updatedAt').lean()
+                            ]
+                            })
+                        .countDocuments()
+                
+                orders = await Demandslip.find({$and: [
+                                ...searchParams,
+                                {ticketNumber:{ $regex:date}},
+                                {username:username},
+                                {employeeId: employeeExists._id.toString()},
+                            ]
+                            },
+                        '-_id -__v -employeeId -createdAt -updatedAt')
+                        .skip(firstIndex)
+                        .limit(recordLimit)
+                        .lean().exec()
             }
             // Parameterized search
             else{
+                docCount = await Demandslip.find({
+                                username:username,
+                                employeeId: employeeExists._id.toString(),
+                                ticketNumber:{ $regex: date}
+                            
+                        }).countDocuments()
+
                 orders = await Demandslip.find({
                         username:username,
                         employeeId: employeeExists._id.toString(),
                         ticketNumber:{ $regex: date}
                     
-                },'-_id -__v -employeeId -createdAt -updatedAt').lean()
+                        },'-_id -__v -employeeId -createdAt -updatedAt')
+                        .skip(firstIndex)
+                        .limit(recordLimit)
+                        .lean().exec()
             }
         
         }else{
@@ -192,19 +232,49 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
 
                 // Find all incase of no search params
                 if(!date && !status && !publisherUsername && !ticketNum){
+                    docCount = await Demandslip?.find().countDocuments()
+
                     orders = await Demandslip?.find({}
-                                                ,'-id -__v').lean()
+                                        ,'-id -__v')
+                                        .skip(firstIndex)
+                                        .limit(recordLimit)
+                                        .lean().exec()
                 }
                 // Parameterized search
                 else{
+                    docCount = await Demandslip.find({$and: searchParams})
+                                            .countDocuments()
+
                     orders = await Demandslip.find({$and: searchParams}
-                                                ,'-_id -__v').lean()
+                                            ,'-_id -__v')
+                                            .skip(firstIndex)
+                                            .limit(recordLimit)
+                                            .lean().exec()
                 }
     }
 
-    const paginatedOrders = paginateData(orders, currPage, recordLimit)
+    // Paginate Data
+    if(docCount){
+        pageCount = Math.ceil(docCount / recordLimit)
+        
+        if(currPage>pageCount){
+            res.status(404)
+            throw new Error('Page not Found')
+        }
+    }else{
+        let results = {
+            totalDataLength:0,
+            pageCount:1,
+            currentPage:1,
+            data: orders
+        }
+        return res.status(200).json(results)
+    }
+    
+    
+    const paginatedOrders = paginateData(orders,docCount, 
+        currPage, recordLimit, pageCount, firstIndex, lastIndex)
 
-    // res.status(200).json(orders) 
     res.status(200).json(paginatedOrders)
 })
 

@@ -238,11 +238,12 @@ function DemandSlip() {
   // Reset Prod Search Results and Load Demand Slips
   useEffect(()=>{
     if(isAdmin || isManager){
-      dispatch(getAllDemandSlips())
+      // dispatch(getAllDemandSlips())
       dispatch(getAllUsers())
-    }else{
-      dispatch(getFilteredDemandSlips())
     }
+    // else{
+    //   dispatch(getFilteredDemandSlips())
+    // }
     
     dispatch(resetProducts())
 
