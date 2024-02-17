@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import "./DemandSlip.css"
 import QuickProdSearchForm from '../../components/Forms/QuickProdSearchForm'
 import { useDispatch, useSelector } from 'react-redux'
-import { getAllDemandSlips, getFilteredDemandSlips } from '../../features/orders/orderSlice'
+import { getFilteredDemandSlips } from '../../features/orders/orderSlice'
 import Loader from '../../components/Loader/Loader'
 import LoginAgainModal from '../../components/Modals/LoginAgainModal'
 import useAuth from '../../hooks/useAuth'
@@ -62,7 +62,6 @@ function DemandSlip() {
   const onFilterChange=(e)=>{
     if(e.target.name==='rawDate'){
       const fD = handleDateFilter(e.target.value)
-      // console.log(`fD:${fD}`)
 
       setFilterParams((prevState)=>({
           ...prevState,
@@ -95,7 +94,6 @@ function DemandSlip() {
   }
 
   const handleFilterSearch =()=>{
-    // console.log(`filterParams:${JSON.stringify(filterParams,null,4)}`)
     dispatch(getFilteredDemandSlips(filterParams))
   }
   
@@ -226,8 +224,6 @@ function DemandSlip() {
       let formatterFilterDate = inputDay+inputMonth+inputYear
       
       return formatterFilterDate
-      // console.log(`formatted Date:${inputDay+inputMonth+inputYear}`)
-      // dispatch(getFilteredDemandSlips(filterDate)) 
     }
   }
   
@@ -238,17 +234,9 @@ function DemandSlip() {
   // Reset Prod Search Results and Load Demand Slips
   useEffect(()=>{
     if(isAdmin || isManager){
-      // dispatch(getAllDemandSlips())
       dispatch(getAllUsers())
-    }
-    // else{
-    //   dispatch(getFilteredDemandSlips())
-    // }
-    
+    }    
     dispatch(resetProducts())
-
-    // console.log(JSON.stringify(({...filterParams, filterStatus:'p'}),null,4))
-    
   },[])
   
   // Set Filter Username
@@ -272,10 +260,8 @@ function DemandSlip() {
     {!token && <LoginAgainModal />}
     {isLoading && <Loader/>}
     <div className='container' 
-      style={{
-        // border:'1px solid red', 
+      style={{ 
         justifyContent:"flex-start",
-        
       }}
     >
       <>
@@ -420,8 +406,8 @@ function DemandSlip() {
         }
         
 
-        {/* All Orders */}
-        {allFlag &&
+        {/* Orders */}
+        {!pendingFlag &&
         <AllOrderPagination 
           dataList={orderData} 
           isLoaded={isSuccess}
@@ -432,39 +418,10 @@ function DemandSlip() {
 
         {/* Pending Orders */}
         {pendingFlag &&
-        <AllOrderPagination dataList={orderData} 
+        <AllOrderPagination 
+          dataList={orderData} 
           isLoaded={isSuccess}
           pendingPageFlag={true}
-          filterParams={filterParams}
-          cardsPerPageLimit={pageLimit}
-        />
-        }
-
-        {/* Partial Orders */}
-        {partialFlag &&
-        <AllOrderPagination 
-          dataList={orderData} 
-          isLoaded={isSuccess}
-          filterParams={filterParams}
-          cardsPerPageLimit={pageLimit}
-        />
-        }
-
-        {/* Failed Orders */}
-        {failedFlag &&
-        <AllOrderPagination 
-          dataList={orderData} 
-          isLoaded={isSuccess}
-          filterParams={filterParams}
-          cardsPerPageLimit={pageLimit}
-        />
-        }
-
-        {/* Fulfilled Orders */}
-        {fulfilledFlag &&
-        <AllOrderPagination 
-          dataList={orderData} 
-          isLoaded={isSuccess}
           filterParams={filterParams}
           cardsPerPageLimit={pageLimit}
         />

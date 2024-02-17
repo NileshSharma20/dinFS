@@ -12,6 +12,7 @@ import Users from './pages/UserManagement/Users';
 import './App.css';
 import Footer from './components/Footer/Footer';
 import DemandSlip from './pages/DemandSlip/DemandSlip';
+import DemandslipAnalytics from './pages/Analytics/DemandslipAnalytics';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
         <Route path='/products/:sku' element={<Product /> }/> 
         <Route path='/user-management' element={<Users />} />
         <Route path='/demand-slip-generator' element={<DemandSlip />} />
+        <Route path='/demand-slip-analytics' element={<DemandslipAnalytics />} />
 
         <Route path='*' element={<NotFound /> } />
       </Routes>
