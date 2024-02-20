@@ -1,11 +1,15 @@
 const asyncHandler = require('express-async-handler')
-const { generateTicket } = require("../helper/orderHelper")
 const fs = require("fs")
+
+const { generateTicket } = require("../helper/orderHelper")
+const { paginateData } = require('../helper/paginationHelper')
+
+const { endOfDay } = require('date-fns/endOfDay')
+const { startOfDay } = require('date-fns/startOfDay')
 
 const Demandslip = require("../models/demandslipModel")
 const DemandslipHistory = require('../models/demandslipHistoryModel')
 const User = require("../models/userModel")
-const { paginateData } = require('../helper/paginationHelper')
 
 // @desc   Create a new Demand Slip
 // @route  POST /api/order/
@@ -122,6 +126,7 @@ const getAllDemandSlips =asyncHandler(async(req,res)=>{
 // @access Private
 const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
     const { date, 
+            endDate,
             publisherUsername, 
             status, 
             ticketNum    
@@ -216,8 +221,26 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
                 let searchParams = []
 
                 // Params based search string
-                if(date){
+                if(date && !endDate){
                     searchParams=[{ticketNumber:{ $regex:date}}, ...searchParams]
+                }
+                if(date && endDate){
+                    let fromDateString = date.slice(4)+
+                                    '-'+date.slice(2,4)+
+                                    '-'+date.slice(0,2)
+                    let toDateString = endDate.slice(4)+
+                                    '-'+endDate.slice(2,4)+
+                                    '-'+endDate.slice(0,2)
+                    let fromDate = new Date(fromDateString)
+                    let toDate = new Date(toDateString) 
+                    
+                    // console.log(`fD:${startOfDay(fromDate)}`)
+                    // console.log(`tD:${endOfDay(toDate)}`)
+                    // .toISOString()
+                    searchParams=[
+                        {createdAt:{$gte:startOfDay(fromDate)}},
+                        {createdAt:{$lte:endOfDay(toDate)}},
+                    ]
                 }
                 if(status){
                     searchParams=[{status:status}, ...searchParams]

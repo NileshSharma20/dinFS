@@ -1,0 +1,11 @@
+.graph-container{
+    width: 80vw;
+    min-height: 30vh;
+    padding: 2rem;
+
+    background-color: var(--white);
+
+    border-radius: 20px;
+
+    /* border: 1px solid red; */
+}

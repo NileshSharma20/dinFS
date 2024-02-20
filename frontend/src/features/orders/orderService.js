@@ -81,7 +81,8 @@ const getFilteredDemandSlips = async(filterParams,token)=>{
         // Minimum one filter param
         else{
             let filterQueryString = '?'
-            const {filterDate, 
+            const {filterDate,
+                filterToDate, 
                 filterPublisherUsername, 
                 filterStatus,
                 filterTicketNum,
@@ -92,6 +93,10 @@ const getFilteredDemandSlips = async(filterParams,token)=>{
             if(filterDate && filterDate!==''){
                 fullDate = filterDate
                 filterQueryString=filterQueryString+`date=${filterDate}`
+            }
+            
+            if(filterDate!=='' && filterToDate && filterToDate!==''){
+                filterQueryString = filterQueryString+`&endDate=${filterToDate}`
             }
             
             if(filterPublisherUsername && filterPublisherUsername!==''){
@@ -130,7 +135,7 @@ const getFilteredDemandSlips = async(filterParams,token)=>{
                                     filterQueryString+`&limit=${limit}`
                 }
 
-            console.log(`fQS: ${order_URI+`filter`+filterQueryString}`)
+            // console.log(`fQS: ${order_URI+`filter`+filterQueryString}`)
 
             response = await axios.get(order_URI+`filter`+filterQueryString, config)
 

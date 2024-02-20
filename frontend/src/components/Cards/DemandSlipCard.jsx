@@ -48,6 +48,13 @@ function DemandSlipCard({info, partialFlag=false}) {
 
         {(isAdmin||isManager) && 
         <div className="card-row">
+            <div className="card-element" 
+                style={{gridColumn:`1/span 2`, marginBottom:`1rem`}}
+            >
+                <h3>
+                {new Date(info.createdAt).toString().split(' ').splice(0,4).join(' ')}
+                </h3>
+            </div>
 
             <div className="card-element">
                 <h3>Created</h3>

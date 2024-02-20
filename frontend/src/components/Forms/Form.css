@@ -225,18 +225,30 @@
     transition: 0.3s ease-in-out;
 }
 
-.date-input-box{
+.date-input-label{
     padding: 0.4rem 0.8rem;
+    border-radius: 10px 0 0 10px;
+    background-color: var(--formBgColor);
+    width:fit-content;
+    height: 2rem;
+}
+.date-input-box{
+    padding: 0rem 0.8rem;
+    margin: 0 0.5rem 0 0;
 
-    border-radius: 10px;
+    height: 2rem;
+
+    border-radius: 0 10px 10px 0;
     border: none;
 
     cursor: pointer;
 }
 
 .ds-filter-form-control{
-    padding: 0.4rem 0.8rem;
-    /* margin: 0 0.5rem; */
+    padding: 0rem 0.8rem;
+    margin: 0 0.5rem;
+
+    height: 2rem;
 
     border-radius: 10px;
     border: none;

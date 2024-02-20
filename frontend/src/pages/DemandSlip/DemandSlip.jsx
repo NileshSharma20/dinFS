@@ -1,17 +1,21 @@
 import React, { useEffect, useState, useRef } from 'react'
 
-import "./DemandSlip.css"
-import QuickProdSearchForm from '../../components/Forms/QuickProdSearchForm'
 import { useDispatch, useSelector } from 'react-redux'
-import { getFilteredDemandSlips } from '../../features/orders/orderSlice'
+
+import QuickProdSearchForm from '../../components/Forms/QuickProdSearchForm'
+import UserDropdown from '../../components/Dropdown/UserDropdown'
 import Loader from '../../components/Loader/Loader'
 import LoginAgainModal from '../../components/Modals/LoginAgainModal'
-import useAuth from '../../hooks/useAuth'
+import AllOrderPagination from './AllOrderPagination'
+
+import { getFilteredDemandSlips } from '../../features/orders/orderSlice'
 import { resetProducts } from '../../features/products/productSlice'
 import { AiOutlineClose } from 'react-icons/ai'
 import { getAllUsers } from '../../features/users/usersSlice'
-import UserDropdown from '../../components/Dropdown/UserDropdown'
-import AllOrderPagination from './AllOrderPagination'
+
+import useAuth from '../../hooks/useAuth'
+
+import "./DemandSlip.css"
 
 function DemandSlip() {
   const dispatch = useDispatch()
@@ -19,6 +23,7 @@ function DemandSlip() {
   const { isAdmin, isManager } = useAuth()
   
   const dateInputRef = useRef(null);
+  const toDateInputRef = useRef(null);
 
   const {token} = useSelector((state)=>state.auth)
 
@@ -44,7 +49,9 @@ function DemandSlip() {
 
   const [filterParams,setFilterParams] = useState({
     rawDate:'',
+    rawToDate:'',
     filterDate:'',
+    filterToDate:'',
     filterPublisherUsername:'',
     filterStatus:'',
     filterTicketNum:'',
@@ -68,11 +75,19 @@ function DemandSlip() {
           filterDate:fD
       }))
     }
+    else if(e.target.name==='rawToDate'){
+      const tD = handleDateFilter(e.target.value)
+
+      setFilterParams((prevState)=>({
+          ...prevState,
+          filterToDate:tD
+      }))
+    }
     
     setFilterParams((prevState)=>({
       ...prevState,
       [e.target.name]:e.target.value
-  }))
+    }))
   }
 
   const handleNumField = (e) => {
@@ -83,7 +98,9 @@ function DemandSlip() {
   const handleFilterClear =()=>{
     setFilterParams({
       rawDate:'',
+      rawToDate:'',
       filterDate:'',
+      filterToDate:'',
       filterPublisherUsername:'',
       filterStatus:'',
       filterTicketNum:'',
@@ -94,6 +111,15 @@ function DemandSlip() {
   }
 
   const handleFilterSearch =()=>{
+    if(filterParams.filterDate!=='' 
+      && filterParams.filterToDate!=''
+      &&(filterParams.rawDate>filterParams.rawToDate)){
+        return alert('Invalid Dates: Start Date cannot be greater than End Date')
+    }
+    if(filterParams.filterDate==='' && filterParams.filterToDate!==''){
+      return alert('Invalid Dates: Enter from date')
+    }
+
     dispatch(getFilteredDemandSlips(filterParams))
   }
   
@@ -341,6 +367,9 @@ function DemandSlip() {
         {(isAdmin || isManager) && 
         <>
           {/* Filter Date Input */}
+          <label htmlFor="rawDate" className='date-input-label'>
+            Start Date
+          </label>
           <input
             className='date-input-box'
             name='rawDate'
@@ -348,6 +377,18 @@ function DemandSlip() {
             value={filterParams.rawDate}
             onChange={onFilterChange}
             ref={dateInputRef}
+          />
+
+          <label htmlFor="rawToDate" className='date-input-label'>
+            End Date
+          </label>
+          <input
+            className='date-input-box'
+            name='rawToDate'
+            type="date"
+            value={filterParams.rawToDate}
+            onChange={onFilterChange}
+            ref={toDateInputRef}
           />
 
           {/* Username Dropdown button */}
