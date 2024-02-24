@@ -12,7 +12,7 @@ function DemandSlipEditCard({info}) {
     const [editFlag, setEditFlag] = useState(false)
 
     const pdfBodyData = info.orderedProductList.map((order)=>{
-      return [order.productFullName,order.quantity]
+      return [order.productFullName,order.quantity+` `+order.unit]
     })
 
     const ticketDate = info.ticketNumber.slice(3,5)+"-"+info.ticketNumber.slice(5,7)+"-"+info.ticketNumber.slice(7) 
@@ -138,7 +138,7 @@ function DemandSlipEditCard({info}) {
                         <p>{prod.sku}</p>
                     </div>
 
-                    <p>{prod.quantity}</p> 
+                    <p>{prod.quantity} {prod.unit}</p> 
             </div>
             )}
 

@@ -23,14 +23,16 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
         orderedProductList: [{
             sku:"",
             productFullName:"",
-            quantity:""
+            quantity:"",
+            unit:'PC',
         }]
     })
 
     const [updatedOrderList, setUpdatedOrderList] = useState([{
         sku:"MANUAL",
         productFullName:"",
-        quantity:""
+        quantity:"",
+        unit:'PC',
     }])
 
     const [skuData, setSKUData] = useState({
@@ -62,7 +64,8 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
         setUpdatedOrderList([{
             sku:"MANUAL",
             productFullName:"",
-            quantity:""
+            quantity:"",
+            unit:'PC',
         }])
         setFormData({
             deliveryPartnerName: "",
@@ -70,7 +73,8 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
             orderedProductList: [{
                 sku:"",
                 productFullName:"",
-                quantity:""
+                quantity:"",
+                unit:'PC',
             }]
         })
 
@@ -129,6 +133,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
             orderItem[e.target.name] = e.target.value.toUpperCase()
         }
 
+        // console.log(JSON.stringify(orderItem,null,4))
         setUpdatedOrderList(orderList)
     }
 
@@ -150,7 +155,8 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
         let emptyOrderListObj = []
         emptyOrderListObj = updatedOrderList.filter(prod=>(prod.sku===""
                                                     ||prod.productFullName===""
-                                                    ||prod.quantity===""))
+                                                    ||prod.quantity===""
+                                                    ||prod.unit===""))
 
         if(emptyOrderListObj.length>0){
             return alert('Empty Field/s')
@@ -272,7 +278,8 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                     <div className='ds-col-prod-list' key={index}>
                         <p><span>SKU: </span> {`${item.sku}`}</p>
                         <p><span>Product Full Name: </span> {`${item.productFullName}`}</p>
-                        <p><span>Quantity: </span> {`${item.quantity}`}</p>
+                        <p><span>Quantity: </span> {`${item.quantity} ${item.unit}`}</p>
+                        {/* <p><span></span></p> */}
                         <br />
                     </div>
                     )
@@ -338,6 +345,9 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                                 autoComplete='off'
                                 onChange={(e)=>onOrderItemChange(e,index)}
                                 />
+
+                            
+                                
                             </section>
 
                             <div style={{display:`flex`, 
@@ -351,6 +361,9 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                                 >
                                 <AiOutlineClose />
                             </div>
+
+                            <div className="card-form-quantity-box">
+
                              <input
                                 className='card-form-control'
                                 type='text'
@@ -363,6 +376,20 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                                 onChange={(e)=>onOrderItemChange(e,index)}
                                 />
 
+                            
+                            <select name='unit' id={`unit${index}`}
+                                defaultValue={"PC"}
+                                onChange={(e)=>onOrderItemChange(e,index)}
+                                >
+                                <option value="PC">PC</option>
+                                <option value="SET">SET</option>
+                                <option value="PAIR">PAIR</option>
+                                <option value="ML">ML</option>
+                                <option value="L">L</option>
+                            </select>
+                            
+                            </div>
+                            
                             </div>
 
                         </div >
