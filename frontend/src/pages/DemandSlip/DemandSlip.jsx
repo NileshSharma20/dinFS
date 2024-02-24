@@ -12,9 +12,10 @@ import { getFilteredDemandSlips } from '../../features/orders/orderSlice'
 import { resetProducts } from '../../features/products/productSlice'
 import { AiOutlineClose } from 'react-icons/ai'
 import { getAllUsers } from '../../features/users/usersSlice'
-
+// 
 import useAuth from '../../hooks/useAuth'
 
+// import UserDropdown from "../../components/Dropdown/UserDropdown"
 import "./DemandSlip.css"
 
 function DemandSlip() {

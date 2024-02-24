@@ -65,6 +65,13 @@
     padding-left: 0rem;
 }
 
+.card-form-quantity-box{
+    width: 100%;
+    display: grid;
+    grid-template-columns: 60% 40%;
+    align-items: flex-end;
+}
+
 .form-checkbox{
     padding-left: 0.2rem;
     display: flex;
