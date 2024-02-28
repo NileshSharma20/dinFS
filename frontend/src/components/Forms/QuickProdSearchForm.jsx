@@ -91,7 +91,8 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
         const newItem = {
             sku: item.sku,
             productFullName: item.productFullName,
-            quantity:""
+            quantity:"",
+            unit:"PC"
         }
         
         // Check for Duplicates
@@ -138,7 +139,12 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
     }
 
     const handleAddItem=()=>{
-        const modelList = [...updatedOrderList,{sku:"MANUAL",productFullName:"",quantity:""}]
+        const modelList = [...updatedOrderList,
+                                    {sku:"MANUAL",
+                                    productFullName:"",
+                                    quantity:"",
+                                    unit:"PC"
+                                }]
         setUpdatedOrderList(modelList)
     }
 
@@ -174,9 +180,9 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                 orderedProductList:updatedOrderList,
             }
             
-            // console.log(`formData:${JSON.stringify(orderInfo,null,4)}`)
+            console.log(`formData:${JSON.stringify(orderInfo,null,4)}`)
             
-            dispatch(generateDemandSlip(orderInfo))
+            // dispatch(generateDemandSlip(orderInfo))
             
         }
     }
@@ -217,7 +223,8 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                     orderedProductList: [{
                         sku:"",
                         productFullName:"",
-                        quantity:""
+                        quantity:"",
+                        unit:"PC"
                     }]
                 })
 
