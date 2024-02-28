@@ -180,9 +180,9 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                 orderedProductList:updatedOrderList,
             }
             
-            console.log(`formData:${JSON.stringify(orderInfo,null,4)}`)
+            // console.log(`formData:${JSON.stringify(orderInfo,null,4)}`)
             
-            // dispatch(generateDemandSlip(orderInfo))
+            dispatch(generateDemandSlip(orderInfo))
             
         }
     }
