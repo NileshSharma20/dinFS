@@ -15,22 +15,25 @@ const dbCollectionList ={
     "RSR":"ballracerModel",
     "BDX":"bendexModel",
     "BSH":"brakeshoeModel",
+    "CCC":"clutchcableModel",
+    "CDI":"cdiModel",
     "CFA":"clutchassemblyModel",
+    "CMA":"camshaftModel",
     "DPD":"discpadModel",
     "FTR":"footrestModel",
     "MSN":"mainstandModel",
     "MOF":"mobilfilterModel",
+    "RKR":"rockerModel",
+    "RVM":"mirrorModel",
+    "SFR":"selfcutModel",
     "SKR":"shockerModel",
     "SSN":"sidestandModel",
-    //
-    "CMA":"camshaftModel",
-    "CDI":"cdiModel",
-    "CCC":"clutchcableModel",
-    "RVM":"mirrorModel",
-    "RKR":"rockerModel",
-    "SFR":"selfcutModel",
     "TCH":"timingchainModel",
     "TCT":"timingchainadjusterModel",
+    //
+    "SPK":"chainsprocketkitModel",
+    "CLP":"caliperModel",
+    "CRB":"carburetorModel"
 }
 
 // @desc   Get All Products

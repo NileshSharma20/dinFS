@@ -87,6 +87,18 @@ const initialState = {
       productName:"Timing-Chain-Adjuster",
       itemCode:"TCT"
     },
+    {
+      productName:"Chain-Sprocket-Kit",
+      itemCode:"SPK"
+    },
+    {
+      productName:"Caliper",
+      itemCode:"CLP"
+    },
+    {
+      productName:"Carburetor",
+      itemCode:"CRB"
+    },
     ],
     productData: [],
     productSKUData:[],

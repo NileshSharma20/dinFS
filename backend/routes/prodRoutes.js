@@ -20,7 +20,8 @@ router.route('/:itemCode')
               .get(getAllProd)
               .post(setProd)
 
-router.route('/exportMongoData/:itemCode').get(verifyJWT, getDataForExportProd)
+router.route('/exportMongoData/:itemCode')
+       .get(verifyJWT, getDataForExportProd)
 
 // router.route('/index')
 router.route('/index/:itemCode')
