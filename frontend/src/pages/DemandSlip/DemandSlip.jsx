@@ -113,7 +113,7 @@ function DemandSlip() {
 
   const handleFilterSearch =()=>{
     if(filterParams.filterDate!=='' 
-      && filterParams.filterToDate!=''
+      && filterParams.filterToDate!==''
       &&(filterParams.rawDate>filterParams.rawToDate)){
         return alert('Invalid Dates: Start Date cannot be greater than End Date')
     }

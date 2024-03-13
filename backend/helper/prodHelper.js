@@ -25,7 +25,10 @@ const filenameList ={
     "TCT":["timingChainAdjusterMongo.csv","timingChainAdjusterUpdated.csv"],
     "SPK":["chainKitMongo.csv","chainKitUpdated.csv"],
     "CLP":["caliperMongo.csv","caliperUpdated.csv"],
-    "CRB":["carburetorMongo.csv","carburetorUpdated.csv"]
+    "CRB":["carburetorMongo.csv","carburetorUpdated.csv"],
+    "TCP":["timingChainPadMongo.csv","timingChainPadUpdated.csv"],
+    "VSG":["visorGlassMongo.csv","visorGlassUpdated.csv"],
+    "CFP":["clutchPlateMongo.csv","clutchPlateUpdated.csv"]
 }
 
 // @desc   Clean Mongo Collection data and save it locally

@@ -30,10 +30,13 @@ const dbCollectionList ={
     "SSN":"sidestandModel",
     "TCH":"timingchainModel",
     "TCT":"timingchainadjusterModel",
-    //
     "SPK":"chainsprocketkitModel",
     "CLP":"caliperModel",
-    "CRB":"carburetorModel"
+    "CRB":"carburetorModel",
+    //
+    "TCP":"timingchainpadModel",
+    "VSG":"visorglassModel",
+    "CFP":"clutchPlateModel"
 }
 
 // @desc   Get All Products

@@ -56,7 +56,7 @@ const initialState = {
       itemCode:"CFA",
     },
     {
-      productName:"CAM-SHAFT",
+      productName:"Cam-Shaft",
       itemCode:"CMA"
     },
     {
@@ -98,6 +98,18 @@ const initialState = {
     {
       productName:"Carburetor",
       itemCode:"CRB"
+    },
+    {
+      productName:"Timing-Chain-Pad",
+      itemCode:"TCP"
+    },
+    {
+      productName:"Visor-Glass",
+      itemCode:"VSG"
+    },
+    {
+      productName:"Clutch-Plate",
+      itemCode:"CFP"
     },
     ],
     productData: [],
