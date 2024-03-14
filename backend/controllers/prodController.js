@@ -15,28 +15,28 @@ const dbCollectionList ={
     "RSR":"ballracerModel",
     "BDX":"bendexModel",
     "BSH":"brakeshoeModel",
-    "CCC":"clutchcableModel",
-    "CDI":"cdiModel",
     "CFA":"clutchassemblyModel",
-    "CMA":"camshaftModel",
     "DPD":"discpadModel",
     "FTR":"footrestModel",
     "MSN":"mainstandModel",
     "MOF":"mobilfilterModel",
+    "SKR":"shockerModel",
+    "SSN":"sidestandModel",
+    "CCC":"clutchcableModel",
+    "CDI":"cdiModel",
+    "CMA":"camshaftModel",
     "RKR":"rockerModel",
     "RVM":"mirrorModel",
     "SFR":"selfcutModel",
-    "SKR":"shockerModel",
-    "SSN":"sidestandModel",
     "TCH":"timingchainModel",
     "TCT":"timingchainadjusterModel",
     "SPK":"chainsprocketkitModel",
     "CLP":"caliperModel",
     "CRB":"carburetorModel",
-    //
     "TCP":"timingchainpadModel",
     "VSG":"visorglassModel",
     "CFP":"clutchPlateModel"
+    //
 }
 
 // @desc   Get All Products
@@ -304,14 +304,25 @@ const setManyProd = asyncHandler(async (req,res)=>{
 const updateProd = asyncHandler(async (req,res)=>{
     const { roles } = req
 
+    // console.log(`roles:${roles}`)
+
     if(!roles.includes("Admin")){
         res.status(403)
         throw new Error("Forbidden")
     }
 
     let dbCollection, jsonList=[]
+    
+    // console.log(`req.body:${JSON.stringify(req.body,null,4)}`)
+    
     jsonList.push(req.body)
+    // console.log(`jsonList: ${JSON.stringify(jsonList, null,4)}`)
+
+    // if(!req.body.productName){
+        
+    // }
     const cleanedJSON = cleanJsonData(jsonList)[0]
+
 
     const sku = req.params.sku
     const itemCode = sku.split('-')[0]

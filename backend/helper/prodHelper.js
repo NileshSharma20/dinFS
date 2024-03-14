@@ -1,6 +1,8 @@
 const fs = require('fs');
 const Papa = require('papaparse');
 
+const ItemCodeIndex = require('../models/itemCodeIndexModel')
+
 const filenameList ={
     "SKR":["shockerMongo.csv","shockerUpdated.csv"],
     "BSH":["brakeShoeMongo.csv", "brakeShoeUpdated.csv"],
@@ -104,13 +106,20 @@ const cleanJsonData = (rawJson) => {
         cleanedData=[]
     }else{
 
-    cleanedData = rawJson.filter((item=>item.itemCode && item.productName && item.vehicleModel && item.brandCompany && item.partNum && item.mrp)).map((prod)=>{
+    cleanedData = rawJson.filter((item=>item.itemCode && item.vehicleModel && item.brandCompany && item.partNum && item.mrp)).map((prod)=>{
         // console.log(`rawJSON:${JSON.stringify(rawJson)}`)
         var sku=""
         var metaData = []
+        var prodName
 
-        const cleanedProdName = prod.productName.toUpperCase()
-        var prodName = cleanedProdName.replace(/ /g,'-')
+        if(!prod.productName){
+            const indexProdName = ItemCodeIndex.find({itemCode:prod.itemCode.toUpperCase()})
+                                    .lean()
+            prodName = indexProdName.productName
+        }else{
+            const cleanedProdName = prod.productName.toUpperCase()
+            prodName = cleanedProdName.replace(/ /g,'-')
+        }
 
         //itemCode cleanup
         const cleanedIC = prod.itemCode.toUpperCase()
