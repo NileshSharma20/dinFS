@@ -10,6 +10,7 @@ function ProductForm({initialValue, setFlag}) {
 
     const [formData, setFormData] = useState({
         itemCode: initialValue.itemCode,
+        // productName:initialValue.productName?initialValue.productName:,
         vehicleModel: initialValue.vehicleModel,
         brandCompany: initialValue.brandCompany,
         partNum: initialValue.partNum,
@@ -22,6 +23,7 @@ function ProductForm({initialValue, setFlag}) {
 
     const [skuData, setSKUData] = useState({
         itemCode:`${initialValue.itemCode.split("-")[0]}`,
+        // productName:"",
         vehicleModel:"",
         brandCompany:"",
         partNum:"",
@@ -31,7 +33,13 @@ function ProductForm({initialValue, setFlag}) {
     const [updatedMetaData, setUpdatedMetaData] = useState({...initialValue?.metaData})
     const [updatedModels, setUpdatedModels] = useState([...initialValue.compatibleModels])
 
-    const {itemCode, vehicleModel, brandCompany, partNum, sku, mrp} = formData
+    const {itemCode, 
+            // productName, 
+            vehicleModel, 
+            brandCompany, 
+            partNum, 
+            sku, 
+            mrp} = formData
 
     /////////////////////////////////////////////////
     //////// Functions /////////////////////////////
@@ -83,6 +91,7 @@ function ProductForm({initialValue, setFlag}) {
         }else{
             const prodInfo = {
                 itemCode,
+                // productName,
                 vehicleModel,
                 brandCompany,
                 partNum,
@@ -91,7 +100,7 @@ function ProductForm({initialValue, setFlag}) {
                 ...updatedMetaData
             }
             
-            // console.log(`formData:${JSON.stringify(prodInfo,null,4)}`)
+            console.log(`formData:${JSON.stringify(prodInfo,null,4)}`)
             
             dispatch(updateProduct({prodInfo,sku}))
         }
@@ -107,6 +116,7 @@ function ProductForm({initialValue, setFlag}) {
     // Get SKU Products API call 
     const onSKUSubmit=(e)=>{
         e.preventDefault()
+        console.log(`data: ${JSON.stringify(skuData,null,4)}`)
         
         if(skuData.itemCode===""){
         alert(`Please Enter Item Code`)
@@ -139,6 +149,18 @@ function ProductForm({initialValue, setFlag}) {
                     autoComplete='off'
                     onChange={onChange} />
             </div>
+
+            {/* <div className="form-group">
+                <label htmlFor={`productName`}>Product Name</label>
+                <input type="text" 
+                    className='card-form-control'
+                    name= 'productName'
+                    id={`productName`}
+                    value = {productName}
+                    placeholder="productName"
+                    autoComplete='off'
+                    onChange={onChange} />
+            </div> */}
 
             <div className="form-group">
                 <label htmlFor={`vehicleModel`}>Vehicle Model</label>

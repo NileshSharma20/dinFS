@@ -449,7 +449,7 @@ function DemandSlip() {
         
 
         {/* Orders */}
-        {!pendingFlag &&
+        {!createFlag && !pendingFlag &&
         <AllOrderPagination 
           dataList={orderData} 
           isLoaded={isSuccess}
@@ -459,7 +459,7 @@ function DemandSlip() {
         }
 
         {/* Pending Orders */}
-        {pendingFlag &&
+        {!createFlag && pendingFlag &&
         <AllOrderPagination 
           dataList={orderData} 
           isLoaded={isSuccess}

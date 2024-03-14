@@ -158,7 +158,8 @@ const createProductDataJSON = (csvFileData) => {
     }
 
     // console.log(`itemData SKU:${itemData.sku}`)
-    // console.log(`itemData prodInfo:${JSON.stringify(itemData.prodInfo,null,4)}`)
+    console.log(`itemData prodInfo:${JSON.stringify(itemData.prodInfo,null,4)}`)
+
 
     const response = await axios.patch(prod_URI +`${itemData.sku}`, itemData.prodInfo, config)
 
