@@ -1,4 +1,5 @@
 import axios from 'axios'
+const asyncHandler = require('express-async-handler')
 
 // const prod_URI = 'https://api.dinmotoindia.com/api/prod/'
 const main_URI = process.env.REACT_APP_LOCAL_URI 

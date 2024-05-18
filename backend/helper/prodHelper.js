@@ -106,7 +106,12 @@ const cleanJsonData = (rawJson) => {
         cleanedData=[]
     }else{
 
-    cleanedData = rawJson.filter((item=>item.itemCode && item.vehicleModel && item.brandCompany && item.partNum && item.mrp)).map((prod)=>{
+    cleanedData = rawJson.filter((item=>
+                                    item.itemCode && 
+                                    item.vehicleModel && 
+                                    item.brandCompany && 
+                                    item.partNum && 
+                                    item.mrp)).map((prod)=>{
         // console.log(`rawJSON:${JSON.stringify(rawJson)}`)
         var sku=""
         var metaData = []
@@ -182,7 +187,7 @@ const cleanJsonData = (rawJson) => {
             productName: prodName,
             vehicleModel: spaceRemovedVM,
             brandCompany: spaceRemovedBC,
-            partNum: spaceRemovedPN,
+            partNum: pN,
             mrp: cleanedMRP,
             sku: sku,
             compatibleModels: delimitedCM,
