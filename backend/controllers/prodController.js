@@ -33,10 +33,13 @@ const dbCollectionList ={
     "SPK":"chainsprocketkitModel",
     "CLP":"caliperModel",
     "CRB":"carburetorModel",
-    //
     "TCP":"timingchainpadModel",
     "VSG":"visorglassModel",
-    "CFP":"clutchPlateModel"
+    "CFP":"clutchPlateModel",
+    //
+    "LKT":'lockkitModel',
+    "SMC":"metercableModel",
+    "RHS":"righthandswitchModel"
 }
 
 // @desc   Get All Products

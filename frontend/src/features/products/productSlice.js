@@ -111,6 +111,18 @@ const initialState = {
       productName:"Clutch-Plate",
       itemCode:"CFP"
     },
+    {
+      productName:"Lock-Kit",
+      itemCode:"LKT"
+    },
+    {
+      productName:"Meter-Cable",
+      itemCode:"SMC"
+    },
+    {
+      productName:"Right-Hand-Switch",
+      itemCode:"RHS"
+    },
     ],
     productData: [],
     productSKUData:[],
