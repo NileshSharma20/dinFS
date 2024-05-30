@@ -122,6 +122,8 @@ function DemandSlip() {
     }
 
     dispatch(getFilteredDemandSlips(filterParams))
+
+    
   }
   
   const handleCreateClick=()=>{
@@ -156,6 +158,8 @@ function DemandSlip() {
     setFulfilledFlag(false)
     
     setAllFlag(true)
+
+    
   }
   
   const handlePendingClick=()=>{
@@ -179,6 +183,8 @@ function DemandSlip() {
     setFulfilledFlag(false)
     
     setPendingFlag(true)
+
+    
   }
   
   const handlePartialClick=()=>{
@@ -198,6 +204,8 @@ function DemandSlip() {
       setFulfilledFlag(false)
       
       setPartialFlag(true)
+
+      
     }
   
   const handleFailedClick=()=>{
@@ -217,6 +225,8 @@ function DemandSlip() {
     setFulfilledFlag(false)
     
     setFailedFlag(true)
+
+    
   }
   
   const handleFulfilledClick=()=>{
@@ -236,6 +246,8 @@ function DemandSlip() {
     setPartialFlag(false)
     
     setFulfilledFlag(true)
+    
+    
   }
   
   const handleLegendClick=()=>{
@@ -296,17 +308,32 @@ function DemandSlip() {
         <>
         <div className="modal-backdrop" ></div> 
         <div className='modal-container'>
+            
             <div className="edit-btn"
                 onClick={()=>handleLegendClick()}
             >
             <AiOutlineClose />
             </div>
-            <div className='ds-new-box'>
-              {prodCodeList.map((item,index)=>{
-                return(
-                  <p key={index}><span style={{fontWeight:`bold`}}>{item.itemCode}: </span>{item.productName}</p>
-                )
-              })}
+
+            <div className='ds-prodList-box'>
+              {prodCodeList.map((item,index)=>(
+                
+                  <div className='ds-prodList-col' key={index}>
+
+                    <div className='ds-prodList-itemCode' >
+                      <span>{index+1}. </span>
+                      <span style={{fontWeight:`bold`}}>
+                        {item.itemCode}: 
+                        </span>
+                    </div>
+                    <div>
+
+                        {item.productName}
+                    </div>
+                  </div>
+                
+              )
+              )}
             </div>
         </div>
       </>
@@ -449,7 +476,7 @@ function DemandSlip() {
         
 
         {/* Orders */}
-        {!pendingFlag &&
+        {!createFlag && !pendingFlag &&
         <AllOrderPagination 
           dataList={orderData} 
           isLoaded={isSuccess}
@@ -459,7 +486,7 @@ function DemandSlip() {
         }
 
         {/* Pending Orders */}
-        {pendingFlag &&
+        {!createFlag && pendingFlag &&
         <AllOrderPagination 
           dataList={orderData} 
           isLoaded={isSuccess}

@@ -57,6 +57,8 @@ function AllOrderPagination({
                 // filterStatus
             }))
         }
+
+        window.scrollTo(0, 0)
     }
 
     const handleNextClick=()=>{
@@ -77,6 +79,8 @@ function AllOrderPagination({
                 // filterStatus
             }))
         }
+
+        window.scrollTo(0, 0)
     }
 
     const handleCurrentClick=(pageNum)=>{
@@ -86,6 +90,8 @@ function AllOrderPagination({
             limit:cardsPerPageLimit,
             // filterStatus
         }))
+
+        window.scrollTo(0, 0)
     }
 
     ////////////////////////////////////////////////////

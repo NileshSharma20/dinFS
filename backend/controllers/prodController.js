@@ -9,7 +9,7 @@ const Products = require('../models/productsModel')
 const ItemCodeIndex = require('../models/itemCodeIndexModel')
 
 const dbCollectionList ={
-    // "ALL":"productsModel",
+    "ALL":"productsModel",
     "ACC":"acceleratorcableModel",
     "ARF":"airfilterModel",
     "RSR":"ballracerModel",
@@ -36,10 +36,96 @@ const dbCollectionList ={
     "TCP":"timingchainpadModel",
     "VSG":"visorglassModel",
     "CFP":"clutchPlateModel",
-    //
     "LKT":'lockkitModel',
     "SMC":"metercableModel",
-    "RHS":"righthandswitchModel"
+    "RHS":"righthandswitchModel",
+    //
+    "ARM":"armatureModel",
+    "BLN":"balancerModel",
+    "BLT":"beltModel",
+    "BPA":"cylinderkitModel",
+    "BLV":"brakeleverModel",
+
+    "BPL":"brakepedalModel",
+    "CNA":"chainadjusterModel",
+    "CHS":"chasisModel",
+    "CCN":"clutchcenterModel",
+    "CGP":"clutchgasketpackingModel",
+
+    "CHB":"clutchhubModel",
+    "CLV":"clutchleverModel",
+    "CPA":"clutchpulleyModel",
+    "CWT":"clutchshoeModel",
+    "CSW":"clutchswitchModel",
+    
+    "CYK":"clutchyokeModel",
+    "CON":"condensorModel",
+    "KPH":"couplinghubModel",
+    "CRA":"crankassemblyModel",
+    "DLV":"discleverModel",
+   
+    "DSP":"discplateModel",
+    "DYK":"discyokeModel",
+    "DRB":"drumrubberModel",
+    "DRM":"drumModel",
+    "TGR":"facedriveModel",
+
+    "FLS":"flasherModel",
+    "RRD":"footrestrodModel",
+    "FAS":"forkassemblyModel",
+    "FBL":"forkballModel",
+    "BRL":"forkbarrelModel",
+
+    "FOS":"forkoilsealModel",
+    "FRD":"forkrodModel",
+    "FSW":"frontstopswitchModel",
+    "FPT":"fuelpetroltapModel",
+    "FTC":"fueltankcapModel",
+    
+    "GBS":"gearboxsprocketModel",
+    "GLV":"gearleverModel",
+    "GPD":"gearpiniondriveModel",
+    "GSF":"gearshaftModel",
+    "GRP":"gripModel",
+
+    "HKT":"halfpackingkitModel",
+    "HND":"handleModel",
+    "HLA":"headlightassemblyModel",
+    "HDO":"headoringModel",
+    "HTC":"htcoilModel",
+    
+    "KKR":"kickpedalModel",
+    "KSF":"kickshaftModel",
+    "LST":"leversetModel",
+    "MGP":"magnetpackingModel",
+    "MSP":"mainstandpinModel",
+
+    "MCA":"mastercylinderassemblyModel",
+    "SMA":"meterassemblyModel",
+    "SMD":"meterdriveModel",
+    "SMP":"meterpinionModel",
+    "SMS":"metersensorModel",
+
+    "OPM":"oilpumpModel",
+    "OWY":"onewayModel",
+    "PKT":"packingkitModel",
+    "PCL":"pickupcoilModel",
+    "PLC":"plugcapModel",
+
+    "PLS":"plugsocketModel",
+    "RSW":"rearstopswitchModel",
+    "RIM":"rimModel",
+    "RLR":"rollerkitModel",
+    "SSM":"selfstartmotorModel",
+
+    "SAS":"suspensionModel",
+    "TLA":"taillightassemblyModel",
+    "TEE":"teeModel",
+    "TKT":"timingchainkitModel",
+    "VOS":"valveoilsealModel",
+
+    "VLV":"valveModel",
+    "VRT":"variatorModel",
 }
 
 // @desc   Get All Products
@@ -70,18 +156,25 @@ const getDataForExportProd = asyncHandler(async (req,res)=>{
     var prod, dbCollection 
     const { itemCode } = req.params
 
-    // Finding right Collection
-    const dbKeys = Object.keys(dbCollectionList)
-    if(dbKeys.includes(itemCode.toUpperCase())){
-        dbCollection = require(`../models/${dbCollectionList[itemCode.toUpperCase()]}`) 
-    }else{
-        res.status(400)
-        throw new Error('Specify Collection')
-    }
-    
-    prod = await dbCollection?.find().lean()
+    // if(itemCode.toUpperCase()==="ALL"){
+    //     prod = await dbCollection?.find().lean()
 
-    createMongoDataBackup(prod,itemCode.toUpperCase())
+    //     createMongoDataBackup(prod,itemCode.toUpperCase())
+    // }else{
+
+        // Finding right Collection
+        const dbKeys = Object.keys(dbCollectionList)
+        if(dbKeys.includes(itemCode.toUpperCase())){
+            dbCollection = require(`../models/${dbCollectionList[itemCode.toUpperCase()]}`) 
+        }else{
+            res.status(400)
+            throw new Error('Specify Collection')
+        }
+        
+        prod = await dbCollection?.find().lean()
+        createMongoDataBackup(prod,itemCode.toUpperCase())
+    // }
+        
 
     res.status(200).json(prod)
 })
@@ -277,10 +370,10 @@ const setManyProd = asyncHandler(async (req,res)=>{
     const { itemCode } = req.body
     
     const localJson = localCSVtoJSON(itemCode.toUpperCase())
-    // console.log(`localCSVtoJSON length:${localJson.length}`)
+    console.log(`localCSVtoJSON length:${localJson.length}`)
     
     const cleanedJSON = cleanJsonData(localJson)
-    // console.log(`cleanedJSON length:${cleanedJSON.length}`)
+    console.log(`cleanedJSON length:${cleanedJSON.length}`)
 
     const options = { ordered: true };
 

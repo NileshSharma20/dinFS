@@ -14,11 +14,27 @@
 
 .modal-container{
     position: fixed;
+    /* top: 50%;
+    left: 50%;
 
+    transform-origin: 50%, 50%;
+    transform: translate(-50%,-50%); */
+
+    /* padding: 5vh 0; */
+
+    /* height: calc(100% + 10vh); */
+    height: 100%;
+    max-height: 80vh;
+    
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
+    
+    /* border-radius: 20px; */
+    background-color: var(--formBgColor);
+    
     z-index: 9;
+
+    overflow-y: scroll;
 }
