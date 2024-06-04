@@ -21,6 +21,8 @@ import "./DemandSlip.css"
 function DemandSlip() {
   const dispatch = useDispatch()
 
+  const modalRef = useRef()
+
   const { isAdmin, isManager } = useAuth()
   
   const dateInputRef = useRef(null);
@@ -294,6 +296,22 @@ function DemandSlip() {
 
   },[filterUsername])
 
+  //Pop up handling
+  useEffect(()=>{
+    let handler = (event) => {
+        if(legendFlag && !modalRef.current.contains(event.target) 
+          )
+          {
+              setLegendFlag(false)  
+          }
+    };
+    document.addEventListener("mousedown", handler);
+
+    return()=>{
+    document.removeEventListener("mousedown",handler);
+    }
+  })
+
   return (
     <>
     {!token && <LoginAgainModal />}
@@ -307,9 +325,9 @@ function DemandSlip() {
       {legendFlag &&
         <>
         <div className="modal-backdrop" ></div> 
-        <div className='modal-container'>
+        <div className='legend-modal-container' ref={modalRef}>
             
-            <div className="edit-btn"
+            <div className="edit-btn legend-close-btn"
                 onClick={()=>handleLegendClick()}
             >
             <AiOutlineClose />

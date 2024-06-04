@@ -4,414 +4,416 @@ import { refreshToken } from '../auth/authSlice'
 
 // Get user from localStorage
 // const productData = JSON.parse(localStorage.getItem('productData'))
+const prodCodeListUnsorted = [{
+  productName:"Air-Filter",
+  itemCode:"ARF",
+},  
+{
+  productName:"Ball-Racer",
+  itemCode:"RSR",
+},
+{
+  productName:"Bendex",
+  itemCode:"BDX",
+},
+{
+  productName:"Brake-Shoe",
+  itemCode:"BSH",
+},
+{
+  productName:"Disc-Pad",
+  itemCode:"DPD",
+},
+{
+  productName:"Foot-Rest",
+  itemCode:"FTR",
+},
+{
+  productName:"Main-Stand",
+  itemCode:"MSN",
+},
+{
+  productName:"Mobil-Filter",
+  itemCode:"MOF",
+},
+{
+  productName:"Shocker",
+  itemCode:"SKR",
+},
 
+{
+  productName:"Side-Stand",
+  itemCode:"SSN",
+},
+{
+  productName:"Accelerator-Cable",
+  itemCode:"ACC",
+},
+{
+  productName:"Clutch-Asssembly",
+  itemCode:"CFA",
+},
+{
+  productName:"Cam-Shaft",
+  itemCode:"CMA"
+},
+{
+  productName:"CDI",
+  itemCode:"CDI"
+},
+{
+  productName:"Clutch-Cable",
+  itemCode:"CCC"
+},
+{
+  productName:"Mirror",
+  itemCode:"RVM"
+},
+{
+  productName:"Rocker",
+  itemCode:"RKR"
+},
+{
+  productName:"Self-Cut",
+  itemCode:"SFR"
+},
+{
+  productName:"Timing-Chain",
+  itemCode:"TCH"
+},
+{
+  productName:"Timing-Chain-Adjuster",
+  itemCode:"TCT"
+},
+{
+  productName:"Chain-Sprocket-Kit",
+  itemCode:"SPK"
+},
+{
+  productName:"Caliper",
+  itemCode:"CLP"
+},
+{
+  productName:"Carburetor",
+  itemCode:"CRB"
+},
+{
+  productName:"Timing-Chain-Pad",
+  itemCode:"TCP"
+},
+{
+  productName:"Visor-Glass",
+  itemCode:"VSG"
+},
+{
+  productName:"Clutch-Plate",
+  itemCode:"CFP"
+},
+{
+  productName:"Lock-Kit",
+  itemCode:"LKT"
+},
+{
+  productName:"Meter-Cable",
+  itemCode:"SMC"
+},
+{
+  productName:"Right-Hand-Switch",
+  itemCode:"RHS"
+},
+{
+  productName:"Armature",
+  itemCode:"ARM"
+},
+{
+  productName:"Balancer",
+  itemCode:"BLN"
+},
+{
+  productName:"Belt",
+  itemCode:"BLT"
+},
+{
+  productName:"Cylinder-Kit",
+  itemCode:"BPA"
+},
+{
+  productName:"Brake-Lever",
+  itemCode:"BLV"
+},
+{
+  productName:"Brake-Pedal",
+  itemCode:"BPL"
+},
+{
+  productName:"Chain-Adjuster",
+  itemCode:"CNA"
+},
+{
+  productName:"Chasis",
+  itemCode:"CHS"
+},
+{
+  productName:"Clutch-Center",
+  itemCode:"CCN"
+},
+{
+  productName:"Clutch-Gasket-Packing",
+  itemCode:"CGP"
+},
+{
+  productName:"Clutch-Hub",
+  itemCode:"CHB"
+},
+{
+  productName:"Clutch-Lever",
+  itemCode:"CLV"
+},
+{
+  productName:"Clutch-Pulley",
+  itemCode:"CPA"
+},
+{
+  productName:"Clutch-Shoe",
+  itemCode:"CWT"
+},
+{
+  productName:"Clutch-Switch",
+  itemCode:"CSW"
+},
+{
+  productName:"Clutch-Yoke",
+  itemCode:"CYK"
+},
+{
+  productName:"Condensor",
+  itemCode:"CON"
+},
+{
+  productName:"Coupling-Hub",
+  itemCode:"KPH"
+},
+{
+  productName:"Crank-Assembly",
+  itemCode:"CRA"
+},
+{
+  productName:"Disc-Lever",
+  itemCode:"DLV"
+},
+{
+  productName:"Disc-Yoke",
+  itemCode:"DSP"
+},
+{
+  productName:"Drum-Rubber",
+  itemCode:"DYK"
+},
+{
+  productName:"Drum",
+  itemCode:"DRB"
+},
+{
+  productName:"Face-Drive",
+  itemCode:"DRM"
+},
+{
+  productName:"Flasher",
+  itemCode:"TGR"
+},
+{
+  productName:"Foot-Rest-Rod",
+  itemCode:"FLS"
+},
+{
+  productName:"Fork-Assembly",
+  itemCode:"RRD"
+},
+{
+  productName:"Fork-Barrel",
+  itemCode:"FAS"
+},
+{
+  productName:"Fork-Oil-Seal",
+  itemCode:"FBL"
+},
+{
+  productName:"Fork-Rod",
+  itemCode:"BRL"
+},
+{
+  productName:"Front-Stop-Switch",
+  itemCode:"FOS"
+},
+{
+  productName:"Fuel-Petrol-Tap",
+  itemCode:"FRD"
+},
+{
+  productName:"Fuel-Tank-Cap",
+  itemCode:"FSW"
+},
+{
+  productName:"Gear-Box-Sprocket",
+  itemCode:"FPT"
+},
+{
+  productName:"Gear-Lever",
+  itemCode:"FTC"
+},
+{
+  productName:"Gear-Pinion-Drive",
+  itemCode:"GBS"
+},
+{
+  productName:"Gear-Shaft",
+  itemCode:"GLV"
+},
+{
+  productName:"Grip",
+  itemCode:"GPD"
+},
+{
+  productName:"Half-Packing-Kit",
+  itemCode:"GSF"
+},
+{
+  productName:"Handle",
+  itemCode:"GRP"
+},
+{
+  productName:"Head-Light-Assembly",
+  itemCode:"HKT"
+},
+{
+  productName:"Head-Oring",
+  itemCode:"HND"
+},
+{
+  productName:"Ht-Coil",
+  itemCode:"HLA"
+},
+{
+  productName:"Kick-Pedal",
+  itemCode:"HDO"
+},
+{
+  productName:"Kick-Shaft",
+  itemCode:"HTC"
+},
+{
+  productName:"Lever-Set",
+  itemCode:"KKR"
+},
+{
+  productName:"Magnet-Packing",
+  itemCode:"KSF"
+},
+{
+  productName:"Main-Stand-Pin",
+  itemCode:"LST"
+},
+{
+  productName:"Master-Cylinder-Assembly",
+  itemCode:"MGP"
+},
+{
+  productName:"Meter-Assembly",
+  itemCode:"MSP"
+},
+{
+  productName:"Meter-Drive",
+  itemCode:"MCA"
+},
+{
+  productName:"Meter-Pinion",
+  itemCode:"SMA"
+},
+{
+  productName:"Meter-Sensor",
+  itemCode:"SMD"
+},
+{
+  productName:"Oil-Pump",
+  itemCode:"SMP"
+},
+{
+  productName:"One-Way",
+  itemCode:"SMS"
+},
+{
+  productName:"Packing-Kit",
+  itemCode:"OPM"
+},
+{
+  productName:"Pickup-Coil",
+  itemCode:"OWY"
+},
+{
+  productName:"Disc-Plate",
+  itemCode:"PKT"
+},
+{
+  productName:"Fork-Ball",
+  itemCode:"PCL"
+},
+{
+  productName:"Plug-Cap",
+  itemCode:"PLC"
+},
+{
+  productName:"Plug-Socket",
+  itemCode:"PLS"
+},
+{
+  productName:"Rear-Stop-Switch",
+  itemCode:"RSW"
+},
+{
+  productName:"Rim",
+  itemCode:"RIM"
+},
+{
+  productName:"Roller-Kit",
+  itemCode:"RLR"
+},
+{
+  productName:"Self-Start-Motor",
+  itemCode:"SSM"
+},
+{
+  productName:"Suspension",
+  itemCode:"SAS"
+},
+{
+  productName:"Tail-Light-Assembly",
+  itemCode:"TLA"
+},
+{
+  productName:"Tee",
+  itemCode:"TEE"
+},
+{
+  productName:"Timing-Chain-Kit",
+  itemCode:"TKT"
+},
+{
+  productName:"Valve-Oil-Seal",
+  itemCode:"VOS"
+},
+{
+  productName:"Valve",
+  itemCode:"VLV"
+},
+{
+  productName:"Variator",
+  itemCode:"VRT"
+},    
+]
 const initialState = {
-    prodCodeList:[{
-      productName:"Air-Filter",
-      itemCode:"ARF",
-    },  
-    {
-      productName:"Ball-Racer",
-      itemCode:"RSR",
-    },
-    {
-      productName:"Bendex",
-      itemCode:"BDX",
-    },
-    {
-      productName:"Brake-Shoe",
-      itemCode:"BSH",
-    },
-    {
-      productName:"Disc-Pad",
-      itemCode:"DPD",
-    },
-    {
-      productName:"Foot-Rest",
-      itemCode:"FTR",
-    },
-    {
-      productName:"Main-Stand",
-      itemCode:"MSN",
-    },
-    {
-      productName:"Mobil-Filter",
-      itemCode:"MOF",
-    },
-    {
-      productName:"Shocker",
-      itemCode:"SKR",
-    },
-    
-    {
-      productName:"Side-Stand",
-      itemCode:"SSN",
-    },
-    {
-      productName:"Accelerator-Cable",
-      itemCode:"ACC",
-    },
-    {
-      productName:"Clutch-Asssembly",
-      itemCode:"CFA",
-    },
-    {
-      productName:"Cam-Shaft",
-      itemCode:"CMA"
-    },
-    {
-      productName:"CDI",
-      itemCode:"CDI"
-    },
-    {
-      productName:"Clutch-Cable",
-      itemCode:"CCC"
-    },
-    {
-      productName:"Mirror",
-      itemCode:"RVM"
-    },
-    {
-      productName:"Rocker",
-      itemCode:"RKR"
-    },
-    {
-      productName:"Self-Cut",
-      itemCode:"SFR"
-    },
-    {
-      productName:"Timing-Chain",
-      itemCode:"TCH"
-    },
-    {
-      productName:"Timing-Chain-Adjuster",
-      itemCode:"TCT"
-    },
-    {
-      productName:"Chain-Sprocket-Kit",
-      itemCode:"SPK"
-    },
-    {
-      productName:"Caliper",
-      itemCode:"CLP"
-    },
-    {
-      productName:"Carburetor",
-      itemCode:"CRB"
-    },
-    {
-      productName:"Timing-Chain-Pad",
-      itemCode:"TCP"
-    },
-    {
-      productName:"Visor-Glass",
-      itemCode:"VSG"
-    },
-    {
-      productName:"Clutch-Plate",
-      itemCode:"CFP"
-    },
-    {
-      productName:"Lock-Kit",
-      itemCode:"LKT"
-    },
-    {
-      productName:"Meter-Cable",
-      itemCode:"SMC"
-    },
-    {
-      productName:"Right-Hand-Switch",
-      itemCode:"RHS"
-    },
-    {
-      productName:"Armature",
-      itemCode:"ARM"
-    },
-    {
-      productName:"Balancer",
-      itemCode:"BLN"
-    },
-    {
-      productName:"Belt",
-      itemCode:"BLT"
-    },
-    {
-      productName:"Cylinder-Kit",
-      itemCode:"BPA"
-    },
-    {
-      productName:"Brake-Lever",
-      itemCode:"BLV"
-    },
-    {
-      productName:"Brake-Pedal",
-      itemCode:"BPL"
-    },
-    {
-      productName:"Chain-Adjuster",
-      itemCode:"CNA"
-    },
-    {
-      productName:"Chasis",
-      itemCode:"CHS"
-    },
-    {
-      productName:"Clutch-Center",
-      itemCode:"CCN"
-    },
-    {
-      productName:"Clutch-Gasket-Packing",
-      itemCode:"CGP"
-    },
-    {
-      productName:"Clutch-Hub",
-      itemCode:"CHB"
-    },
-    {
-      productName:"Clutch-Lever",
-      itemCode:"CLV"
-    },
-    {
-      productName:"Clutch-Pulley",
-      itemCode:"CPA"
-    },
-    {
-      productName:"Clutch-Shoe",
-      itemCode:"CWT"
-    },
-    {
-      productName:"Clutch-Switch",
-      itemCode:"CSW"
-    },
-    {
-      productName:"Clutch-Yoke",
-      itemCode:"CYK"
-    },
-    {
-      productName:"Condensor",
-      itemCode:"CON"
-    },
-    {
-      productName:"Coupling-Hub",
-      itemCode:"KPH"
-    },
-    {
-      productName:"Crank-Assembly",
-      itemCode:"CRA"
-    },
-    {
-      productName:"Disc-Lever",
-      itemCode:"DLV"
-    },
-    {
-      productName:"Disc-Yoke",
-      itemCode:"DSP"
-    },
-    {
-      productName:"Drum-Rubber",
-      itemCode:"DYK"
-    },
-    {
-      productName:"Drum",
-      itemCode:"DRB"
-    },
-    {
-      productName:"Face-Drive",
-      itemCode:"DRM"
-    },
-    {
-      productName:"Flasher",
-      itemCode:"TGR"
-    },
-    {
-      productName:"Foot-Rest-Rod",
-      itemCode:"FLS"
-    },
-    {
-      productName:"Fork-Assembly",
-      itemCode:"RRD"
-    },
-    {
-      productName:"Fork-Barrel",
-      itemCode:"FAS"
-    },
-    {
-      productName:"Fork-Oil-Seal",
-      itemCode:"FBL"
-    },
-    {
-      productName:"Fork-Rod",
-      itemCode:"BRL"
-    },
-    {
-      productName:"Front-Stop-Switch",
-      itemCode:"FOS"
-    },
-    {
-      productName:"Fuel-Petrol-Tap",
-      itemCode:"FRD"
-    },
-    {
-      productName:"Fuel-Tank-Cap",
-      itemCode:"FSW"
-    },
-    {
-      productName:"Gear-Box-Sprocket",
-      itemCode:"FPT"
-    },
-    {
-      productName:"Gear-Lever",
-      itemCode:"FTC"
-    },
-    {
-      productName:"Gear-Pinion-Drive",
-      itemCode:"GBS"
-    },
-    {
-      productName:"Gear-Shaft",
-      itemCode:"GLV"
-    },
-    {
-      productName:"Grip",
-      itemCode:"GPD"
-    },
-    {
-      productName:"Half-Packing-Kit",
-      itemCode:"GSF"
-    },
-    {
-      productName:"Handle",
-      itemCode:"GRP"
-    },
-    {
-      productName:"Head-Light-Assembly",
-      itemCode:"HKT"
-    },
-    {
-      productName:"Head-Oring",
-      itemCode:"HND"
-    },
-    {
-      productName:"Ht-Coil",
-      itemCode:"HLA"
-    },
-    {
-      productName:"Kick-Pedal",
-      itemCode:"HDO"
-    },
-    {
-      productName:"Kick-Shaft",
-      itemCode:"HTC"
-    },
-    {
-      productName:"Lever-Set",
-      itemCode:"KKR"
-    },
-    {
-      productName:"Magnet-Packing",
-      itemCode:"KSF"
-    },
-    {
-      productName:"Main-Stand-Pin",
-      itemCode:"LST"
-    },
-    {
-      productName:"Master-Cylinder-Assembly",
-      itemCode:"MGP"
-    },
-    {
-      productName:"Meter-Assembly",
-      itemCode:"MSP"
-    },
-    {
-      productName:"Meter-Drive",
-      itemCode:"MCA"
-    },
-    {
-      productName:"Meter-Pinion",
-      itemCode:"SMA"
-    },
-    {
-      productName:"Meter-Sensor",
-      itemCode:"SMD"
-    },
-    {
-      productName:"Oil-Pump",
-      itemCode:"SMP"
-    },
-    {
-      productName:"One-Way",
-      itemCode:"SMS"
-    },
-    {
-      productName:"Packing-Kit",
-      itemCode:"OPM"
-    },
-    {
-      productName:"Pickup-Coil",
-      itemCode:"OWY"
-    },
-    {
-      productName:"Disc-Plate",
-      itemCode:"PKT"
-    },
-    {
-      productName:"Fork-Ball",
-      itemCode:"PCL"
-    },
-    {
-      productName:"Plug-Cap",
-      itemCode:"PLC"
-    },
-    {
-      productName:"Plug-Socket",
-      itemCode:"PLS"
-    },
-    {
-      productName:"Rear-Stop-Switch",
-      itemCode:"RSW"
-    },
-    {
-      productName:"Rim",
-      itemCode:"RIM"
-    },
-    {
-      productName:"Roller-Kit",
-      itemCode:"RLR"
-    },
-    {
-      productName:"Self-Start-Motor",
-      itemCode:"SSM"
-    },
-    {
-      productName:"Suspension",
-      itemCode:"SAS"
-    },
-    {
-      productName:"Tail-Light-Assembly",
-      itemCode:"TLA"
-    },
-    {
-      productName:"Tee",
-      itemCode:"TEE"
-    },
-    {
-      productName:"Timing-Chain-Kit",
-      itemCode:"TKT"
-    },
-    {
-      productName:"Valve-Oil-Seal",
-      itemCode:"VOS"
-    },
-    {
-      productName:"Valve",
-      itemCode:"VLV"
-    },
-    {
-      productName:"Variator",
-      itemCode:"VRT"
-    },    
-    ],
+    prodCodeList: prodCodeListUnsorted.sort((a,b)=>
+      a.productName.localeCompare(b.productName)
+    ),
     productData: [],
     productSKUData:[],
     noMatch: false,

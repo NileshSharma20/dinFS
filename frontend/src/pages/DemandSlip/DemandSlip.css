@@ -112,12 +112,15 @@
 
 .ds-prodList-box{
     position: relative;
-    width: 60vw;
+    width: 100%;
+    max-width: 60vw;
+    /* height:auto; */
     height: 100%;
 
-    padding: 5vh 10vw;
+    padding: 5vh 5vw;
 
     display: grid;
+    /* flex-wrap: wrap; */
     grid-template-columns: 1fr 1fr 1fr;
     column-gap: 2rem;
     row-gap: 1rem;
@@ -128,7 +131,9 @@
     justify-self: flex-start;
 
     background-color: var(--formBgColor);
-
+    
+    scrollbar-gutter: stable;
+    overflow-y: scroll;
 
     /* border: 1px solid black; */
     /* border-radius: 20px; */
@@ -277,6 +282,12 @@
     background-color: var(--backgroundColor);
     color: var(--formBgColor);
     transition: 0.3s ease-in-out;
+}
+
+.legend-close-btn{
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
 }
 
 /* /////////////////////1200///////////////////// */

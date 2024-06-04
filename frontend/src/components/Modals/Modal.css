@@ -38,3 +38,23 @@
 
     overflow-y: scroll;
 }
+
+.legend-modal-container{
+    position: fixed;
+    /* top: 0;
+    left:0; */
+
+    /* padding: 2vw; */
+
+    width: 60vw;
+    height: 80vh;
+
+    background-color: var(--formBgColor);
+
+    z-index: 9;
+    overflow: hidden;
+    /* overflow-y: scroll; */
+
+    border-radius: 20px;
+
+}

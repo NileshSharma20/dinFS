@@ -9,7 +9,7 @@ const Products = require('../models/productsModel')
 const ItemCodeIndex = require('../models/itemCodeIndexModel')
 
 const dbCollectionList ={
-    "ALL":"productsModel",
+    // "ALL":"productsModel",
     "ACC":"acceleratorcableModel",
     "ARF":"airfilterModel",
     "RSR":"ballracerModel",
@@ -257,17 +257,77 @@ const pushToProduct = asyncHandler(async (req,res)=>{
 // @route  POST /api/prod/search/sku/:skuOnlyFlag
 // @access Public
 const getSKUProd = asyncHandler(async (req,res)=>{
-    const iC = req.body.itemCode?req.body.itemCode.toUpperCase():""
-    const cleanedVM = req.body.vehicleModel?req.body.vehicleModel.toUpperCase():""
-    const vM = cleanedVM.replace(/-/g,"")
-    const bC = req.body.brandCompany?req.body.brandCompany.toUpperCase():""
-    const spaceRemovedPN = req.body.partNum?req.body.partNum.replace(/ /g,""):""
+    const iC = req.body.itemCode? req.body.itemCode.toUpperCase() : ""
+    
+    const cleanedVM = req.body.vehicleModel? req.body.vehicleModel.toUpperCase() : ""
+    // const vM = cleanedVM.replace(/-/g,"")
+    const vM = cleanedVM.replace(/-/g," ")
+    const vMKeywordList = cleanedVM.split(" ")
+    
+    const bC = req.body.brandCompany? req.body.brandCompany.toUpperCase() : ""
+    // const 
+
+    const spaceRemovedPN = req.body.partNum? req.body.partNum.replace(/ /g,"") : ""
     const cleanedPN = spaceRemovedPN.replace(/-/g,"") 
     const pN = cleanedPN.toUpperCase()
 
     const { skuOnlyFlag } = req.params
 
     let prod, dbCollection
+    let searchParams = [
+        // {sku: { $regex: iC}},
+    ]
+
+    // Defining Fields to be searched based on input
+    if(vM!==""){
+        let vMsearchParams = vMKeywordList.map((keyWord=>{
+            return {vehicleModel:{$regex:keyWord}}
+        }))
+
+        // console.log(`vM search Params:${JSON.stringify(vMsearchParams,null,4)}`)
+        searchParams = [{
+            $or:[
+                {sku:{$regex:vM}},
+                {
+                    $and:[
+                    ...vMsearchParams
+                    ]
+                }
+                // {vehicleModel:{$regex:vM}}, 
+            ]
+        },
+            ...searchParams
+        ]
+    }
+
+    if(bC!==""){
+        searchParams = [{
+            $or:[
+                {sku: { $regex: bC}},
+                {brandCompany:{$regex:bC}}, 
+            ]
+        },
+            ...searchParams
+        ]
+    }
+
+    if(pN!==""){
+        searchParams = [{
+            $or:[
+                {sku: { $regex: pN}},
+                {partNum:{$regex:pN}}, 
+
+            ]
+        },
+            ...searchParams
+        ]
+    }
+
+    if(searchParams.length===0){
+        searchParams=[
+            {sku:{$regex:iC}}
+        ]
+    }
 
     // Finding right Collection
     const dbKeys = Object.keys(dbCollectionList)
@@ -288,11 +348,9 @@ const getSKUProd = asyncHandler(async (req,res)=>{
         .select('sku itemCode productName vehicleModel brandCompany partNum metaData -_id')
         .lean()
     }else if(skuOnlyFlag==="false"){
+        // console.log(`searchParams:${JSON.stringify(searchParams,null,4)}`)
         prod = await dbCollection.find({ $and:[
-            {sku: { $regex: iC}}, 
-            {sku: { $regex: vM}}, 
-            {sku: { $regex: bC}}, 
-            {sku: { $regex: pN}}
+            ...searchParams
         ]},{__v:0})
         .lean()
     }
