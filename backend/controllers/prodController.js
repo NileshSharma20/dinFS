@@ -340,10 +340,7 @@ const getSKUProd = asyncHandler(async (req,res)=>{
 
     if(skuOnlyFlag==="true"){
         prod = await dbCollection.find({ $and:[
-            {sku: { $regex: iC}}, 
-            {sku: { $regex: vM}}, 
-            {sku: { $regex: bC}}, 
-            {sku: { $regex: pN}}
+            ...searchParams
         ]})
         .select('sku itemCode productName vehicleModel brandCompany partNum metaData -_id')
         .lean()
