@@ -1,13 +1,13 @@
 const mongoose = require('mongoose')
 
-const chasisSchema = mongoose.Schema({
+const chassisSchema = mongoose.Schema({
     itemCode:{
         type: String,
         required: [true, 'Please add the Item Code']
     },   
     productName:{
         type: String,
-        default: "CHASIS",
+        default: "CHASSIS",
     },  
     vehicleModel:{
         type: String,
@@ -44,4 +44,4 @@ const chasisSchema = mongoose.Schema({
     }
 )
 
-module.exports = mongoose.model('Chasis', chasisSchema)
+module.exports = mongoose.model('Chassis', chassisSchema)

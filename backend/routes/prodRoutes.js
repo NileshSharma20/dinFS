@@ -26,7 +26,10 @@ router.route('/exportMongoData/:itemCode')
 // router.route('/index')
 router.route('/index/:itemCode')
        .get(getItemCodeIndex)
-       .post(setItemCodeIndex)
+       // .post(setItemCodeIndex)
+
+router.route('/index/all')
+       .post(verifyJWT, setItemCodeIndex)
 
 router.delete('/deleteAll',verifyJWT, deleteAllProd)
 

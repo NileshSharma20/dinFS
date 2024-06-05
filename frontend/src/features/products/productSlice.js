@@ -6,6 +6,122 @@ import { refreshToken } from '../auth/authSlice'
 // const productData = JSON.parse(localStorage.getItem('productData'))
 const prodCodeListUnsorted = [
   {
+    productName:"Lock-Kit",
+    itemCode:"LKT"
+  },
+  {
+    productName:"Accelerator-Cable",
+    itemCode:"ACC"
+  },
+  {
+    productName:"Air-Filter",
+    itemCode:"ARF"
+  },
+  {
+    productName:"Ball-Racer",
+    itemCode:"RSR"
+  },
+  {
+    productName:"Bendex",
+    itemCode:"BDX"
+  },
+  {
+    productName:"Brake-Shoe",
+    itemCode:"BSH"
+  },
+  {
+    productName:"Clutch-Cable",
+    itemCode:"CCC"
+  },
+  {
+    productName:"Cdi",
+    itemCode:"CDI"
+  },
+  {
+    productName:"Clutch-Assembly",
+    itemCode:"CFA"
+  },
+  {
+    productName:"Cam-Shaft",
+    itemCode:"CMA"
+  },
+  {
+    productName:"Disc-Pad",
+    itemCode:"DPD"
+  },
+  {
+    productName:"Foot-Rest",
+    itemCode:"FTR"
+  },
+  {
+    productName:"Main-Stand",
+    itemCode:"MSN"
+  },
+  {
+    productName:"Mobil-Filter",
+    itemCode:"MOF"
+  },
+  {
+    productName:"Rocker",
+    itemCode:"RKR"
+  },
+  {
+    productName:"Mirror",
+    itemCode:"RVM"
+  },
+  {
+    productName:"Self-Cut",
+    itemCode:"SFR"
+  },
+  {
+    productName:"Shocker",
+    itemCode:"SKR"
+  },
+  {
+    productName:"Side-Stand",
+    itemCode:"SSN"
+  },
+  {
+    productName:"Timing-Chain",
+    itemCode:"TCH"
+  },
+  {
+    productName:"Timing-Chain-Adjuster",
+    itemCode:"TCT"
+  },
+  {
+    productName:"Chain-Sprocket-Kit",
+    itemCode:"SPK"
+  },
+  {
+    productName:"Caliper",
+    itemCode:"CLP"
+  },
+  {
+    productName:"Carburetor",
+    itemCode:"CRB"
+  },
+  {
+    productName:"Timing-Chain-Pad",
+    itemCode:"TCP"
+  },
+  {
+    productName:"Visor-Glass",
+    itemCode:"VSG"
+  },
+  {
+    productName:"Clutch-Plate",
+    itemCode:"CFP"
+  },
+  {
+    productName:"Meter-Cable",
+    itemCode:"SMC"
+  },
+  {
+    productName:"Right-Hand-Switch",
+    itemCode:"RHS"
+  },
+  {
     productName:"Armature",
     itemCode:"ARM"
   },
@@ -34,7 +150,7 @@ const prodCodeListUnsorted = [
     itemCode:"CNA"
   },
   {
-    productName:"Chasis",
+    productName:"Chassis",
     itemCode:"CHS"
   },
   {

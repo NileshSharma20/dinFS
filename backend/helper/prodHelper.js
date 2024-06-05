@@ -3,6 +3,8 @@ const Papa = require('papaparse');
 
 const filenameList ={
     "ALL":["productsMongo.csv"],
+    "ICI":["itemCodeIndexMongo.csv", "itemCodeIndexUpdated.csv"],
+    //
     "SKR":["shockerMongo.csv","shockerUpdated.csv"],
     "BSH":["brakeShoeMongo.csv", "brakeShoeUpdated.csv"],
     "DPD":["discpadMongo.csv", "discpadUpdated.csv"],
@@ -15,7 +17,6 @@ const filenameList ={
     "MSN":["mainStandMongo.csv", "mainStandUpdated.csv"],
     "CFA":["clutchAssemblyMongo.csv","clutchAssemblyUpdated.csv"],
     "ACC":["acceleratorCableMongo.csv","acceleratorCableUpdated.csv"],
-    //
     "CMA":["camShaftMongo.csv","camShaftUpdated.csv"],
     "CDI":["cdiMongo.csv","cdiUpdated.csv"],
     "CCC":["clutchCableMongo.csv","clutchCableUpdated.csv"],
@@ -33,7 +34,6 @@ const filenameList ={
     "LKT":["lockKitMongo.csv","lockKitUpdated.csv"],
     "SMC":["meterCableMongo.csv","meterCableUpdated.csv"],
     "RHS":["rightHandSwitchMongo.csv","rightHandSwitchUpdated.csv"],
-    //
     "ARM":["armatureMongo.csv","armatureUpdated.csv"],
     "BLN":["balancerMongo.csv","balancerUpdated.csv"],
     "BLT":["beltMongo.csv","beltUpdated.csv"],
@@ -41,7 +41,7 @@ const filenameList ={
     "BLV":["brakeLeverMongo.csv","brakeLeverUpdated.csv"],
     "BPL":["brakePedalMongo.csv","brakePedalUpdated.csv"],
     "CNA":["chainAdjusterMongo.csv","chainAdjusterUpdated.csv"],
-    "CHS":["chasisMongo.csv","chasisUpdated.csv"],
+    "CHS":["chassisMongo.csv","chassisUpdated.csv"],
     "CCN":["clutchCenterMongo.csv","clutchCenterUpdated.csv"],
     "CGP":["clutchGasketPackingMongo.csv","clutchGasketPackingUpdated.csv"],
     "CHB":["clutchHubMongo.csv","clutchHubUpdated.csv"],
@@ -160,14 +160,14 @@ const localCSVtoJSON = (iC) => {
     if(dbKeys.includes(iC)){
         csvFile = `../CsvData/${ filenameList[iC][1] }` 
     }else{
-        csvFile = '../CsvData/shockerUpdated.csv'
+        throw new Error('ItemCode not found')
     }
 
     const csvData = fs.readFileSync(csvFile, 'utf8');
 
     const jsonData = Papa.parse(csvData, { header: true });
 
-    console.log(`localCSVtoJSON helper:\n${iC}:${JSON.stringify(jsonData.data[0],null,4)}`)
+    // console.log(`localCSVtoJSON helper:\n${iC}:${JSON.stringify(jsonData.data[0],null,4)}`)
 
     return jsonData.data
 }
@@ -263,8 +263,36 @@ return cleanedData
 
 }
 
+// @desc Clean raw ItemCode JSON
+const cleanItemCodeJsonData = (rawJson) => {
+    var cleanedData = []
+
+    if(!rawJson || rawJson.length===0){
+        cleanedData=[]
+    }else{
+        cleanedData =rawJson.filter((item=>item.itemCode && item.productName)).map((itemData)=>{
+            var cleanedItemCode = ""
+            var cleanedProductName = ""
+
+            cleanedItemCode = itemData.itemCode.toUpperCase()
+            cleanedItemCode = cleanedItemCode.replace(/ /g,"")
+
+            cleanedProductName = itemData.productName.toUpperCase()
+            cleanedProductName = cleanedProductName.replace(/ /g,"")
+
+            return{
+                itemCode: cleanedItemCode,
+                productName: cleanedProductName
+            }
+        })
+    }
+
+    return cleanedData
+}
+
 module.exports = {
     cleanJsonData,
     localCSVtoJSON,
     createMongoDataBackup,
+    cleanItemCodeJsonData,
 }

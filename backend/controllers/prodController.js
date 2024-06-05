@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler')
-const {cleanJsonData, localCSVtoJSON, createMongoDataBackup } = require("../helper/prodHelper")
+const {cleanJsonData, localCSVtoJSON, createMongoDataBackup, cleanItemCodeJsonData } = require("../helper/prodHelper")
 
 // const Shocker = require('../models/shockerModel')
 // const Brakeshoe = require('../models/brakeshoeModel')
@@ -10,6 +10,7 @@ const ItemCodeIndex = require('../models/itemCodeIndexModel')
 
 const dbCollectionList ={
     // "ALL":"productsModel",
+    "ICI":"itemCodeIndexModel",
     "ACC":"acceleratorcableModel",
     "ARF":"airfilterModel",
     "RSR":"ballracerModel",
@@ -48,7 +49,7 @@ const dbCollectionList ={
 
     "BPL":"brakepedalModel",
     "CNA":"chainadjusterModel",
-    "CHS":"chasisModel",
+    "CHS":"chassisModel",
     "CCN":"clutchcenterModel",
     "CGP":"clutchgasketpackingModel",
 
@@ -200,29 +201,60 @@ const getItemCodeIndex = asyncHandler(async(req,res)=>{
 })
 
 // @desc   Set Product Name from Item Code 
-// @route  SET /api/index/:itemCode
+// @route  SET /api/prod/index/:itemCode
 // @access Public
 const setItemCodeIndex =asyncHandler(async(req,res)=>{
-    const { itemCode } = req.params 
-    const { productName } = req.body
+    // const { itemCode } = req.params 
+    // const { productName } = req.body
 
-    const indexClone = await ItemCodeIndex
-                            .findOne({itemCode: itemCode.toUpperCase()})
-                            .lean()
-
-    if(indexClone){
-        res.status(409)
-        throw new Error(`Item Code Already Exists`)
-    }
-
-    const indexData = {
-        itemCode:itemCode.toUpperCase(), 
-        productName: productName.toUpperCase()
-    }
-
-    await ItemCodeIndex.create(indexData) 
+    const { rewrite } = req.query
     
-    res.status(200).json(indexData)
+    const { roles } = req
+
+    if(!roles.includes("Admin")){
+        res.status(403)
+        throw new Error("Forbidden")
+    }
+
+    const localJson = localCSVtoJSON("ICI")
+
+    const cleanedJSON = cleanItemCodeJsonData(localJson)
+
+    if(rewrite==="true"){
+        await ItemCodeIndex.deleteMany({})
+        
+        await ItemCodeIndex.insertMany(cleanedJSON,{ordered:true} )
+        
+        res.status(200).json(cleanedJSON)
+    }else{
+        const existingData = await ItemCodeIndex.find()
+                                                .select('itemCode productName -_id')
+                                                .lean()
+        let existingDataSet = new Set()
+        let newDataSet = new Set()
+
+        cleanedJSON.forEach((itemData)=>{
+            newDataSet.add(itemData.itemCode)
+        })
+
+        existingData.forEach((itemData)=>{
+            existingDataSet.add(itemData.itemCode)
+        })
+
+        let toAddDataSet = new Set(
+            [...newDataSet].filter(x => !existingDataSet.has(x)));
+
+        let toAddData = []
+
+        for (const item of toAddDataSet) {
+            let itemToBeAdded = cleanedJSON.filter((x)=>x.itemCode===item)
+            toAddData.push(itemToBeAdded[0])    
+        }
+        
+        await ItemCodeIndex.insertMany(toAddData,{ordered:true} )
+
+        res.status(200).json({message:`Added ${toAddData.length} new item indexes`})
+    }
 })
 
 
