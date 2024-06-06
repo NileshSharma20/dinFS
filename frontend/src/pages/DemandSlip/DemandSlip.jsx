@@ -17,6 +17,7 @@ import useAuth from '../../hooks/useAuth'
 
 // import UserDropdown from "../../components/Dropdown/UserDropdown"
 import "./DemandSlip.css"
+import LegendModal from '../../components/Modals/LegendModal'
 
 function DemandSlip() {
   const dispatch = useDispatch()
@@ -68,6 +69,10 @@ function DemandSlip() {
   /////////////////////////////////////////////////
   //////// Functions /////////////////////////////
   ////////////////////////////////////////////////
+
+  const handleLegendClick=()=>{
+    setLegendFlag(!legendFlag)
+  }
 
   const onFilterChange=(e)=>{
     if(e.target.name==='rawDate'){
@@ -252,9 +257,9 @@ function DemandSlip() {
     
   }
   
-  const handleLegendClick=()=>{
-    setLegendFlag(!legendFlag)
-  }
+  // const handleLegendClick=()=>{
+  //   setLegendFlag(!legendFlag)
+  // }
   
   const handleDateFilter=(rawData)=>{
     if(rawData!==''){
@@ -297,20 +302,20 @@ function DemandSlip() {
   },[filterUsername])
 
   //Pop up handling
-  useEffect(()=>{
-    let handler = (event) => {
-        if(legendFlag && !modalRef.current.contains(event.target) 
-          )
-          {
-              setLegendFlag(false)  
-          }
-    };
-    document.addEventListener("mousedown", handler);
+  // useEffect(()=>{
+  //   let handler = (event) => {
+  //       if(legendFlag && !modalRef.current.contains(event.target) 
+  //         )
+  //         {
+  //             setLegendFlag(false)  
+  //         }
+  //   };
+  //   document.addEventListener("mousedown", handler);
 
-    return()=>{
-    document.removeEventListener("mousedown",handler);
-    }
-  })
+  //   return()=>{
+  //   document.removeEventListener("mousedown",handler);
+  //   }
+  // })
 
   return (
     <>
@@ -322,39 +327,45 @@ function DemandSlip() {
       }}
     >
       <>
-      {legendFlag &&
-        <>
-        <div className="modal-backdrop" ></div> 
-        <div className='legend-modal-container' ref={modalRef}>
+      {legendFlag 
+        &&
+        <LegendModal 
+          data={prodCodeList} 
+          setFlag={setLegendFlag} 
+          flag={legendFlag}
+        />
+      //   <>
+      //   <div className="modal-backdrop" ></div> 
+      //   <div className='legend-modal-container' ref={modalRef}>
             
-            <div className="edit-btn legend-close-btn"
-                onClick={()=>handleLegendClick()}
-            >
-            <AiOutlineClose />
-            </div>
+      //       <div className="edit-btn legend-close-btn"
+      //           onClick={()=>handleLegendClick()}
+      //       >
+      //       <AiOutlineClose />
+      //       </div>
 
-            <div className='ds-prodList-box'>
-              {prodCodeList.map((item,index)=>(
+      //       <div className='ds-prodList-box'>
+      //         {prodCodeList.map((item,index)=>(
                 
-                  <div className='ds-prodList-col' key={index}>
+      //             <div className='ds-prodList-col' key={index}>
 
-                    <div className='ds-prodList-itemCode' >
-                      <span>{index+1}. </span>
-                      <span style={{fontWeight:`bold`}}>
-                        {item.itemCode}: 
-                        </span>
-                    </div>
-                    <div>
+      //               <div className='ds-prodList-itemCode' >
+      //                 <span>{index+1}. </span>
+      //                 <span style={{fontWeight:`bold`}}>
+      //                   {item.itemCode}: 
+      //                   </span>
+      //               </div>
+      //               <div>
 
-                        {item.productName}
-                    </div>
-                  </div>
+      //                   {item.productName}
+      //               </div>
+      //             </div>
                 
-              )
-              )}
-            </div>
-        </div>
-      </>
+      //         )
+      //         )}
+      //       </div>
+      //   </div>
+      // </>
       }
 
       <div className="ds-filter-container">
