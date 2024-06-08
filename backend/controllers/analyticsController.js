@@ -4,6 +4,8 @@ const { endOfDay } = require('date-fns/endOfDay')
 const { startOfDay } = require('date-fns/startOfDay')
 
 const Demandslip = require("../models/demandslipModel")
+const Products = require('../models/productsModel')
+const { createFieldAggregateMongoData } = require('../helper/analyticsHelper')
 
 // @desc   Get Aggreagted Data for Demand Slips
 // @route  GET /api/analytics/demandSlip
@@ -96,6 +98,68 @@ const demandSlipAggregateData = asyncHandler(async (req,res)=>{
     res.status(200).json(aggData)
 })
 
+// @desc   Get Aggreagted Data for Vehicle Models
+// @route  GET /api/analytics/vehicleModel
+// @access Private
+const vehicleModelAggregateData = asyncHandler(async (req,res)=>{
+    const { createLocalFile } = req.query
+
+    // let aggData = []
+
+    const aggData = await Products.aggregate([
+        {
+            $group:{ _id: "$vehicleModel",
+                skus:{ $push:"$sku" }
+            }
+        },{
+            $sort:{_id:1}
+        }
+    ])
+
+    if(!aggData || aggData.length===0){
+        res.status(404)
+        throw new Error('No data found')
+    }
+
+    if(createLocalFile==="true" || createLocalFile){
+        createFieldAggregateMongoData(aggData, "vehicleModel")
+    }
+
+    res.status(200).json(aggData)
+})
+
+// @desc   Get Aggreagted Data for Vehicle Models
+// @route  GET /api/analytics/partNum
+// @access Private
+const partNumberAggregateData = asyncHandler(async (req,res)=>{
+    const { createLocalFile } = req.query
+
+    // let aggData = []
+
+    const aggData = await Products.aggregate([
+        {
+            $group:{ _id: "$partNum",
+                skus:{ $push:"$sku" }
+            }
+        },{
+            $sort:{_id:1}
+        }
+    ])
+
+    if(!aggData || aggData.length===0){
+        res.status(404)
+        throw new Error('No data found')
+    }
+
+    if(createLocalFile==="true" || createLocalFile){
+        createFieldAggregateMongoData(aggData, 'partNum')
+    }
+
+    res.status(200).json(aggData)
+})
+
 module.exports={
-    demandSlipAggregateData
+    demandSlipAggregateData,
+    vehicleModelAggregateData,
+    partNumberAggregateData,
 }

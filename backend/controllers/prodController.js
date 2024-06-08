@@ -300,9 +300,11 @@ const getSKUProd = asyncHandler(async (req,res)=>{
     const bC = req.body.brandCompany? req.body.brandCompany.toUpperCase() : ""
     // const 
 
-    const spaceRemovedPN = req.body.partNum? req.body.partNum.replace(/ /g,"") : ""
-    const cleanedPN = spaceRemovedPN.replace(/-/g,"") 
-    const pN = cleanedPN.toUpperCase()
+    // const spaceRemovedPN = req.body.partNum? req.body.partNum.replace(/ /g,"") : ""
+    // const cleanedPN = spaceRemovedPN.replace(/-/g,"") 
+    const pN = req.body.partNum?req.body.partNum.toUpperCase():""
+    const cleanedPN = pN.replace(/-/g,"") 
+    const pNKeywordList = cleanedPN.split(" ")
 
     const { skuOnlyFlag } = req.params
 
@@ -317,7 +319,6 @@ const getSKUProd = asyncHandler(async (req,res)=>{
             return {vehicleModel:{$regex:keyWord}}
         }))
 
-        // console.log(`vM search Params:${JSON.stringify(vMsearchParams,null,4)}`)
         searchParams = [{
             $or:[
                 {sku:{$regex:vM}},
@@ -326,7 +327,6 @@ const getSKUProd = asyncHandler(async (req,res)=>{
                     ...vMsearchParams
                     ]
                 }
-                // {vehicleModel:{$regex:vM}}, 
             ]
         },
             ...searchParams
@@ -345,15 +345,34 @@ const getSKUProd = asyncHandler(async (req,res)=>{
     }
 
     if(pN!==""){
+        let pNsearchParams = pNKeywordList.map((keyWord=>{
+            return {partNum:{$regex:keyWord}}
+        }))
+
+        let spaceRemovedPN = cleanedPN.replace(/ /g,"")
+
+
         searchParams = [{
             $or:[
-                {sku: { $regex: pN}},
-                {partNum:{$regex:pN}}, 
-
+                {sku:{$regex:spaceRemovedPN.replace(/ /g,"")}},
+                {
+                    $and:[
+                    ...pNsearchParams
+                    ]
+                }
             ]
         },
             ...searchParams
         ]
+
+        // searchParams = [{
+        //     $or:[
+        //         {sku: { $regex: pN}},
+        //         {partNum:{$regex:pN}}, 
+        //     ]
+        // },
+        //     ...searchParams
+        // ]
     }
 
     if(searchParams.length===0){

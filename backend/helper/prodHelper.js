@@ -144,9 +144,9 @@ const createMongoDataBackup = (mongoFile,iC) =>{
     
     fs.writeFile(filePath,csvData, (err)=>{
         if(err){
-            console.log(`createMongoDataBackup(HelperFunction): Error during writing file: ${err}`)
+            console.log(`createMongoDataBackup (HelperFunction): Error during writing file: ${err}`)
         }else{
-            console.log(`createMongoDataBackup(HelperFunction): ${filenameList[iC][0]} File written successfully\n`)
+            console.log(`createMongoDataBackup (HelperFunction): ${filenameList[iC][0]} File written successfully\n`)
         }
     })
 }
@@ -250,7 +250,7 @@ const cleanJsonData = (rawJson) => {
             productName: prodName,
             vehicleModel: spaceRemovedVM,
             brandCompany: spaceRemovedBC,
-            partNum: spaceRemovedPN,
+            partNum: pN,
             mrp: cleanedMRP,
             sku: sku,
             compatibleModels: delimitedCM,
