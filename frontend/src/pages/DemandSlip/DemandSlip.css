@@ -96,6 +96,7 @@
 .ds-new-box{
     width: 80vw;
     min-height: 20vh;
+    height: 100%;
 
     background-color: var(--formBgColor);
     border-radius: 20px;
@@ -106,8 +107,8 @@
     flex-direction: column; */
     display: grid;
     grid-template-columns: 50% 50%;
-   
-}
+    justify-content: flex-start;
+}  
 
 .ds-new-col{
     display: flex;

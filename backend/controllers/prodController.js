@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler')
-const {cleanJsonData, localCSVtoJSON, createMongoDataBackup } = require("../helper/prodHelper")
+const {cleanJsonData, localCSVtoJSON, createMongoDataBackup, cleanItemCodeJsonData } = require("../helper/prodHelper")
 
 // const Shocker = require('../models/shockerModel')
 // const Brakeshoe = require('../models/brakeshoeModel')
@@ -10,6 +10,8 @@ const ItemCodeIndex = require('../models/itemCodeIndexModel')
 
 const dbCollectionList ={
     // "ALL":"productsModel",
+    "ICI":"itemCodeIndexModel",
+    //
     "ACC":"acceleratorcableModel",
     "ARF":"airfilterModel",
     "RSR":"ballracerModel",
@@ -35,8 +37,97 @@ const dbCollectionList ={
     "CRB":"carburetorModel",
     "TCP":"timingchainpadModel",
     "VSG":"visorglassModel",
-    "CFP":"clutchPlateModel"
+    "CFP":"clutchPlateModel",
+    "LKT":'lockkitModel',
+    "SMC":"metercableModel",
+    "RHS":"righthandswitchModel",
     //
+    "ARM":"armatureModel",
+    "BLN":"balancerModel",
+    "BLT":"beltModel",
+    "BPA":"cylinderkitModel",
+    "BLV":"brakeleverModel",
+
+    "BPL":"brakepedalModel",
+    "CNA":"chainadjusterModel",
+    "CHS":"chassisModel",
+    "CCN":"clutchcenterModel",
+    "CGP":"clutchgasketpackingModel",
+
+    "CHB":"clutchhubModel",
+    "CLV":"clutchleverModel",
+    "CPA":"clutchpulleyModel",
+    "CWT":"clutchshoeModel",
+    "CSW":"clutchswitchModel",
+    
+    "CYK":"clutchyokeModel",
+    "CON":"condensorModel",
+    "KPH":"couplinghubModel",
+    "CRA":"crankassemblyModel",
+    "DLV":"discleverModel",
+   
+    "DSP":"discplateModel",
+    "DYK":"discyokeModel",
+    "DRB":"drumrubberModel",
+    "DRM":"drumModel",
+    "TGR":"facedriveModel",
+
+    "FLS":"flasherModel",
+    "RRD":"footrestrodModel",
+    "FAS":"forkassemblyModel",
+    "FBL":"forkballModel",
+    "BRL":"forkbarrelModel",
+
+    "FOS":"forkoilsealModel",
+    "FRD":"forkrodModel",
+    "FSW":"frontstopswitchModel",
+    "FPT":"fuelpetroltapModel",
+    "FTC":"fueltankcapModel",
+    
+    "GBS":"gearboxsprocketModel",
+    "GLV":"gearleverModel",
+    "GPD":"gearpiniondriveModel",
+    "GSF":"gearshaftModel",
+    "GRP":"gripModel",
+
+    "HKT":"halfpackingkitModel",
+    "HND":"handleModel",
+    "HLA":"headlightassemblyModel",
+    "HDO":"headoringModel",
+    "HTC":"htcoilModel",
+    
+    "KKR":"kickpedalModel",
+    "KSF":"kickshaftModel",
+    "LST":"leversetModel",
+    "MGP":"magnetpackingModel",
+    "MSP":"mainstandpinModel",
+
+    "MCA":"mastercylinderassemblyModel",
+    "SMA":"meterassemblyModel",
+    "SMD":"meterdriveModel",
+    "SMP":"meterpinionModel",
+    "SMS":"metersensorModel",
+
+    "OPM":"oilpumpModel",
+    "OWY":"onewayModel",
+    "PKT":"packingkitModel",
+    "PCL":"pickupcoilModel",
+    "PLC":"plugcapModel",
+
+    "PLS":"plugsocketModel",
+    "RSW":"rearstopswitchModel",
+    "RIM":"rimModel",
+    "RLR":"rollerkitModel",
+    "SSM":"selfstartmotorModel",
+
+    "SAS":"suspensionModel",
+    "TLA":"taillightassemblyModel",
+    "TEE":"teeModel",
+    "TKT":"timingchainkitModel",
+    "VOS":"valveoilsealModel",
+
+    "VLV":"valveModel",
+    "VRT":"variatorModel",
 }
 
 // @desc   Get All Products
@@ -67,18 +158,25 @@ const getDataForExportProd = asyncHandler(async (req,res)=>{
     var prod, dbCollection 
     const { itemCode } = req.params
 
-    // Finding right Collection
-    const dbKeys = Object.keys(dbCollectionList)
-    if(dbKeys.includes(itemCode.toUpperCase())){
-        dbCollection = require(`../models/${dbCollectionList[itemCode.toUpperCase()]}`) 
-    }else{
-        res.status(400)
-        throw new Error('Specify Collection')
-    }
-    
-    prod = await dbCollection?.find().lean()
+    // if(itemCode.toUpperCase()==="ALL"){
+    //     prod = await dbCollection?.find().lean()
 
-    createMongoDataBackup(prod,itemCode.toUpperCase())
+    //     createMongoDataBackup(prod,itemCode.toUpperCase())
+    // }else{
+
+        // Finding right Collection
+        const dbKeys = Object.keys(dbCollectionList)
+        if(dbKeys.includes(itemCode.toUpperCase())){
+            dbCollection = require(`../models/${dbCollectionList[itemCode.toUpperCase()]}`) 
+        }else{
+            res.status(400)
+            throw new Error('Specify Collection')
+        }
+        
+        prod = await dbCollection?.find().lean()
+        createMongoDataBackup(prod,itemCode.toUpperCase())
+    // }
+        
 
     res.status(200).json(prod)
 })
@@ -104,29 +202,60 @@ const getItemCodeIndex = asyncHandler(async(req,res)=>{
 })
 
 // @desc   Set Product Name from Item Code 
-// @route  SET /api/index/:itemCode
+// @route  SET /api/prod/index/:itemCode
 // @access Public
 const setItemCodeIndex =asyncHandler(async(req,res)=>{
-    const { itemCode } = req.params 
-    const { productName } = req.body
+    // const { itemCode } = req.params 
+    // const { productName } = req.body
 
-    const indexClone = await ItemCodeIndex
-                            .findOne({itemCode: itemCode.toUpperCase()})
-                            .lean()
-
-    if(indexClone){
-        res.status(409)
-        throw new Error(`Item Code Already Exists`)
-    }
-
-    const indexData = {
-        itemCode:itemCode.toUpperCase(), 
-        productName: productName.toUpperCase()
-    }
-
-    await ItemCodeIndex.create(indexData) 
+    const { rewrite } = req.query
     
-    res.status(200).json(indexData)
+    const { roles } = req
+
+    if(!roles.includes("Admin")){
+        res.status(403)
+        throw new Error("Forbidden")
+    }
+
+    const localJson = localCSVtoJSON("ICI")
+
+    const cleanedJSON = cleanItemCodeJsonData(localJson)
+
+    if(rewrite==="true"){
+        await ItemCodeIndex.deleteMany({})
+        
+        await ItemCodeIndex.insertMany(cleanedJSON,{ordered:true} )
+        
+        res.status(200).json(cleanedJSON)
+    }else{
+        const existingData = await ItemCodeIndex.find()
+                                                .select('itemCode productName -_id')
+                                                .lean()
+        let existingDataSet = new Set()
+        let newDataSet = new Set()
+
+        cleanedJSON.forEach((itemData)=>{
+            newDataSet.add(itemData.itemCode)
+        })
+
+        existingData.forEach((itemData)=>{
+            existingDataSet.add(itemData.itemCode)
+        })
+
+        let toAddDataSet = new Set(
+            [...newDataSet].filter(x => !existingDataSet.has(x)));
+
+        let toAddData = []
+
+        for (const item of toAddDataSet) {
+            let itemToBeAdded = cleanedJSON.filter((x)=>x.itemCode===item)
+            toAddData.push(itemToBeAdded[0])    
+        }
+        
+        await ItemCodeIndex.insertMany(toAddData,{ordered:true} )
+
+        res.status(200).json({message:`Added ${toAddData.length} new item indexes`})
+    }
 })
 
 
@@ -161,17 +290,77 @@ const pushToProduct = asyncHandler(async (req,res)=>{
 // @route  POST /api/prod/search/sku/:skuOnlyFlag
 // @access Public
 const getSKUProd = asyncHandler(async (req,res)=>{
-    const iC = req.body.itemCode?req.body.itemCode.toUpperCase():""
-    const cleanedVM = req.body.vehicleModel?req.body.vehicleModel.toUpperCase():""
-    const vM = cleanedVM.replace(/-/g,"")
-    const bC = req.body.brandCompany?req.body.brandCompany.toUpperCase():""
-    const spaceRemovedPN = req.body.partNum?req.body.partNum.replace(/ /g,""):""
+    const iC = req.body.itemCode? req.body.itemCode.toUpperCase() : ""
+    
+    const cleanedVM = req.body.vehicleModel? req.body.vehicleModel.toUpperCase() : ""
+    // const vM = cleanedVM.replace(/-/g,"")
+    const vM = cleanedVM.replace(/-/g," ")
+    const vMKeywordList = cleanedVM.split(" ")
+    
+    const bC = req.body.brandCompany? req.body.brandCompany.toUpperCase() : ""
+    // const 
+
+    const spaceRemovedPN = req.body.partNum? req.body.partNum.replace(/ /g,"") : ""
     const cleanedPN = spaceRemovedPN.replace(/-/g,"") 
     const pN = cleanedPN.toUpperCase()
 
     const { skuOnlyFlag } = req.params
 
     let prod, dbCollection
+    let searchParams = [
+        // {sku: { $regex: iC}},
+    ]
+
+    // Defining Fields to be searched based on input
+    if(vM!==""){
+        let vMsearchParams = vMKeywordList.map((keyWord=>{
+            return {vehicleModel:{$regex:keyWord}}
+        }))
+
+        // console.log(`vM search Params:${JSON.stringify(vMsearchParams,null,4)}`)
+        searchParams = [{
+            $or:[
+                {sku:{$regex:vM}},
+                {
+                    $and:[
+                    ...vMsearchParams
+                    ]
+                }
+                // {vehicleModel:{$regex:vM}}, 
+            ]
+        },
+            ...searchParams
+        ]
+    }
+
+    if(bC!==""){
+        searchParams = [{
+            $or:[
+                {sku: { $regex: bC}},
+                {brandCompany:{$regex:bC}}, 
+            ]
+        },
+            ...searchParams
+        ]
+    }
+
+    if(pN!==""){
+        searchParams = [{
+            $or:[
+                {sku: { $regex: pN}},
+                {partNum:{$regex:pN}}, 
+
+            ]
+        },
+            ...searchParams
+        ]
+    }
+
+    if(searchParams.length===0){
+        searchParams=[
+            {sku:{$regex:iC}}
+        ]
+    }
 
     // Finding right Collection
     const dbKeys = Object.keys(dbCollectionList)
@@ -184,19 +373,14 @@ const getSKUProd = asyncHandler(async (req,res)=>{
 
     if(skuOnlyFlag==="true"){
         prod = await dbCollection.find({ $and:[
-            {sku: { $regex: iC}}, 
-            {sku: { $regex: vM}}, 
-            {sku: { $regex: bC}}, 
-            {sku: { $regex: pN}}
+            ...searchParams
         ]})
         .select('sku itemCode productName vehicleModel brandCompany partNum metaData -_id')
         .lean()
     }else if(skuOnlyFlag==="false"){
+        // console.log(`searchParams:${JSON.stringify(searchParams,null,4)}`)
         prod = await dbCollection.find({ $and:[
-            {sku: { $regex: iC}}, 
-            {sku: { $regex: vM}}, 
-            {sku: { $regex: bC}}, 
-            {sku: { $regex: pN}}
+            ...searchParams
         ]},{__v:0})
         .lean()
     }
@@ -274,10 +458,10 @@ const setManyProd = asyncHandler(async (req,res)=>{
     const { itemCode } = req.body
     
     const localJson = localCSVtoJSON(itemCode.toUpperCase())
-    // console.log(`localCSVtoJSON length:${localJson.length}`)
+    console.log(`localCSVtoJSON length:${localJson.length}`)
     
     const cleanedJSON = cleanJsonData(localJson)
-    // console.log(`cleanedJSON length:${cleanedJSON.length}`)
+    console.log(`cleanedJSON length:${cleanedJSON.length}`)
 
     const options = { ordered: true };
 

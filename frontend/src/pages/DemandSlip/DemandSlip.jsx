@@ -17,9 +17,12 @@ import useAuth from '../../hooks/useAuth'
 
 // import UserDropdown from "../../components/Dropdown/UserDropdown"
 import "./DemandSlip.css"
+import LegendModal from '../../components/Modals/LegendModal'
 
 function DemandSlip() {
   const dispatch = useDispatch()
+
+  const modalRef = useRef()
 
   const { isAdmin, isManager } = useAuth()
   
@@ -66,6 +69,10 @@ function DemandSlip() {
   /////////////////////////////////////////////////
   //////// Functions /////////////////////////////
   ////////////////////////////////////////////////
+
+  const handleLegendClick=()=>{
+    setLegendFlag(!legendFlag)
+  }
 
   const onFilterChange=(e)=>{
     if(e.target.name==='rawDate'){
@@ -122,6 +129,8 @@ function DemandSlip() {
     }
 
     dispatch(getFilteredDemandSlips(filterParams))
+
+    
   }
   
   const handleCreateClick=()=>{
@@ -156,6 +165,8 @@ function DemandSlip() {
     setFulfilledFlag(false)
     
     setAllFlag(true)
+
+    
   }
   
   const handlePendingClick=()=>{
@@ -179,6 +190,8 @@ function DemandSlip() {
     setFulfilledFlag(false)
     
     setPendingFlag(true)
+
+    
   }
   
   const handlePartialClick=()=>{
@@ -198,6 +211,8 @@ function DemandSlip() {
       setFulfilledFlag(false)
       
       setPartialFlag(true)
+
+      
     }
   
   const handleFailedClick=()=>{
@@ -217,6 +232,8 @@ function DemandSlip() {
     setFulfilledFlag(false)
     
     setFailedFlag(true)
+
+    
   }
   
   const handleFulfilledClick=()=>{
@@ -236,11 +253,13 @@ function DemandSlip() {
     setPartialFlag(false)
     
     setFulfilledFlag(true)
+    
+    
   }
   
-  const handleLegendClick=()=>{
-    setLegendFlag(!legendFlag)
-  }
+  // const handleLegendClick=()=>{
+  //   setLegendFlag(!legendFlag)
+  // }
   
   const handleDateFilter=(rawData)=>{
     if(rawData!==''){
@@ -282,6 +301,22 @@ function DemandSlip() {
 
   },[filterUsername])
 
+  //Pop up handling
+  // useEffect(()=>{
+  //   let handler = (event) => {
+  //       if(legendFlag && !modalRef.current.contains(event.target) 
+  //         )
+  //         {
+  //             setLegendFlag(false)  
+  //         }
+  //   };
+  //   document.addEventListener("mousedown", handler);
+
+  //   return()=>{
+  //   document.removeEventListener("mousedown",handler);
+  //   }
+  // })
+
   return (
     <>
     {!token && <LoginAgainModal />}
@@ -292,24 +327,45 @@ function DemandSlip() {
       }}
     >
       <>
-      {legendFlag &&
-        <>
-        <div className="modal-backdrop" ></div> 
-        <div className='modal-container'>
-            <div className="edit-btn"
-                onClick={()=>handleLegendClick()}
-            >
-            <AiOutlineClose />
-            </div>
-            <div className='ds-new-box'>
-              {prodCodeList.map((item,index)=>{
-                return(
-                  <p key={index}><span style={{fontWeight:`bold`}}>{item.itemCode}: </span>{item.productName}</p>
-                )
-              })}
-            </div>
-        </div>
-      </>
+      {legendFlag 
+        &&
+        <LegendModal 
+          data={prodCodeList} 
+          setFlag={setLegendFlag} 
+          flag={legendFlag}
+        />
+      //   <>
+      //   <div className="modal-backdrop" ></div> 
+      //   <div className='legend-modal-container' ref={modalRef}>
+            
+      //       <div className="edit-btn legend-close-btn"
+      //           onClick={()=>handleLegendClick()}
+      //       >
+      //       <AiOutlineClose />
+      //       </div>
+
+      //       <div className='ds-prodList-box'>
+      //         {prodCodeList.map((item,index)=>(
+                
+      //             <div className='ds-prodList-col' key={index}>
+
+      //               <div className='ds-prodList-itemCode' >
+      //                 <span>{index+1}. </span>
+      //                 <span style={{fontWeight:`bold`}}>
+      //                   {item.itemCode}: 
+      //                   </span>
+      //               </div>
+      //               <div>
+
+      //                   {item.productName}
+      //               </div>
+      //             </div>
+                
+      //         )
+      //         )}
+      //       </div>
+      //   </div>
+      // </>
       }
 
       <div className="ds-filter-container">

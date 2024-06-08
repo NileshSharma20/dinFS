@@ -4,6 +4,9 @@ const Papa = require('papaparse');
 const ItemCodeIndex = require('../models/itemCodeIndexModel')
 
 const filenameList ={
+    "ALL":["productsMongo.csv"],
+    "ICI":["itemCodeIndexMongo.csv", "itemCodeIndexUpdated.csv"],
+    //
     "SKR":["shockerMongo.csv","shockerUpdated.csv"],
     "BSH":["brakeShoeMongo.csv", "brakeShoeUpdated.csv"],
     "DPD":["discpadMongo.csv", "discpadUpdated.csv"],
@@ -16,7 +19,6 @@ const filenameList ={
     "MSN":["mainStandMongo.csv", "mainStandUpdated.csv"],
     "CFA":["clutchAssemblyMongo.csv","clutchAssemblyUpdated.csv"],
     "ACC":["acceleratorCableMongo.csv","acceleratorCableUpdated.csv"],
-    //
     "CMA":["camShaftMongo.csv","camShaftUpdated.csv"],
     "CDI":["cdiMongo.csv","cdiUpdated.csv"],
     "CCC":["clutchCableMongo.csv","clutchCableUpdated.csv"],
@@ -30,7 +32,82 @@ const filenameList ={
     "CRB":["carburetorMongo.csv","carburetorUpdated.csv"],
     "TCP":["timingChainPadMongo.csv","timingChainPadUpdated.csv"],
     "VSG":["visorGlassMongo.csv","visorGlassUpdated.csv"],
-    "CFP":["clutchPlateMongo.csv","clutchPlateUpdated.csv"]
+    "CFP":["clutchPlateMongo.csv","clutchPlateUpdated.csv"],
+    "LKT":["lockKitMongo.csv","lockKitUpdated.csv"],
+    "SMC":["meterCableMongo.csv","meterCableUpdated.csv"],
+    "RHS":["rightHandSwitchMongo.csv","rightHandSwitchUpdated.csv"],
+    "ARM":["armatureMongo.csv","armatureUpdated.csv"],
+    "BLN":["balancerMongo.csv","balancerUpdated.csv"],
+    "BLT":["beltMongo.csv","beltUpdated.csv"],
+    "BPA":["blockPistonAssebmlyCylinderKitMongo.csv","blockPistonAssebmlyCylinderKitUpdated.csv"],
+    "BLV":["brakeLeverMongo.csv","brakeLeverUpdated.csv"],
+    "BPL":["brakePedalMongo.csv","brakePedalUpdated.csv"],
+    "CNA":["chainAdjusterMongo.csv","chainAdjusterUpdated.csv"],
+    "CHS":["chassisMongo.csv","chassisUpdated.csv"],
+    "CCN":["clutchCenterMongo.csv","clutchCenterUpdated.csv"],
+    "CGP":["clutchGasketPackingMongo.csv","clutchGasketPackingUpdated.csv"],
+    "CHB":["clutchHubMongo.csv","clutchHubUpdated.csv"],
+    "CLV":["clutchLeverUpadted.csv","clutchLeverUpadted.csv"],
+    "CPA":["clutchPulleyAssemblyMongo.csv","clutchPulleyAssemblyUpdated.csv"],
+    "CWT":["clutchShoeMongo.csv","clutchShoeUpdated.csv"],
+    "CSW":["clutchSwitchMongo.csv","clutchSwitchUpdated.csv"],
+    "CYK":["clutchYokeMongo.csv","clutchYokeUpdated.csv"],
+    "CON":["condensorMongo.csv","condensorUpdated.csv"],
+    "KPH":["couplingHubMongo.csv","couplingHubUpdated.csv"],
+    "CRA":["crankAssemblyMongo.csv","crankAssemblyUpdated.csv"],
+    "DLV":["discLeverMongo.csv","discLeverUpdated.csv"],
+    "DSP":["discPlateMongo.csv","discPlateUpdated.csv"],
+    "DYK":["discYokeMongo.csv","discYokeUpdated.csv"],
+    "DRB":["drumRubberMongo.csv","drumRubberUpdated.csv"],
+    "DRM":["drumMongo.csv","drumUpdated.csv"],
+    "TGR":["faceDriveMongo.csv","faceDriveUpdated.csv"],
+    "FLS":["flasherMongo.csv","flasherUpdated.csv"],
+    "RRD":["footRestRodMongo.csv","footRestRodUpdated.csv"],
+    "FAS":["forkAssemblyMongo.csv","forkAssemblyUpdated.csv"],
+    "FBL":["forkBallMongo.csv","forkBallUpdated.csv"],
+    "BRL":["forkBarrelMongo.csv","forkBarrelUpdated.csv"],
+    "FOS":["forkOilSealMongo.csv","forkOilSealUpdated.csv"],
+    "FRD":["forkRodMongo.csv","forkRodUpdated.csv"],
+    "FSW":["frontStopSwitchMongo.csv","frontStopSwitchUpdated.csv"],
+    "FPT":["fuelPetrolTapMongo.csv","fuelPetrolTapUpdated.csv"],
+    "FTC":["fuelTankCapMongo.csv","fuelTankCapUpdated.csv"],
+    "GBS":["gearBoxSprocketMongo.csv","gearBoxSprocketUpdated.csv"],
+    "GLV":["gearLeverMongo.csv","gearLeverUpdated.csv"],
+    "GPD":["gearPinionDriveMongo.csv","gearPinionDriveUpdated.csv"],
+    "GSF":["gearShaftMongo.csv","gearShaftUpdated.csv"],
+    "GRP":["gripMongo.csv","gripUpdated.csv"],
+    "HKT":["halfPackingKitMongo.csv","halfPackingKitUpdated.csv"],
+    "HND":["handleMongo.csv","handleUpdated.csv"],
+    "HLA":["headLightAssemblyMongo.csv","headLightAssemblyUpdated.csv"],
+    "HDO":["headOringMongo.csv","headOringUpdated.csv"],
+    "HTC":["htCoilMongo.csv","htCoilUpdated.csv"],
+    "KKR":["kickPedalMongo.csv","kickPedalUpdated.csv"],
+    "KSF":["kickShaftMongo.csv","kickShaftUpdated.csv"],
+    "LST":["leverSetMongo.csv","leverSetUpdated.csv"],
+    "MGP":["magnetPackingMongo.csv","magnetPackingUpdated.csv"],
+    "MSP":["mainStandPinMongo.csv","mainStandPinUpdated.csv"],
+    "MCA":["masterCylinderAssemblyMongo.csv","masterCylinderAssemblyUpdated.csv"],
+    "SMA":["meterAssemblyMongo.csv","meterAssemblyUpdated.csv"],
+    "SMD":["meterDriveMongo.csv","meterDriveUpdated.csv"],
+    "SMP":["meterPinionMongo.csv","meterPinionUpdated.csv"],
+    "SMS":["meterSensorMongo.csv","meterSensorUpdated.csv"],
+    "OPM":["oilPumpMongo.csv","oilPumpUpdated.csv"],
+    "OWY":["oneWayMongo.csv","oneWayUpdated.csv"],
+    "PKT":["packingKitMongo.csv","packingKitUpdated.csv"],
+    "PCL":["pickUpCoilMongo.csv","pickUpCoilUpdated.csv"],
+    "PLC":["plugCapMongo.csv","plugCapUpdated.csv"],
+    "PLS":["plugSocketMongo.csv","plugSocketUpdated.csv"],
+    "RSW":["rearStopSwitchMongo.csv","rearStopSwitchUpdated.csv"],
+    "RIM":["rimMongo.csv","rimUpdated.csv"],
+    "RLR":["rollerKitMongo.csv","rollerKitUpdated.csv"],
+    "SSM":["selfStartMotorMongo.csv","selfStartMotorUpdated.csv"],
+    "SAS":["suspensionMongo.csv","suspensionUpdated.csv"],
+    "TLA":["tailLightAssemblyMongo.csv","tailLightAssemblyUpdated.csv"],
+    "TEE":["teeMongo.csv","teeUpdated.csv"],
+    "TKT":["timingChainKitMongo.csv","timingChainKitUpdated.csv"],
+    "VOS":["valveOilSealMongo.csv","valveOilSealUpdated.csv"],
+    "VLV":["valveMongo.csv","valveUpdated.csv"],
+    "VRT":["variatorMongo.csv","variatorUpdated.csv"],
 }
 
 // @desc   Clean Mongo Collection data and save it locally
@@ -71,7 +148,7 @@ const createMongoDataBackup = (mongoFile,iC) =>{
         if(err){
             console.log(`createMongoDataBackup(HelperFunction): Error during writing file: ${err}`)
         }else{
-            console.log(`createMongoDataBackup(HelperFunction): File written successfully\n`)
+            console.log(`createMongoDataBackup(HelperFunction): ${filenameList[iC][0]} File written successfully\n`)
         }
     })
 }
@@ -85,14 +162,14 @@ const localCSVtoJSON = (iC) => {
     if(dbKeys.includes(iC)){
         csvFile = `../CsvData/${ filenameList[iC][1] }` 
     }else{
-        csvFile = '../CsvData/shockerUpdated.csv'
+        throw new Error('ItemCode not found')
     }
 
     const csvData = fs.readFileSync(csvFile, 'utf8');
 
     const jsonData = Papa.parse(csvData, { header: true });
 
-    console.log(`${iC}:${JSON.stringify(jsonData.data[0],null,4)}`)
+    // console.log(`localCSVtoJSON helper:\n${iC}:${JSON.stringify(jsonData.data[0],null,4)}`)
 
     return jsonData.data
 }
@@ -200,8 +277,36 @@ return cleanedData
 
 }
 
+// @desc Clean raw ItemCode JSON
+const cleanItemCodeJsonData = (rawJson) => {
+    var cleanedData = []
+
+    if(!rawJson || rawJson.length===0){
+        cleanedData=[]
+    }else{
+        cleanedData =rawJson.filter((item=>item.itemCode && item.productName)).map((itemData)=>{
+            var cleanedItemCode = ""
+            var cleanedProductName = ""
+
+            cleanedItemCode = itemData.itemCode.toUpperCase()
+            cleanedItemCode = cleanedItemCode.replace(/ /g,"")
+
+            cleanedProductName = itemData.productName.toUpperCase()
+            cleanedProductName = cleanedProductName.replace(/ /g,"")
+
+            return{
+                itemCode: cleanedItemCode,
+                productName: cleanedProductName
+            }
+        })
+    }
+
+    return cleanedData
+}
+
 module.exports = {
     cleanJsonData,
     localCSVtoJSON,
     createMongoDataBackup,
+    cleanItemCodeJsonData,
 }

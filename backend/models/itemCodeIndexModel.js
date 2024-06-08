@@ -7,7 +7,7 @@ const itemCodeIndexSchema = mongoose.Schema({
     },   
     productName:{
         type: String,
-        required: [true, 'Please add the Model/s']
+        required: [true, 'Please add the Product Name']
     }
     },
     {
