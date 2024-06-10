@@ -10,7 +10,7 @@ const ItemCodeIndex = require('../models/itemCodeIndexModel')
 const axios = require('axios')
 
 const dbCollectionList ={
-    "ALL":"productsModel",
+    // "ALL":"productsModel",
     // "ICI":"itemCodeIndexModel",
     //
     "ACC":"acceleratorcableModel",
