@@ -11,7 +11,9 @@ const {getAllProd,
        setManyProd,
        updateProd,
        deleteProd,
-       deleteAllProd} = require('../controllers/prodController')
+       deleteAllProd,
+       addNewFields,
+       addNewFieldsBatch} = require('../controllers/prodController')
 
 const verifyJWT = require('../middleware/verifyJWT')
        
@@ -42,9 +44,13 @@ router.route('/search/:searchKey')
 router.post('/upload/multiple',verifyJWT, setManyProd)
 // router.post('/upload',verifyJWT, setManyProd)
 
+router.put('/addNewField/:itemCode',verifyJWT, addNewFields)
+
 router.route('/:sku')
        .patch(verifyJWT, updateProd)
        .delete(verifyJWT, deleteProd)
+
+// router.put('/batchUpdate/madness',verifyJWT, addNewFieldsBatch)
 
 
 module.exports = router

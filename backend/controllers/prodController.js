@@ -7,10 +7,11 @@ const {cleanJsonData, localCSVtoJSON, createMongoDataBackup, cleanItemCodeJsonDa
 // const Mobilfilter = require('../models/mobilFilterModel')
 const Products = require('../models/productsModel')
 const ItemCodeIndex = require('../models/itemCodeIndexModel')
+const axios = require('axios')
 
 const dbCollectionList ={
-    // "ALL":"productsModel",
-    "ICI":"itemCodeIndexModel",
+    "ALL":"productsModel",
+    // "ICI":"itemCodeIndexModel",
     //
     "ACC":"acceleratorcableModel",
     "ARF":"airfilterModel",
@@ -412,20 +413,38 @@ const getSKUProd = asyncHandler(async (req,res)=>{
 // @route  GET /api/prod/search/:searchKey
 // @access Public
 const searchAll = asyncHandler(async(req,res)=>{
-    const searchKey = req.params.searchKey.toUpperCase()
+    const { testSearch } = req.query
+    const searchKey = req.params.searchKey.trim().toUpperCase()
 
-    const response = await Products.find({$or:[
-        {itemCode:{$regex: searchKey}},
-        {productName:{$regex: searchKey}},
-        {vehicleModel:{$regex: searchKey}},
-        {brandCompany:{$regex: searchKey}},
-        {partNum:{$regex: searchKey}},
-        {sku:{$regex: searchKey}},
-    ]})
-    .lean()
-    // .select('sku -_id')
-    
-    res.status(200).json(response)
+    const searchKeyList  = searchKey.split(" ")
+    let searchParams = []
+
+    if(searchKeyList && searchKeyList.length!==0){
+        searchParams = searchKeyList.map(keyWord=>{
+            return {productFullName:{$regex:keyWord}}
+        }) 
+    }
+
+    // if(testSearch==="true"){
+        const response = await Products.find({ $and:[
+            ...searchParams
+        ]})
+
+        res.status(200).json(response) 
+    // }else{
+    //     const response = await Products.find({$or:[
+    //                     {itemCode:{$regex: searchKey}},
+    //                     {productName:{$regex: searchKey}},
+    //                     {vehicleModel:{$regex: searchKey}},
+    //                     {brandCompany:{$regex: searchKey}},
+    //                     {partNum:{$regex: searchKey}},
+    //                     {sku:{$regex: searchKey}},
+    //                     ]})
+    //                     .lean()
+    // // .select('sku -_id')
+
+    // res.status(200).json(response)
+    // }
 })
 
 // @desc   Set Product 
@@ -539,6 +558,90 @@ const updateProd = asyncHandler(async (req,res)=>{
     res.status(200).json({message:`Updated ${sku}`})
 })
 
+const addNewFields = asyncHandler(async (req,res)=>{
+    const { roles } = req
+    const { itemCode } = req.params
+
+    if(!roles.includes("Admin")){
+        res.status(403)
+        throw new Error("Forbidden")
+    }
+
+    let dbCollection
+
+    // Finding right Collection
+    const dbKeys = Object.keys(dbCollectionList)
+    if(dbKeys.includes(itemCode.toUpperCase() )){
+        dbCollection = require(`../models/${dbCollectionList[itemCode.toUpperCase()]}`) 
+    }else{
+        res.status(400)
+        throw new Error('Specify Collection')
+    }
+
+    var prodFullNameQuery = {"$concat":["$productName"," ","$vehicleModel"]}
+
+    await dbCollection.aggregate([
+        {
+            $project:{
+                _id:"$_id",
+                productFullName:{$concat:[
+                                    "$productName"," ",
+                                    "$vehicleModel"," ",
+                                    "$brandCompany"," ",
+                                    "$partNum"
+                                ]},
+                qty:"0",
+                unit:"PC"
+            }
+        },
+        {
+            $merge:{
+                into:dbCollection.collection.collectionName,
+                on:"_id"
+            }
+        }
+    ])
+
+    // const results = await dbCollection.updateMany({}, 
+    //                             {$set:{"productFullName":{$concat:["Name","-"]},
+    //                                 "qty":"0",
+    //                                 "unit":"SET",
+    //                             }})
+
+    res.status(200).json({message:`Updated ${itemCode.toUpperCase()}`})
+})
+
+
+// const addNewFieldsBatch = asyncHandler(async (req,res)=>{
+//     const { roles } = req
+
+//     if(!roles.includes("Admin")){
+//         res.status(403)
+//         throw new Error("Forbidden")
+//     }
+
+//     const waitFor = (ms) => new Promise(r => setTimeout(r, ms));
+
+//     async function asyncForEach(array, callback) {
+//         for (let index = 0; index < array.length; index++) {
+//           await callback(array[index], index, array);
+//         }
+//       }
+
+//     const keysList = Object.keys(testCollectionMap)
+
+//     const start = async () => {
+//     await asyncForEach(keysList, async (itemData) => {
+//         await axios.put(`http://localhost:5000/api/prod/addNewField/`+`${itemData}`);
+//         console.log(itemData);
+//     });
+//     console.log(`Done`);
+//     }
+//     start();
+
+//     res.status(200).json(keysList)
+// })
+
 // @desc   Delete specific Product
 // @route  DELETE /api/prod/:sku
 // @access Private
@@ -606,4 +709,6 @@ module.exports = {
     updateProd,
     deleteProd,
     deleteAllProd,
+    addNewFields,
+    // addNewFieldsBatch,
 }

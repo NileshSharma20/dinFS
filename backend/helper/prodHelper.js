@@ -167,7 +167,7 @@ const localCSVtoJSON = (iC) => {
 
     const jsonData = Papa.parse(csvData, { header: true });
 
-    // console.log(`localCSVtoJSON helper:\n${iC}:${JSON.stringify(jsonData.data[0],null,4)}`)
+    console.log(`localCSVtoJSON helper:\n${iC}:${JSON.stringify(jsonData.data[0],null,4)}`)
 
     return jsonData.data
 }
@@ -184,6 +184,7 @@ const cleanJsonData = (rawJson) => {
     cleanedData = rawJson.filter((item=>item.itemCode && item.productName && item.vehicleModel && item.brandCompany && item.partNum && item.mrp)).map((prod)=>{
         // console.log(`rawJSON:${JSON.stringify(rawJson)}`)
         var sku=""
+        var productFullName = ""
         var metaData = []
 
         const cleanedProdName = prod.productName.toUpperCase()
@@ -223,6 +224,14 @@ const cleanJsonData = (rawJson) => {
         const spaceRemovedMRP = prod.mrp?prod.mrp.replace(/ /g,''):""
         var cleanedMRP = spaceRemovedMRP.replace(/,/g,'')
 
+        //qty cleanup
+        const spaceRemovedQty = prod.qty?prod.qty.replace(/ /g,''):""
+        var cleanedQty = spaceRemovedQty.replace(/,/g,'')
+
+        //unit cleanup
+        const spaceRemovedUnit = prod.unit?prod.unit.replace(/ /g,''):""
+        var cleanedUnit = spaceRemovedUnit.toUpperCase()
+
         //compatibleModels cleanup and conversion to Array
         const spaceRemovedCM = prod.compatibleModels?prod.compatibleModels.replace(/ /g,''):""
         var delimitedCM = spaceRemovedCM.split(',')
@@ -230,11 +239,16 @@ const cleanJsonData = (rawJson) => {
         //SKU generation
         sku = iC+"-"+vM+"-"+bC+"-"+pN
 
+        //Product Full Name generation
+        productFullName = prodName + " " + spaceRemovedVM + " " + spaceRemovedBC + " " + pN
+
         const prodClone = Object.assign({},prod)
         delete prodClone.itemCode
         delete prodClone.productName
         delete prodClone.vehicleModel
         delete prodClone.brandCompany
+        delete prodClone?.qty
+        delete prodClone?.unit
         delete prodClone.partNum
         delete prodClone.mrp
         delete prodClone.compatibleModels
@@ -248,16 +262,21 @@ const cleanJsonData = (rawJson) => {
         return {
             itemCode: iC,
             productName: prodName,
+            productFullName: productFullName,
             vehicleModel: spaceRemovedVM,
             brandCompany: spaceRemovedBC,
             partNum: pN,
             mrp: cleanedMRP,
+            qty:cleanedQty,
+            unit:cleanedUnit,
             sku: sku,
             compatibleModels: delimitedCM,
             metaData: metaData
         }
     })
 }  
+
+console.log(`cleanJsonData helper:\n${JSON.stringify(cleanedData[0],null,4)}`)
 
 return cleanedData
 
