@@ -423,9 +423,27 @@ const searchAll = asyncHandler(async(req,res)=>{
         }) 
     }
 
+    // searchParams = [{
+    //     $or:[
+    //         {sku:{$regex:searchKey}},
+    //         {
+    //             $and:[
+    //                 ...searchParams
+    //             ]
+    //         }
+    //     ]
+    // }]
+
+    // console.log(`sP: ${JSON.stringify(searchParams,null,4)}`)
+
     // if(testSearch==="true"){
-        const response = await Products.find({ $and:[
-            ...searchParams
+        const response = await Products.find({ $or:[
+            {sku:{$regex:searchKey}},
+            {
+                $and:[
+                    ...searchParams
+                ]
+            }
         ]})
 
         res.status(200).json(response) 

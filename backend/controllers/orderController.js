@@ -372,26 +372,22 @@ const updateAfterDelivery = asyncHandler(async(req,res)=>{
         totalCost: demandSlip.totalCost
     }
 
-    // recievedProductList=[
-        // {sku: skuValue
-        // ,productFullName,
-        // quantity:qtyValue},
-    //     {sku,productFullName,quantity},
-    //         .
-    //         .
-    //         .
-    //     {sku,productFullName,quantity},
-    // ]
-    let toUpdateProdList = demandSlip.recievedProductList
+    // Update Quantity of Recieved Products
+    // let toUpdateProdList = demandSlip.recievedProductList
 
-    for(const itemData of toUpdateProdList){
-        console.log(`sku:${JSON.stringify(itemData,null,4)}`)    
-        
-        await Products.updateOne({sku:itemData.sku},
-            {$inc:{qty:itemData.quantity}},
-            {upsert:false}
-        )
-    }
+    // for(const itemData of toUpdateProdList){ 
+    //     let partNumber = itemData.sku.split("-")[3]
+    //     console.log(`pN: ${partNumber}`)           
+    //     await Products.updateMany({$or:[
+    //                                 {sku:itemData.sku},
+    //                                 {sku:{$regex:partNumber}}
+    //                             ]},
+    //         {$inc:{qty:itemData.quantity}},
+    //         {upsert:false}
+    //     )
+    // }
+
+    // res.status(200).json(demandSlip)
 
     const demandHistory =  await DemandslipHistory.create(demandBackup)
     const updatedDemandslip = await demandSlip.save()

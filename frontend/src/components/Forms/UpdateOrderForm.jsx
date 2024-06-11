@@ -255,17 +255,19 @@ function UpdateOrderForm({ initialValue, setFlag}) {
 
             {formData.status==="partial" &&
 
-            <div className="form-group">
-                <div className="card-grid-row">
+            <div className="form-group" style={{width:`100%`}}>
+                <div className="card-grid-row card-grid-row-partial ">
                     <h3></h3>
-                    <label>Products</label>
-                    <h3>Ordered</h3>
-                    <h3>Recieved</h3>
+                    <h3>Products</h3>
+                    <h3>Ord.</h3>
+                    <h3>Recv.</h3>
                 </div>
+
+                {/* {console.log(`prodData:${JSON.stringify(formData,null,4)}`)} */}
                 {formData.recievedProductList.map((prod,k)=>{
                     return(
 
-                    <div className="card-grid-row" key={k}>
+                    <div className="card-grid-row card-grid-row-partial " key={k}>
                         <p>{k+1}.</p>
 
                         {/* <p>{prod.sku}</p>
@@ -277,7 +279,9 @@ function UpdateOrderForm({ initialValue, setFlag}) {
                             <p>{prod.sku}</p>
                         </div>
 
-                        <p>{prod.quantity}</p>
+                        <p>
+                            {formData.orderedProductList.filter((x)=>x.sku===prod.sku)[0].quantity}
+                        </p>
                         
                         <input
                             type="text" 
