@@ -12,7 +12,6 @@ const axios = require('axios')
 const dbCollectionList ={
     // "ALL":"productsModel",
     // "ICI":"itemCodeIndexModel",
-    //
     "ACC":"acceleratorcableModel",
     "ARF":"airfilterModel",
     "RSR":"ballracerModel",
@@ -42,7 +41,6 @@ const dbCollectionList ={
     "LKT":'lockkitModel',
     "SMC":"metercableModel",
     "RHS":"righthandswitchModel",
-    //
     "ARM":"armatureModel",
     "BLN":"balancerModel",
     "BLT":"beltModel",
@@ -425,9 +423,27 @@ const searchAll = asyncHandler(async(req,res)=>{
         }) 
     }
 
+    // searchParams = [{
+    //     $or:[
+    //         {sku:{$regex:searchKey}},
+    //         {
+    //             $and:[
+    //                 ...searchParams
+    //             ]
+    //         }
+    //     ]
+    // }]
+
+    // console.log(`sP: ${JSON.stringify(searchParams,null,4)}`)
+
     // if(testSearch==="true"){
-        const response = await Products.find({ $and:[
-            ...searchParams
+        const response = await Products.find({ $or:[
+            {sku:{$regex:searchKey}},
+            {
+                $and:[
+                    ...searchParams
+                ]
+            }
         ]})
 
         res.status(200).json(response) 
@@ -558,6 +574,9 @@ const updateProd = asyncHandler(async (req,res)=>{
     res.status(200).json({message:`Updated ${sku}`})
 })
 
+// @desc   Update specific Product
+// @route  PATCH /api/prod/:sku
+// @access Private
 const addNewFields = asyncHandler(async (req,res)=>{
     const { roles } = req
     const { itemCode } = req.params
@@ -568,47 +587,44 @@ const addNewFields = asyncHandler(async (req,res)=>{
     }
 
     let dbCollection
-
-    // Finding right Collection
     const dbKeys = Object.keys(dbCollectionList)
+
+    
+    // for(const iCode in dbCollectionList){
+        // Finding right Collection
     if(dbKeys.includes(itemCode.toUpperCase() )){
         dbCollection = require(`../models/${dbCollectionList[itemCode.toUpperCase()]}`) 
     }else{
         res.status(400)
         throw new Error('Specify Collection')
     }
-
-    var prodFullNameQuery = {"$concat":["$productName"," ","$vehicleModel"]}
-
-    await dbCollection.aggregate([
-        {
-            $project:{
-                _id:"$_id",
-                productFullName:{$concat:[
-                                    "$productName"," ",
-                                    "$vehicleModel"," ",
-                                    "$brandCompany"," ",
-                                    "$partNum"
-                                ]},
-                qty:"0",
-                unit:"PC"
-            }
-        },
-        {
-            $merge:{
-                into:dbCollection.collection.collectionName,
+        
+        await dbCollection.aggregate([
+            {
+                $project:{
+                    _id:"$_id",
+                qty:{$toInt:"$qty"},
+                }
+            },
+            {
+                $merge:{
+                    into:dbCollection.collection.collectionName,
                 on:"_id"
+                }
             }
-        }
-    ])
+        ])
+    // }
+                        
+                        // const results = await dbCollection.updateMany({}, 
+                        // unit:"PC"
+                        // productFullName:{$concat:[
+                        //                     "$productName"," ",
+                        //                     "$vehicleModel"," ",
+                        //                     "$brandCompany"," ",
+                        //                     "$partNum"
+                        //                 ]},
 
-    // const results = await dbCollection.updateMany({}, 
-    //                             {$set:{"productFullName":{$concat:["Name","-"]},
-    //                                 "qty":"0",
-    //                                 "unit":"SET",
-    //                             }})
-
-    res.status(200).json({message:`Updated ${itemCode.toUpperCase()}`})
+    res.status(200).json({message:`Updated All in List`})
 })
 
 

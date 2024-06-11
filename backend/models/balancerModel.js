@@ -9,18 +9,6 @@ const balancerSchema = mongoose.Schema({
         type: String,
         default: "BALANCER",
     },
-    productFullName:{
-        type: String,
-        required: [true, 'Please Add Product Full Name']
-    },  
-    qty:{
-        type:String,
-        default:'0',
-    },
-    unit:{
-        type: String,
-        required:[true, 'Please Add Unit']
-    },
     vehicleModel:{
         type: String,
         required: [true, 'Please add the Model/s']
@@ -44,7 +32,20 @@ const balancerSchema = mongoose.Schema({
     compatibleModels:{
         type: [String],
         required: [false]
+    },   
+    productFullName:{
+        type: String,
+        required: [true, 'Please Add Product Full Name']
+    },  
+    qty:{
+        type: Number,
+        default:0,
     },
+    unit:{
+        type: String,
+        default: "PC",
+        // required:[true, 'Please Add Unit']
+    }, 
     metaData:{
         type: Object,
         required: false,

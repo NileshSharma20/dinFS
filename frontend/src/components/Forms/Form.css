@@ -55,6 +55,7 @@
     width:fit-content;
     justify-content: flex-start;
     font-weight: bold;
+
 }
 
 .form-control{
@@ -63,6 +64,7 @@
 
 .card-form-control{
     padding-left: 0rem;
+    /* width: 3rem; */
 }
 
 .card-form-quantity-box{
