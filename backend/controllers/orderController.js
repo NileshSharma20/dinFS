@@ -10,6 +10,8 @@ const { startOfDay } = require('date-fns/startOfDay')
 const Demandslip = require("../models/demandslipModel")
 const DemandslipHistory = require('../models/demandslipHistoryModel')
 const User = require("../models/userModel")
+const Products = require('../models/productsModel')
+
 
 // @desc   Create a new Demand Slip
 // @route  POST /api/order/
@@ -368,6 +370,27 @@ const updateAfterDelivery = asyncHandler(async(req,res)=>{
         orderedProductList: demandSlip.orderedProductList,
         recievedProductList: demandSlip.recievedProductList,
         totalCost: demandSlip.totalCost
+    }
+
+    // recievedProductList=[
+        // {sku: skuValue
+        // ,productFullName,
+        // quantity:qtyValue},
+    //     {sku,productFullName,quantity},
+    //         .
+    //         .
+    //         .
+    //     {sku,productFullName,quantity},
+    // ]
+    let toUpdateProdList = demandSlip.recievedProductList
+
+    for(const itemData of toUpdateProdList){
+        console.log(`sku:${JSON.stringify(itemData,null,4)}`)    
+        
+        await Products.updateOne({sku:itemData.sku},
+            {$inc:{qty:itemData.quantity}},
+            {upsert:false}
+        )
     }
 
     const demandHistory =  await DemandslipHistory.create(demandBackup)
