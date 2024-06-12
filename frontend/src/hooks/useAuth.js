@@ -5,6 +5,7 @@ const useAuth = () => {
     const { token } = useSelector((state)=>state.auth)
     let isManager = false
     let isAdmin = false
+    let isAccountant = false
     let isEmployee = false
     let status = ""
 
@@ -14,10 +15,14 @@ const useAuth = () => {
 
         isManager = roles.includes('Manager')
         isAdmin = roles.includes('Admin')
+        isAccountant = roles.includes('Accountant')
         isEmployee = roles.includes('Employee')
 
         if(isEmployee){
             status = "Employee"
+        }
+        if(isAccountant){
+            status = "Accountant"
         }
         if(isManager){
             status = "Manager"
@@ -26,10 +31,10 @@ const useAuth = () => {
             status = "Admin"
         }
 
-        return { username, roles, isManager, isAdmin, status }
+        return { username, roles, isManager, isAdmin, isAccountant, status }
     }
 
-    return {username:"", roles:[], isManager, isAdmin, status}
+    return {username:"", roles:[], isManager, isAdmin, isAccountant, status}
 }
 
 export default useAuth

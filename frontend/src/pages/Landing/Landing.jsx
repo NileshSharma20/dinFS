@@ -13,11 +13,11 @@ function Landing() {
     const pathList = [{
         pathname:"products",
         name:"Products",
-        accessLevel:["Admin","Manager","Employee"]
+        accessLevel:["Admin","Manager","Accountant","Employee"]
     },{
         pathname:"indiamart-templates",
         name:"Templates",
-        accessLevel:["Admin","Manager","Employee"]
+        accessLevel:["Admin","Manager","Accountant","Employee"]
     },{
         pathname:"user-management",
         name:"User Management",
@@ -25,7 +25,7 @@ function Landing() {
     },{
         pathname:"demand-slip-generator",
         name:"Demand Slip Generator",
-        accessLevel:["Admin","Manager","Employee"]
+        accessLevel:["Admin","Manager","Accountant","Employee"]
     },{
         pathname:"demand-slip-analytics",
         name:"Demand Slip Analytics",

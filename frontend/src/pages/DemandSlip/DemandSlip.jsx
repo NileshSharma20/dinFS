@@ -10,7 +10,6 @@ import AllOrderPagination from './AllOrderPagination'
 
 import { getFilteredDemandSlips } from '../../features/orders/orderSlice'
 import { resetProducts } from '../../features/products/productSlice'
-import { AiOutlineClose } from 'react-icons/ai'
 import { getAllUsers } from '../../features/users/usersSlice'
 // 
 import useAuth from '../../hooks/useAuth'
@@ -22,9 +21,7 @@ import LegendModal from '../../components/Modals/LegendModal'
 function DemandSlip() {
   const dispatch = useDispatch()
 
-  const modalRef = useRef()
-
-  const { isAdmin, isManager } = useAuth()
+  const { isAdmin, isManager, isAccountant } = useAuth()
   
   const dateInputRef = useRef(null);
   const toDateInputRef = useRef(null);
@@ -50,6 +47,21 @@ function DemandSlip() {
   const [partialFlag, setPartialFlag] = useState(false)
 
   const [legendFlag, setLegendFlag] = useState(false)
+  
+  // const currDate = new Date()
+  // let currDay = currDate.getDate()
+  // let currMonth = currDate.getMonth()+1
+  // let currYear = currDate.getFullYear()
+
+  // if(currDay<10){
+  //   currDay = '0'+currDay
+  // }
+
+  // if(currMonth<10){
+  //   currMonth = '0'+currMonth
+  // }
+
+  // const currDateString = currYear+"-"+currMonth+"-"+currDay
 
   const [filterParams,setFilterParams] = useState({
     rawDate:'',
@@ -59,7 +71,7 @@ function DemandSlip() {
     filterPublisherUsername:'',
     filterStatus:'',
     filterTicketNum:'',
-    accessLevel: isManager
+    accessLevel: isAccountant
   })
 
   const pageLimit = 50
@@ -112,7 +124,7 @@ function DemandSlip() {
       filterPublisherUsername:'',
       filterStatus:'',
       filterTicketNum:'',
-      accessLevel: isManager
+      accessLevel: isAccountant
     })
 
     setFilterUsername('')
@@ -279,7 +291,7 @@ function DemandSlip() {
   
   // Reset Prod Search Results and Load Demand Slips
   useEffect(()=>{
-    if(isAdmin || isManager){
+    if(isAdmin || isManager || isAccountant){
       dispatch(getAllUsers())
     }    
     dispatch(resetProducts())
@@ -421,7 +433,7 @@ function DemandSlip() {
           style={{height:`auto`, marginBottom:`3vh`}}
           >
 
-        {(isAdmin || isManager) && 
+        {(isAdmin || isManager || isAccountant) && 
         <>
           {/* Filter Date Input */}
           <label htmlFor="rawDate" className='date-input-label'>

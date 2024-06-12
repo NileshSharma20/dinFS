@@ -4,7 +4,7 @@ import useAuth from '../../hooks/useAuth'
 import '../../pages/DemandSlip/DemandSlip.css'
 
 function DemandSlipCard({info, partialFlag=false}) {
-    const { isAdmin, isManager } = useAuth()
+    const { isAdmin, isManager, isAccountant } = useAuth()
 
     const [statusColour, setStatusColour] = useState({})
 
@@ -31,7 +31,7 @@ function DemandSlipCard({info, partialFlag=false}) {
             <div className="card-element">
 
             <h3>{info.ticketNumber}</h3>
-            {(isAdmin||isManager) && 
+            {(isAdmin||isManager||isAccountant) && 
             <h3>{info?.username}</h3>
             }
             </div>
@@ -46,7 +46,7 @@ function DemandSlipCard({info, partialFlag=false}) {
         </div>
         <br />
 
-        {(isAdmin||isManager) && 
+        {(isAdmin||isManager||isAccountant) && 
         <div className="card-row">
             <div className="card-element" 
                 style={{gridColumn:`1/span 2`, marginBottom:`1rem`}}
@@ -56,15 +56,19 @@ function DemandSlipCard({info, partialFlag=false}) {
                 </h3>
             </div>
 
-            <div className="card-element">
-                <h3>Created</h3>
-                {createdTimeString}
-            </div>
+            {isAdmin && isManager &&
+                <>
+                <div className="card-element">
+                    <h3>Created</h3>
+                    {createdTimeString}
+                </div>
 
-            <div className="card-element">
-                <h3>Updated</h3>
-                {updatedTimeString}
-            </div>
+                <div className="card-element">
+                    <h3>Updated</h3>
+                    {updatedTimeString}
+                </div>
+                </>
+            }
         </div>
         }
         {/* <div className="card-row">

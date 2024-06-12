@@ -34,9 +34,11 @@ function UserForm({initialValue, setFlag}) {
 
     const handleRoles=(e)=>{
         if(e.target.value==="admin"){
-            setCheckList(["Admin","Manager","Employee"])
+            setCheckList(["Admin","Manager","Accountant","Employee"])
         }else if(e.target.value==="manager"){
-            setCheckList(["Manager","Employee"])
+            setCheckList(["Manager","Accountant","Employee"])
+        }else if(e.target.value==="accountant"){
+            setCheckList(["Accountant","Employee"])
         }else if(e.target.value==="employee"){
             setCheckList(["Employee"])
         }
@@ -185,11 +187,27 @@ function UserForm({initialValue, setFlag}) {
                         <div className="radio-group-item">
                         <input type="radio" 
                             name="roles" 
+                            id={`${initialValue.username} role accountant`} 
+                            value="accountant"
+                            defaultChecked={initialValue.roles.includes("Accountant") && 
+                                            !initialValue.roles.includes("Admin") &&
+                                            !initialValue.roles.includes("Manager") ?
+                                            true:false}
+                            onChange={handleRoles} />
+                        <label htmlFor={`${initialValue.username} role accountant`}>Accountant</label>
+                        </div>
+                    </div>
+
+                    <div className="radio-group">
+                        <div className="radio-group-item">
+                        <input type="radio" 
+                            name="roles" 
                             id={`${initialValue.username} role employee`} 
                             value="employee"
                             defaultChecked={initialValue.roles.includes("Employee") && 
                                             !initialValue.roles.includes("Admin") && 
-                                            !initialValue.roles.includes("Manager") ?
+                                            !initialValue.roles.includes("Manager") && 
+                                            !initialValue.roles.includes("Accountant") ?
                                             true:false}
                             onChange={handleRoles} />
                         <label htmlFor={`${initialValue.username} role employee`}>Employee</label>

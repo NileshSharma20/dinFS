@@ -123,7 +123,6 @@ const getAllDemandSlips =asyncHandler(async(req,res)=>{
 })
 
 // @desc   Get date filtered Demand Slips
-// @route  POST /api/order/filter/:date
 // @route  GET /api/order/filter
 // @access Private
 const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
@@ -133,6 +132,28 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
             status, 
             ticketNum    
         } = req.query
+    
+    const currentDate = new Date();
+
+    let todayDate = currentDate.getDate();
+    let todayMonth = currentDate.getMonth() + 1;
+    let todayYear = currentDate.getFullYear();
+
+    if(todayDate<10){
+        todayDate = `0${todayDate}`
+    }
+    
+    if(todayMonth<10){
+        todayMonth = `0${todayMonth}`
+    }
+
+    const fullCurrentDateString = todayYear+'-'+todayMonth+'-'+todayDate
+    const fullCurrentDate = new Date(fullCurrentDateString)
+
+    const fullCurrentDateClean = todayYear+todayMonth+todayDate
+
+    // let weekAgoDate = new Date(fullCurrentDate - 7 * 24 * 60 * 60 * 1000)
+    // console.log(`week ago date: ${weekAgoDate}`)
     
     const currPage = parseInt(req.query.page) || 1
     const recordLimit = parseInt(req.query.limit) || 50
@@ -161,7 +182,7 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
 
     // Employee Level Access
     if(!roles?.length || !Array.isArray(roles) ||
-        !roles.includes("Manager")){
+        !roles.includes("Accountant")){
 
             // Employee Level Access
             let searchParams = []
@@ -170,7 +191,7 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
             if(status){
                 searchParams=[{status:status}, ...searchParams]
             }
-            if(ticketNum ){
+            if(ticketNum){
                 searchParams=[{ticketNumber:{ $regex:ticketNum}},
                     ...searchParams]
             }
@@ -179,7 +200,7 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
             if(searchParams.length!==0){
                 docCount = await Demandslip.find({$and: [
                             ...searchParams,
-                            {ticketNumber:{ $regex:date}},
+                            {ticketNumber:{ $regex:fullCurrentDateClean}},
                             {username:username},
                             {employeeId: employeeExists._id.toString()},
                             ]
@@ -218,6 +239,90 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
                         .lean().exec()
             }
         
+        }else if(roles.includes("Accountant") && !roles.includes("Manager")){
+            // Accountant Level Access
+            let searchParams = []
+            let weekAgoDate = new Date(fullCurrentDate - 7 * 24 * 60 * 60 * 1000)
+
+            // Maximum Date Range for Accountant is 7days from today
+            searchParams = [
+                {createdAt:{$gte:startOfDay(weekAgoDate)}},
+                {createdAt:{$lte:endOfDay(fullCurrentDate)}}
+            ]
+
+            // Params based search string
+            if(date && !endDate){
+                let fromDateString = date.slice(4)+
+                                    '-'+date.slice(2,4)+
+                                    '-'+date.slice(0,2)
+                let fromDate = new Date(fromDateString) 
+                
+                if(fromDate < weekAgoDate){
+                    searchParams=[
+                        {createdAt:{$gte:startOfDay(weekAgoDate)}},
+                        {createdAt:{$lte:endOfDay(weekAgoDate)}},
+                    ]
+                    // res.status(400)
+                    // throw new Error('Bad Request: Date Range Greater than 7 days')
+                }else{
+                    searchParams=[{ticketNumber:{ $regex:date}}, ...searchParams]
+                }
+            }
+            if(date && endDate){
+                let fromDateString = date.slice(4)+
+                                    '-'+date.slice(2,4)+
+                                    '-'+date.slice(0,2) 
+                let toDateString = endDate.slice(4)+
+                                    '-'+endDate.slice(2,4)+
+                                    '-'+endDate.slice(0,2)
+                let fromDate = new Date(fromDateString) 
+                let toDate = new Date(toDateString) 
+
+                if(fromDate < weekAgoDate && !(toDate>fullCurrentDate)){
+                    searchParams=[
+                        {createdAt:{$gte:startOfDay(weekAgoDate)}},
+                        {createdAt:{$lte:endOfDay(toDate)}},
+                    ]
+                    // res.status(400)
+                    // throw new Error('Bad Request: Date Range Greater than 7 days')
+                }else if(toDate>fullCurrentDate && !(fromDate<weekAgoDate)){
+                    searchParams=[
+                        {createdAt:{$gte:startOfDay(fromDate)}},
+                        {createdAt:{$lte:endOfDay(fullCurrentDate)}},
+                    ]
+                    // res.status(400)
+                    // throw new Error('Bad Request: End Date Greater than Today')
+                }else if(fromDate < weekAgoDate && toDate>fullCurrentDate){
+                    searchParams=[...searchParams]
+                }else{
+                    searchParams=[
+                        {createdAt:{$gte:startOfDay(fromDate)}},
+                        {createdAt:{$lte:endOfDay(toDate)}},
+                    ]
+                }
+
+            }
+            if(status){
+                searchParams=[{status:status}, ...searchParams]
+            }
+            if(publisherUsername){
+                searchParams = [{username:publisherUsername}, ...searchParams]
+            }
+            if(ticketNum){
+                searchParams=[{ticketNumber:{ $regex:ticketNum}},
+                    ...searchParams]
+            }
+
+            // Parameterized search
+            docCount = await Demandslip.find({$and: searchParams})
+                                    .countDocuments()
+
+            orders = await Demandslip.find({$and: searchParams}
+                                    ,'-_id -__v')
+                                    .skip(firstIndex)
+                                    .limit(recordLimit)
+                                    .lean().exec()
+
         }else{
             // Manager and Admin Level Access
                 let searchParams = []

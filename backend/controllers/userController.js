@@ -11,7 +11,7 @@ const getAllUsers = asyncHandler(async(req,res)=>{
 
     const { roles } = req
 
-    if(!roles.includes("Manager")){
+    if(!roles.includes("Accountant")){
         res.status(403)
         throw new Error("Forbidden")
     }

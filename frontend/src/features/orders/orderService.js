@@ -53,6 +53,7 @@ const getFilteredDemandSlips = async(filterParams,token)=>{
         }
         
         fullDate = `${ticketDate}${ticketMonth}${ticketYear}`
+        // 12062024
         
         if(filterTicketNum && filterTicketNum!==''){
             filterQueryString = filterQueryString+`&ticketNum=${filterTicketNum}`
@@ -71,6 +72,7 @@ const getFilteredDemandSlips = async(filterParams,token)=>{
 
         response = await axios.get(order_URI+`filter?date=${fullDate}${filterQueryString}`, config)
     }
+    // else if(!accessLevel)
     // Admin and Managaer Level Access
     else{   
 
@@ -135,7 +137,7 @@ const getFilteredDemandSlips = async(filterParams,token)=>{
                                     filterQueryString+`&limit=${limit}`
                 }
 
-            // console.log(`fQS: ${order_URI+`filter`+filterQueryString}`)
+            console.log(`fQS: ${order_URI+`filter`+filterQueryString}`)
 
             response = await axios.get(order_URI+`filter`+filterQueryString, config)
 
