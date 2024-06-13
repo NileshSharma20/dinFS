@@ -48,20 +48,37 @@ function DemandSlip() {
 
   const [legendFlag, setLegendFlag] = useState(false)
   
-  // const currDate = new Date()
-  // let currDay = currDate.getDate()
-  // let currMonth = currDate.getMonth()+1
-  // let currYear = currDate.getFullYear()
+  const currDate = new Date()
+  let currDay = currDate.getDate()
+  let currMonth = currDate.getMonth()+1
+  let currYear = currDate.getFullYear()
 
-  // if(currDay<10){
-  //   currDay = '0'+currDay
-  // }
+  if(currDay<10){
+    currDay = '0'+currDay
+  }
 
-  // if(currMonth<10){
-  //   currMonth = '0'+currMonth
-  // }
+  if(currMonth<10){
+    currMonth = '0'+currMonth
+  }
 
-  // const currDateString = currYear+"-"+currMonth+"-"+currDay
+  const currDateString = currYear+"-"+currMonth+"-"+currDay
+  const currentDateStart = new Date(currDateString)
+
+  let weekAgoDate = new Date(currentDateStart - 7 * 24 * 60 * 60 * 1000)
+
+  let weekAgoDay = weekAgoDate.getDate()
+  let weekAgoMonth = weekAgoDate.getMonth()+1
+  let weekAgoYear = weekAgoDate.getFullYear()
+
+  if(weekAgoDay<10){
+    weekAgoDay = '0'+weekAgoDay
+  }
+
+  if(weekAgoMonth<10){
+    weekAgoMonth = '0'+weekAgoMonth
+  }
+
+  const weekAgoDateString = weekAgoYear+"-"+weekAgoMonth+"-"+weekAgoDay
 
   const [filterParams,setFilterParams] = useState({
     rawDate:'',
@@ -281,7 +298,9 @@ function DemandSlip() {
       let inputDay = rawData.slice(8)
       let formatterFilterDate = inputDay+inputMonth+inputYear
       
-      return formatterFilterDate
+      // console.log(formatterFilterDate)
+
+      return formatterFilterDate      
     }
   }
   
@@ -443,6 +462,8 @@ function DemandSlip() {
             className='date-input-box'
             name='rawDate'
             type="date"
+            max={currDateString}
+            min={(isAccountant && !isManager)? weekAgoDateString:""}
             value={filterParams.rawDate}
             onChange={onFilterChange}
             ref={dateInputRef}
@@ -455,6 +476,8 @@ function DemandSlip() {
             className='date-input-box'
             name='rawToDate'
             type="date"
+            max={currDateString}
+            min={filterParams.rawDate?filterParams.rawDate:""}
             value={filterParams.rawToDate}
             onChange={onFilterChange}
             ref={toDateInputRef}
