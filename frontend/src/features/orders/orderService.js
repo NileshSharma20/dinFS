@@ -137,7 +137,7 @@ const getFilteredDemandSlips = async(filterParams,token)=>{
                                     filterQueryString+`&limit=${limit}`
                 }
 
-            console.log(`fQS: ${order_URI+`filter`+filterQueryString}`)
+            // console.log(`fQS: ${order_URI+`filter`+filterQueryString}`)
 
             response = await axios.get(order_URI+`filter`+filterQueryString, config)
 
