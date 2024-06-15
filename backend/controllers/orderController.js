@@ -19,7 +19,9 @@ const Products = require('../models/productsModel')
 const createNewDemandSlip = asyncHandler(async (req,res)=>{
     const {deliveryPartnerName,
            distributorName,
-           orderedProductList } = req.body
+           orderedProductList,
+           dataStatus
+        } = req.body
     
     const { username } = req
 
@@ -34,21 +36,27 @@ const createNewDemandSlip = asyncHandler(async (req,res)=>{
     const employeeId = employeeExists._id
 
     if(!employeeId || !deliveryPartnerName || !distributorName ||
-        !orderedProductList ||
+        !orderedProductList || !dataStatus || 
         !orderedProductList.length || !Array.isArray(orderedProductList)){
             res.status(400)
             throw new Error(`All fields are required`)
-        }
+    }
     
+    if(!(dataStatus==="incomplete" || dataStatus==="complete")){
+            res.status(400)
+            throw new Error(`Incorrect Data Status`)
+    }
+        
     const { ticketNumber, date } = await generateTicket()
-    
-    
+    // console.log(`orderController`)
+
     const newDemandSlip = {
         ticketNumber,
         employeeId,
         username: employeeExists.username,
         deliveryPartnerName,
         distributorName,
+        dataStatus,
         orderedProductList,
     }
 
@@ -59,6 +67,7 @@ const createNewDemandSlip = asyncHandler(async (req,res)=>{
         username: employeeExists.username,
         deliveryPartnerName,
         distributorName,
+        dataStatus,
         orderedProductList,
     }
     
@@ -130,7 +139,8 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
             endDate,
             publisherUsername, 
             status, 
-            ticketNum    
+            ticketNum,
+            dataStatus    
         } = req.query
     
     const currentDate = new Date();
@@ -179,6 +189,10 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
             res.status(400)
             throw new Error('Bad Request: Invalid DemandSlip Status')
     }
+    if( dataStatus & !(dataStatus==="incomplete" || dataStatus==="complete") ){
+        res.status(400)
+        throw new Error('Bad Request: Invalid DemandSlip Data Status')
+    }
 
     // Employee Level Access
     if(!roles?.length || !Array.isArray(roles) ||
@@ -190,6 +204,9 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
             // Params based search string
             if(status){
                 searchParams=[{status:status}, ...searchParams]
+            }
+            if(dataStatus){
+                searchParams=[{dataStatus:dataStatus},...searchParams]
             }
             if(ticketNum){
                 searchParams=[{ticketNumber:{ $regex:ticketNum}},
@@ -305,6 +322,9 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
             if(status){
                 searchParams=[{status:status}, ...searchParams]
             }
+            if(dataStatus){
+                searchParams=[{dataStatus:dataStatus}, ...searchParams]
+            }
             if(publisherUsername){
                 searchParams = [{username:publisherUsername}, ...searchParams]
             }
@@ -352,6 +372,9 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
                 if(status){
                     searchParams=[{status:status}, ...searchParams]
                 }
+                if(dataStatus){
+                    searchParams=[{dataStatus:dataStatus}, ...searchParams]
+                }
                 if(publisherUsername){
                     searchParams = [{username:publisherUsername}, ...searchParams]
                 }
@@ -361,7 +384,7 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
                 }
 
                 // Find all incase of no search params
-                if(!date && !status && !publisherUsername && !ticketNum){
+                if(!date && !status && !publisherUsername && !ticketNum & !dataStatus){
                     docCount = await Demandslip?.find().countDocuments()
 
                     orders = await Demandslip?.find({}

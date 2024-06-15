@@ -25,6 +25,10 @@ const demandsliphistorySchema = mongoose.Schema({
         type: String,
         default:"pending"
     },
+    dataStatus:{
+        type:String,
+        required: false,
+    },
     totalCost:{
         type:Number,
         default:0

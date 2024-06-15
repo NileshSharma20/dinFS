@@ -3,10 +3,13 @@ import useAuth from '../../hooks/useAuth'
 
 import '../../pages/DemandSlip/DemandSlip.css'
 
+import { HiOutlineDotsHorizontal } from "react-icons/hi";
+
 function DemandSlipCard({info, partialFlag=false}) {
     const { isAdmin, isManager, isAccountant } = useAuth()
 
     const [statusColour, setStatusColour] = useState({})
+    const [dataStatusStyle, setDataStatusStyle] = useState({})
 
     const createdTimeString = new Date(info.createdAt).toString().split(' ')[4]
     const updatedTimeString = new Date(info.updatedAt).toString().split(' ')[4]
@@ -20,6 +23,12 @@ function DemandSlipCard({info, partialFlag=false}) {
             setStatusColour({backgroundColor:`#8ac926`})
         }else{
             setStatusColour({border:`1px solid black`})
+        }
+
+        if(info?.dataStatus === 'incomplete'){
+            setDataStatusStyle({})
+        }else if(info?.dataStatus === 'complete'){
+            setDataStatusStyle({})
         }
     },[])
 
@@ -40,6 +49,9 @@ function DemandSlipCard({info, partialFlag=false}) {
                 <div className="status-circle"
                     style={statusColour}
                 >
+                    {info?.dataStatus === "incomplete" &&
+                        <p style={{color:`black`}}>?</p>
+                    }
                 </div>
             </div>
 
@@ -111,7 +123,7 @@ function DemandSlipCard({info, partialFlag=false}) {
                     <p>{prod.sku}</p>
                 </div>
 
-                <p>{prod.quantity}</p>
+                <p>{prod.quantity} {prod?.unit}</p>
                 
                 {partialFlag && 
                     <p>{info.recievedProductList[i]?.quantity}</p>

@@ -20,6 +20,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
     const [formData, setFormData] = useState({
         deliveryPartnerName: "",
         distributorName: "",
+        dataStatus:"complete",
         orderedProductList: [{
             sku:"",
             productFullName:"",
@@ -47,7 +48,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
         skuOnlyFlag:"true"
     })
       
-    const { deliveryPartnerName, distributorName } = formData
+    const { deliveryPartnerName, distributorName, dataStatus } = formData
 
     /////////////////////////////////////////////////
     //////// Functions /////////////////////////////
@@ -76,6 +77,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
         setFormData({
             deliveryPartnerName: "",
             distributorName: "",
+            dataStatus:"complete",
             orderedProductList: [{
                 sku:"",
                 productFullName:"",
@@ -144,12 +146,16 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
         let orderItem = orderList[i]
         const skuSplitList = orderItem.sku.split("-")
 
-        let newSku = skuSplitList.slice(0,2)
         
-        skuSplitList.length===4 ? 
-            (newSku = newSku.join("-") +"-"+ orderItem.sku.split("-")[3])
-            :
-            (newSku = newSku.join("-"))
+        let newSku = skuSplitList.slice(0,2)
+        // skuSplitList.length===4 ? 
+        //     (newSku = newSku.join("-") +"-"+ orderItem.sku.split("-")[3])
+        //     :
+        newSku = newSku.join("-")
+
+        if(skuSplitList.length===4){
+            orderItem.productPartNumber=""
+        }
 
         // console.log(`newSku:${newSku}`)
         
@@ -221,17 +227,22 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                                                     ||prod.productFullName===""
                                                     ||prod.quantity===""
                                                     ||prod.unit===""))
+        var dataStatusCheck = "complete"
 
         const finalOrderList = updatedOrderList.map((orderItem)=>{
                                     let finalProductFullName = orderItem.productFullName
-                                    orderItem.productBrandName &&
+                                    if(orderItem.sku!=="MANUAL"){
+                                        
+                                        orderItem.productBrandName?
                                         (finalProductFullName=finalProductFullName+" "+orderItem.productBrandName)
-                                    
-                                    orderItem.productPartNumber &&
-                                        (finalProductFullName=finalProductFullName+" "+orderItem.productPartNumber)
-                                    
-                                    // delete orderItem.productBrandName
-                                    // delete orderItem.productPartNumber
+                                        :
+                                        (dataStatusCheck="incomplete")
+
+                                        orderItem.productPartNumber?
+                                            (finalProductFullName=finalProductFullName+" "+orderItem.productPartNumber)
+                                            :
+                                            (dataStatusCheck="incomplete")
+                                    }
                                     
                                     return  {
                                         sku:orderItem.sku,
@@ -241,25 +252,26 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                                     }
                                 })
 
-        console.log(`fOL:${JSON.stringify(finalOrderList,null,4)}`)
+        // console.log(`fOL:${JSON.stringify(finalOrderList,null,4)}`)
 
         if(emptyOrderListObj.length>0){
             return alert('Empty Field/s')
         }
         
-        if(deliveryPartnerName==="" || distributorName==="" || updatedOrderList.length===0 
+        if(deliveryPartnerName==="" || distributorName==="" || updatedOrderList.length===0 || dataStatus===""
             || !Array.isArray(updatedOrderList)){
             return alert(`Please enter valid data`)
         }else{
             const orderInfo = {
-                deliveryPartnerName:deliveryPartnerName.toUpperCase(),
-                distributorName:distributorName.toUpperCase(),
-                orderedProductList:finalOrderList,
+                deliveryPartnerName: deliveryPartnerName.toUpperCase(),
+                distributorName: distributorName.toUpperCase(),
+                orderedProductList: finalOrderList,
+                dataStatus: dataStatusCheck,
             }
             
-            console.log(`formData:${JSON.stringify(orderInfo,null,4)}`)
+            // console.log(`formData:${JSON.stringify(orderInfo,null,4)}`)
             
-            // dispatch(generateDemandSlip(orderInfo))
+            dispatch(generateDemandSlip(orderInfo))
             
         }
     }
@@ -305,6 +317,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                 setFormData({
                     deliveryPartnerName: "",
                     distributorName: "",
+                    dataStatus:"complete",
                     orderedProductList: [{
                         sku:"",
                         productFullName:"",
@@ -425,6 +438,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                                 placeholder="Prod SKU"
                                 autoComplete='off'
                                 onChange={(e)=>onOrderItemChange(e,index)}
+                                readOnly
                                 />
                              <input
                                 className='card-form-control'

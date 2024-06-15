@@ -17,6 +17,7 @@ import useAuth from '../../hooks/useAuth'
 // import UserDropdown from "../../components/Dropdown/UserDropdown"
 import "./DemandSlip.css"
 import LegendModal from '../../components/Modals/LegendModal'
+import DataStatusDropdown from '../../components/Dropdown/DataStatusDropdown'
 
 function DemandSlip() {
   const dispatch = useDispatch()
@@ -87,6 +88,7 @@ function DemandSlip() {
     filterToDate:'',
     filterPublisherUsername:'',
     filterStatus:'',
+    filterDataStatus:'',
     filterTicketNum:'',
     accessLevel: isAccountant
   })
@@ -94,6 +96,7 @@ function DemandSlip() {
   const pageLimit = 50
 
   const [filterUsername, setFilterUsername] = useState('')
+  const [filterDataStatus, setFilterDataStatus] = useState('')
 
   /////////////////////////////////////////////////
   //////// Functions /////////////////////////////
@@ -140,11 +143,13 @@ function DemandSlip() {
       filterToDate:'',
       filterPublisherUsername:'',
       filterStatus:'',
+      filterDataStatus:'',
       filterTicketNum:'',
       accessLevel: isAccountant
     })
 
     setFilterUsername('')
+    setFilterDataStatus('all')
   }
 
   const handleFilterSearch =()=>{
@@ -158,8 +163,6 @@ function DemandSlip() {
     }
 
     dispatch(getFilteredDemandSlips(filterParams))
-
-    
   }
   
   const handleCreateClick=()=>{
@@ -282,8 +285,6 @@ function DemandSlip() {
     setPartialFlag(false)
     
     setFulfilledFlag(true)
-    
-    
   }
   
   // const handleLegendClick=()=>{
@@ -331,6 +332,22 @@ function DemandSlip() {
     }
 
   },[filterUsername])
+
+  // Set Filter Username
+  useEffect(()=>{
+    if(filterDataStatus!=='all'){
+      setFilterParams((prevState)=>({
+        ...prevState,
+        filterDataStatus:filterDataStatus
+      }))
+    }else{
+      setFilterParams((prevState)=>({
+        ...prevState,
+        filterDataStatus:''
+      }))
+    }
+
+  },[filterDataStatus])
 
   //Pop up handling
   // useEffect(()=>{
@@ -448,6 +465,8 @@ function DemandSlip() {
 
       {(allFlag||pendingFlag||failedFlag||partialFlag||fulfilledFlag) 
         &&
+        <>
+
         <div className="ds-filter-container"
           style={{height:`auto`, marginBottom:`3vh`}}
           >
@@ -493,6 +512,20 @@ function DemandSlip() {
           </div>
         </>
         }
+        </div>
+
+        <div className="ds-filter-container"
+          style={{height:`8vh`, marginBottom:`5vh`}}
+        >
+          
+          {/* Username Dropdown button */}
+          <div className='ds-filter-dropdown-container'>
+            <DataStatusDropdown
+              value={filterDataStatus} 
+              dataList={['all','complete','incomplete']} 
+              passUsername={setFilterDataStatus}
+              />
+          </div>
 
         {/* Ticket Number Search*/}
           <input 
@@ -511,6 +544,8 @@ function DemandSlip() {
         <div className='ds-filter-btn' onClick={()=>handleFilterClear()}>Clear</div>
       
       </div>
+
+      </>
     }
       
       {/* All results count */}

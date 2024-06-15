@@ -37,7 +37,7 @@ const getFilteredDemandSlips = async(filterParams,token)=>{
     if(!accessLevel){
         let filterQueryString = ''
 
-        const {filterTicketNum, filterStatus, page, limit} = filterParams
+        const {filterTicketNum, filterStatus, filterDataStatus, page, limit} = filterParams
         
         let currDate = new Date()
         let ticketDate = currDate.getDate()
@@ -61,6 +61,13 @@ const getFilteredDemandSlips = async(filterParams,token)=>{
         if(filterStatus && filterStatus!==''){
             
             filterQueryString = filterQueryString+`&status=${filterStatus}`
+        }
+        if(filterDataStatus && filterDataStatus!==''){
+
+            filterQueryString = filterQueryString[filterQueryString.length-1]==='?'?
+                                filterQueryString+`dataStatus=${filterDataStatus}`
+                                :
+                                filterQueryString+`&dataStatus=${filterDataStatus}`
         }
         if(page){
             filterQueryString = filterQueryString+`&page=${page}`
@@ -87,6 +94,7 @@ const getFilteredDemandSlips = async(filterParams,token)=>{
                 filterToDate, 
                 filterPublisherUsername, 
                 filterStatus,
+                filterDataStatus,
                 filterTicketNum,
                 page, 
                 limit
@@ -115,6 +123,14 @@ const getFilteredDemandSlips = async(filterParams,token)=>{
                                     filterQueryString+`status=${filterStatus}`
                                     :
                                     filterQueryString+`&status=${filterStatus}`
+            }
+
+            if(filterDataStatus && filterDataStatus!==''){
+
+                filterQueryString = filterQueryString[filterQueryString.length-1]==='?'?
+                                    filterQueryString+`dataStatus=${filterDataStatus}`
+                                    :
+                                    filterQueryString+`&dataStatus=${filterDataStatus}`
             }
 
             if(filterTicketNum && filterTicketNum!==''){

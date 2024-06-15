@@ -18,7 +18,7 @@ function AllOrderPagination({
 
     const dispatch = useDispatch()
     
-    const { isManager } = useAuth()
+    const { isAccountant } = useAuth()
 
     const { 
         pageCount,
@@ -211,7 +211,7 @@ function AllOrderPagination({
         {isLoaded && dataList.length===0 &&
 
             <div style={{gridColumn:"1/span 3"}}>
-                <h1>No Orders {isManager?`Today`:``}</h1>
+                <h1>No Orders {isAccountant?`Today`:``}</h1>
             </div>
         }
         
