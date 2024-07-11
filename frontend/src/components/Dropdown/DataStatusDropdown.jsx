@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { FaAngleDown } from "react-icons/fa6";
 import "./Dropdown.css"
 
-function DataStatusDropdown({value, dataList, passUsername}) {
+function DataStatusDropdown({value, dataList, passDataStatus}) {
     const boxRef = useRef(null) 
 
     const [isActive, setIsActive] = useState(false)
@@ -12,11 +12,10 @@ function DataStatusDropdown({value, dataList, passUsername}) {
         setIsActive(!isActive)
     }
 
-    const handleItemClick=(user)=>{
-        const data = user
-
-        passUsername(data)
-        setSelectedItem(user)
+    const handleItemClick=(dataStatus)=>{
+        const data = dataStatus==="all"?'':dataStatus
+        passDataStatus((prevData)=>({...prevData, filterDataStatus:data}))
+        setSelectedItem(dataStatus)
         setIsActive(!isActive)
     }
 

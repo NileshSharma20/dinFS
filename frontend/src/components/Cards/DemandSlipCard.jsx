@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import useAuth from '../../hooks/useAuth'
+import { FiEdit2 } from 'react-icons/fi'
 
 import '../../pages/DemandSlip/DemandSlip.css'
+import { AiOutlineClose } from 'react-icons/ai'
 
-import { HiOutlineDotsHorizontal } from "react-icons/hi";
 
 function DemandSlipCard({info, partialFlag=false}) {
     const { isAdmin, isManager, isAccountant } = useAuth()
 
     const [statusColour, setStatusColour] = useState({})
-    const [dataStatusStyle, setDataStatusStyle] = useState({})
+    const [editFlag, setEditFlag] = useState(false)
 
     const createdTimeString = new Date(info.createdAt).toString().split(' ')[4]
     const updatedTimeString = new Date(info.updatedAt).toString().split(' ')[4]
@@ -25,11 +26,11 @@ function DemandSlipCard({info, partialFlag=false}) {
             setStatusColour({border:`1px solid black`})
         }
 
-        if(info?.dataStatus === 'incomplete'){
-            setDataStatusStyle({})
-        }else if(info?.dataStatus === 'complete'){
-            setDataStatusStyle({})
-        }
+        // if(info?.dataStatus === 'incomplete'){
+        //     setDataStatusStyle({})
+        // }else if(info?.dataStatus === 'complete'){
+        //     setDataStatusStyle({})
+        // }
     },[])
 
   return (
@@ -45,7 +46,19 @@ function DemandSlipCard({info, partialFlag=false}) {
             }
             </div>
 
-            <div className="card-element">
+            <div className="card-element"
+                style={{ justifyContent:`flex-end`}}
+            >
+                {info?.dataStatus === "incomplete" &&
+                (isAccountant || isManager || isAdmin) 
+                &&
+                    <div className="edit-card-btn"
+                        onClick={()=>setEditFlag(!editFlag)}
+                    >
+                        {editFlag?<AiOutlineClose />:<FiEdit2 />}
+                    </div>
+                }
+                
                 <div className="status-circle"
                     style={statusColour}
                 >
@@ -53,6 +66,8 @@ function DemandSlipCard({info, partialFlag=false}) {
                         <p style={{color:`black`}}>?</p>
                     }
                 </div>
+
+                
             </div>
 
         </div>

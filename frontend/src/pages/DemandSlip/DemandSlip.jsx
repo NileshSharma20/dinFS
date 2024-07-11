@@ -18,6 +18,7 @@ import useAuth from '../../hooks/useAuth'
 import "./DemandSlip.css"
 import LegendModal from '../../components/Modals/LegendModal'
 import DataStatusDropdown from '../../components/Dropdown/DataStatusDropdown'
+import { isPending } from '@reduxjs/toolkit'
 
 function DemandSlip() {
   const dispatch = useDispatch()
@@ -46,6 +47,7 @@ function DemandSlip() {
   const [fulfilledFlag, setFulfilledFlag] = useState(false)
   const [failedFlag, setFailedFlag] = useState(false)
   const [partialFlag, setPartialFlag] = useState(false)
+  // const [incompleteFlag, setIncompleteFlag] = useState(false)
 
   const [legendFlag, setLegendFlag] = useState(false)
   
@@ -96,7 +98,7 @@ function DemandSlip() {
   const pageLimit = 50
 
   const [filterUsername, setFilterUsername] = useState('')
-  const [filterDataStatus, setFilterDataStatus] = useState('')
+  // const [filterDataStatus, setFilterDataStatus] = useState('')
 
   /////////////////////////////////////////////////
   //////// Functions /////////////////////////////
@@ -107,19 +109,22 @@ function DemandSlip() {
   }
 
   const onFilterChange=(e)=>{
+    // console.log(`name:${e.target.name}\nvalue:${e.target.value}`)
     if(e.target.name==='rawDate'){
       const fD = handleDateFilter(e.target.value)
 
-      setFilterParams((prevState)=>({
+      return setFilterParams((prevState)=>({
           ...prevState,
+          rawDate:e.target.value,
           filterDate:fD
       }))
     }
     else if(e.target.name==='rawToDate'){
       const tD = handleDateFilter(e.target.value)
 
-      setFilterParams((prevState)=>({
+      return setFilterParams((prevState)=>({
           ...prevState,
+          rawToDate:e.target.value,
           filterToDate:tD
       }))
     }
@@ -149,7 +154,12 @@ function DemandSlip() {
     })
 
     setFilterUsername('')
-    setFilterDataStatus('all')
+
+    pendingFlag && setFilterParams((prevState)=>({...prevState,filterStatus:'pending'})) 
+    partialFlag && setFilterParams((prevState)=>({...prevState,filterStatus:'partial'})) 
+    failedFlag && setFilterParams((prevState)=>({...prevState,filterStatus:'failed'})) 
+    fulfilledFlag && setFilterParams((prevState)=>({...prevState,filterStatus:'fulfilled'})) 
+    // setFilterDataStatus('')
   }
 
   const handleFilterSearch =()=>{
@@ -173,6 +183,7 @@ function DemandSlip() {
     setPartialFlag(false)
     setPendingFlag(false)
     setFulfilledFlag(false)
+    
   }
 
   const handleAllClick=()=>{
@@ -196,9 +207,8 @@ function DemandSlip() {
     setPendingFlag(false)
     setFulfilledFlag(false)
     
-    setAllFlag(true)
-
     
+    setAllFlag(true)
   }
   
   const handlePendingClick=()=>{
@@ -221,9 +231,8 @@ function DemandSlip() {
     setPartialFlag(false)
     setFulfilledFlag(false)
     
-    setPendingFlag(true)
-
     
+    setPendingFlag(true)
   }
   
   const handlePartialClick=()=>{
@@ -236,15 +245,14 @@ function DemandSlip() {
       }
     ))
       
-      setCreateFlag(false)
-      setAllFlag(false)
-      setPendingFlag(false)
-      setFailedFlag(false)
-      setFulfilledFlag(false)
-      
-      setPartialFlag(true)
-
-      
+    setCreateFlag(false)
+    setAllFlag(false)
+    setPendingFlag(false)
+    setFailedFlag(false)
+    setFulfilledFlag(false)
+    
+    
+    setPartialFlag(true)
     }
   
   const handleFailedClick=()=>{
@@ -262,6 +270,7 @@ function DemandSlip() {
     setPendingFlag(false)
     setPartialFlag(false)
     setFulfilledFlag(false)
+    
     
     setFailedFlag(true)
 
@@ -284,8 +293,30 @@ function DemandSlip() {
     setFailedFlag(false)
     setPartialFlag(false)
     
+    
     setFulfilledFlag(true)
   }
+
+  // const handleIncompleteClick=()=>{
+  //   setFilterParams(((prevState)=>({...prevState,filterStatus:'', filterDataStatus:'incomplete'})))
+  //   dispatch(getFilteredDemandSlips(
+  //     { ...filterParams,
+  //       filterStatus:'',
+  //       filterDataStatus:'incomplete',
+  //       page:1,
+  //       limit:pageLimit
+  //     }
+  //   ))
+
+  //   setCreateFlag(false)
+  //   setAllFlag(false)
+  //   setPendingFlag(false)
+  //   setFailedFlag(false)
+  //   setPartialFlag(false)
+  //   setFulfilledFlag(false)
+    
+  //   setIncompleteFlag(true)
+  // }
   
   // const handleLegendClick=()=>{
   //   setLegendFlag(!legendFlag)
@@ -333,37 +364,21 @@ function DemandSlip() {
 
   },[filterUsername])
 
-  // Set Filter Username
-  useEffect(()=>{
-    if(filterDataStatus!=='all'){
-      setFilterParams((prevState)=>({
-        ...prevState,
-        filterDataStatus:filterDataStatus
-      }))
-    }else{
-      setFilterParams((prevState)=>({
-        ...prevState,
-        filterDataStatus:''
-      }))
-    }
-
-  },[filterDataStatus])
-
-  //Pop up handling
+  // Set Filter Data Status
   // useEffect(()=>{
-  //   let handler = (event) => {
-  //       if(legendFlag && !modalRef.current.contains(event.target) 
-  //         )
-  //         {
-  //             setLegendFlag(false)  
-  //         }
-  //   };
-  //   document.addEventListener("mousedown", handler);
-
-  //   return()=>{
-  //   document.removeEventListener("mousedown",handler);
+  //   if(filterDataStatus!=='all'){
+  //     setFilterParams((prevState)=>({
+  //       ...prevState,
+  //       filterDataStatus:filterDataStatus
+  //     }))
+  //   }else{
+  //     setFilterParams((prevState)=>({
+  //       ...prevState,
+  //       filterDataStatus:''
+  //     }))
   //   }
-  // })
+
+  // },[filterDataStatus])
 
   return (
     <>
@@ -454,6 +469,12 @@ function DemandSlip() {
           Fulfilled        
         </div>
 
+        {/* <div className={`ds-filter-btn ${incompleteFlag?"ds-filer-btn-active":""}`}
+          onClick={()=>handleIncompleteClick()}
+        >
+          Incomplete        
+        </div> */}
+
         <div className={`ds-filter-btn ${legendFlag?"ds-filer-btn-active":""}`}
           onClick={()=>handleLegendClick()}
         >
@@ -463,7 +484,9 @@ function DemandSlip() {
 
       </div>
 
-      {(allFlag||pendingFlag||failedFlag||partialFlag||fulfilledFlag) 
+      {(allFlag||pendingFlag||failedFlag||partialFlag||fulfilledFlag
+        // ||incompleteFlag
+      ) 
         &&
         <>
 
@@ -484,6 +507,7 @@ function DemandSlip() {
             max={currDateString}
             min={(isAccountant && !isManager)? weekAgoDateString:""}
             value={filterParams.rawDate}
+            // value={filterParams.filterDate}
             onChange={onFilterChange}
             ref={dateInputRef}
           />
@@ -518,14 +542,16 @@ function DemandSlip() {
           style={{height:`8vh`, marginBottom:`5vh`}}
         >
           
-          {/* Username Dropdown button */}
+          {/* Data Status Dropdown button */}
+          {/* {!incompleteFlag && */}
           <div className='ds-filter-dropdown-container'>
             <DataStatusDropdown
-              value={filterDataStatus} 
+              value={filterParams.filterDataStatus} 
               dataList={['all','complete','incomplete']} 
-              passUsername={setFilterDataStatus}
+              passDataStatus={setFilterParams}
               />
           </div>
+          {/* } */}
 
         {/* Ticket Number Search*/}
           <input 
