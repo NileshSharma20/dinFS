@@ -4,6 +4,7 @@ import { FiEdit2 } from 'react-icons/fi'
 
 import '../../pages/DemandSlip/DemandSlip.css'
 import { AiOutlineClose } from 'react-icons/ai'
+import UpdateIncompleteProdDataForm from '../Forms/UpdateIncompleteProdDataForm'
 
 
 function DemandSlipCard({info, partialFlag=false}) {
@@ -128,6 +129,11 @@ function DemandSlipCard({info, partialFlag=false}) {
     </div>
 
     {/* <div className='ds-new-col'> */}
+    {editFlag?
+            <UpdateIncompleteProdDataForm initialValue={info} />
+        :
+        <>
+        
         {info.orderedProductList?.map((prod,i)=>
             <div className="card-grid-row" key={i}>
                 <p>{i+1}.</p>
@@ -144,10 +150,10 @@ function DemandSlipCard({info, partialFlag=false}) {
                     <p>{info.recievedProductList[i]?.quantity}</p>
                 }
                 
-                {/* <br /> */}
-            {/* </React.Fragment>   */}
-        </div>
+            </div>
         )}
+        </>
+    }
     </div>
     </div>
     </>
