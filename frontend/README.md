@@ -3,6 +3,7 @@
 ## ToDo List
 - [ ] Demand Slip Incomplete Status Update Form
     - [ ] Create Input Form with conditions and safety
+    - [ ] Shift SKU Generation and Data Validation to Backend
 
 - [ ] Admin Review Page
     - [ ] Create new Page for Non-existing products update

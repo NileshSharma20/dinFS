@@ -1,7 +1,7 @@
 const asyncHandler = require('express-async-handler')
 const fs = require("fs")
 
-const { generateTicket } = require("../helper/orderHelper")
+const { generateTicket, generateSKUforIncompleteData } = require("../helper/orderHelper")
 const { paginateData } = require('../helper/paginationHelper')
 
 const { endOfDay } = require('date-fns/endOfDay')
@@ -526,6 +526,51 @@ const updateAfterDelivery = asyncHandler(async(req,res)=>{
         res.status(400)
         throw new Error(`Failure`)
     }
+})
+
+// @desc   Update pending Demand Slip (Admin can update closed tickets)
+// @route  PATCH /api/order/:ticketNumber
+// @access Private
+const updateIncompleteOrder = asyncHandler(async(req,res)=>{
+    const { orderedProductList, status, totalCost } = req.body
+    const { ticketNumber } = req.params
+
+    // Create 7 days logic for Accountant and Manager and infinite for Admin
+
+    const { username, roles } = req
+    
+    const employeeExists = await User.findOne({username}).select('-password').lean()
+
+    // Check if User exists and Active
+    if(!employeeExists || !employeeExists.active){
+        res.status(403)
+        throw new Error('Unauthorized')
+    }
+
+    const employeeId = employeeExists._id
+    
+    const demandSlip = await Demandslip.findOne({ticketNumber:ticketNumber}).exec()
+
+    if(!employeeId || !status || !totalCost
+        ){
+        res.status(400)
+        throw new Error('Data Missing')
+    }
+
+    // Check for existing ticket
+    if(!demandSlip){
+        res.status(400)
+        throw new Error("Demand Slip not found")
+    }
+
+    // Check if ticket status is not pending or if Different User has Accountant access
+    if(demandSlip.status==="pending" || !roles.includes("Accountant")){
+            res.status(403)
+            throw new Error("Forbidden: Minimum Accountant Access required or Order Status Pending")
+    }
+
+    const updatedOrderList = generateSKUforIncompleteData(orderedProductList)
+    
 })
 
 // @desc   Delete Demand Slip (Admin access only)

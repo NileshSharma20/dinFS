@@ -44,6 +44,51 @@ const generateTicket = asyncHandler(async()=>{
     return {ticketNumber, date}
 })
 
+// @desc   Genearet SKU for Incomplete Demand Slip Data
+const generateSKUforIncompleteData = asyncHandler(async(orderedProductList)=>{
+    const updatedOrderList = orderedProductList.map((item)=>{
+        let pN, bC, newSKU, newProdFullName
+
+        if(item.partNum && item.partNum!==""){
+            const spaceRemovedPN = item.partNum.replace(/ /g,"")
+            const cleanedPN = spaceRemovedPN.split("-").join("")
+            const cleanedPN2 = cleanedPN.split("/").join("")
+            pN = cleanedPN2.toUpperCase()
+        }
+        
+        if(item.brandCompany && item.brandCompany!==""){
+            const spaceRemovedBC = item.brandCompany.replace(/ /g,"").toUpperCase()
+            const cleanedBC = spaceRemovedBC.slice(0,3)
+            bC = cleanedBC
+        }
+
+        switch(item){
+            case (!item.partNum && !item.brandCompany):
+                newSKU = item.sku
+                newProdFullName = item.productFullName
+                break;
+
+            case (item.partNum && !item.brandCompany):
+                newSKU = item.sku +"-"+ pN
+                newProdFullName = item.productFullName +"-"+ spaceRemovedPN
+                break;
+            
+            case (item.partNum && item.brandCompany):
+                newSKU = item.sku +"-"+ bC +"-"+ pN
+                newProdFullName = item.productFullName +"-"+ spaceRemovedBC +"-"+ spaceRemovedPN
+                break;
+
+            default:
+                newSKU = item.sku
+                newProdFullName = item.productFullName
+                break;
+            
+        }
+    })
+
+    return updatedOrderList
+})
+
 // @desc   Generating Demand Reciept PDF
 const generateDemandReciept=(ticketNumber, distributorName, date, prodData)=>{
 
@@ -82,7 +127,9 @@ const generateDemandReciept=(ticketNumber, distributorName, date, prodData)=>{
     doc.end();  
 }
 
+
 module.exports = {
     generateTicket,
+    generateSKUforIncompleteData,
     generateDemandReciept,
 }

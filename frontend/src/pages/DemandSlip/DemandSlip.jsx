@@ -18,7 +18,6 @@ import useAuth from '../../hooks/useAuth'
 import "./DemandSlip.css"
 import LegendModal from '../../components/Modals/LegendModal'
 import DataStatusDropdown from '../../components/Dropdown/DataStatusDropdown'
-import { isPending } from '@reduxjs/toolkit'
 
 function DemandSlip() {
   const dispatch = useDispatch()
@@ -41,8 +40,8 @@ function DemandSlip() {
 
   const usernameList = [`all`, ...usersList.map(user=>user.username)]
 
-  const [createFlag, setCreateFlag] = useState(true)
-  const [allFlag, setAllFlag] = useState(false)
+  const [createFlag, setCreateFlag] = useState(false)
+  const [allFlag, setAllFlag] = useState(true)
   const [pendingFlag, setPendingFlag] = useState(false)
   const [fulfilledFlag, setFulfilledFlag] = useState(false)
   const [failedFlag, setFailedFlag] = useState(false)
@@ -90,7 +89,8 @@ function DemandSlip() {
     filterToDate:'',
     filterPublisherUsername:'',
     filterStatus:'',
-    filterDataStatus:'',
+    filterDataStatus:'incomplete',
+    // filterDataStatus:'',
     filterTicketNum:'',
     accessLevel: isAccountant
   })

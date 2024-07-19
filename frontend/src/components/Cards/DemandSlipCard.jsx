@@ -26,12 +26,6 @@ function DemandSlipCard({info, partialFlag=false}) {
         }else{
             setStatusColour({border:`1px solid black`})
         }
-
-        // if(info?.dataStatus === 'incomplete'){
-        //     setDataStatusStyle({})
-        // }else if(info?.dataStatus === 'complete'){
-        //     setDataStatusStyle({})
-        // }
     },[])
 
   return (
@@ -51,6 +45,7 @@ function DemandSlipCard({info, partialFlag=false}) {
                 style={{ justifyContent:`flex-end`}}
             >
                 {info?.dataStatus === "incomplete" &&
+                (info.status!=="pending") &&
                 (isAccountant || isManager || isAdmin) 
                 &&
                     <div className="edit-card-btn"
@@ -99,8 +94,6 @@ function DemandSlipCard({info, partialFlag=false}) {
             }
         </div>
         }
-        {/* <div className="card-row">
-        </div> */}
         
         <br />
         
@@ -117,22 +110,21 @@ function DemandSlipCard({info, partialFlag=false}) {
         </div>
     {/* <p><span>Status: </span> {info.status}</p> */}
 
-    <br />
-    <p><span>Total Cost: </span>{info.totalCost}</p>
-    <br />
-
-    <div className="card-grid-row">
-        <h3></h3>
-        <h3>Products</h3>
-        <h3>Ord.</h3>
-        {partialFlag && <h3>Recv.</h3>}  
-    </div>
-
     {/* <div className='ds-new-col'> */}
-    {editFlag?
+    {(editFlag && info.status!=="pending") ?
             <UpdateIncompleteProdDataForm initialValue={info} />
         :
         <>
+        <br />
+        <p><span>Total Cost: </span>{info.totalCost}</p>
+        <br />
+
+        <div className="card-grid-row">
+            <h3></h3>
+            <h3>Products</h3>
+            <h3>Ord.</h3>
+            {partialFlag && <h3>Recv.</h3>}  
+        </div>
         
         {info.orderedProductList?.map((prod,i)=>
             <div className="card-grid-row" key={i}>

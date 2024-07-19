@@ -1,147 +1,122 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from "react-redux"
-import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai"
-import { getFilteredDemandSlips, resetAfterNewDemandSlip, updateDemandSlip } from '../../features/orders/orderSlice';
+import { getFilteredDemandSlips, resetAfterNewDemandSlip } from '../../features/orders/orderSlice';
 import useAuth from '../../hooks/useAuth';
 
 function UpdateIncompleteProdDataForm({initialValue}) {
     const dispatch = useDispatch();
 
-    const {isAdmin, isManager, isAccountant} = useAuth()
+    const {isAccountant} = useAuth()
 
     const {isSuccess, updatedDataFlag} = useSelector((state)=>state.orders)
 
-    const [formData, setFormData] = useState({
-        ...initialValue
+    const [updatedData, setUpdatedData] = useState({
+        totalCost: initialValue.totalCost,
+        orderedProductList: initialValue.orderedProductList
     })
     
     /////////////////////////////////////////////////
     //////// Functions /////////////////////////////
     ////////////////////////////////////////////////
 
-    const onChange=(e)=>{
-        setFormData((prevState)=>({
-            ...prevState,
-            [e.target.name]:e.target.value
-        }))
-    }
+    // const onChange=(e)=>{
+    //     setFormData((prevState)=>({
+    //         ...prevState,
+    //         [e.target.name]:e.target.value
+    //     }))
+    // }
 
-    const onRecievedListChange=(e,i)=>{
-        var tempList = [...formData.recievedProductList]
-
-        const numValue = e.target.value.replace(/\D/g, "");
-
-        // console.log(`nV:${numValue}`)
-        const intInputValue = parseInt(numValue.replace(/\D/g, ""),10)
-        const intMaxValue = parseInt(initialValue.orderedProductList[i].quantity,10)
-        
-        if(intInputValue>intMaxValue){
-            return alert('Invalid Quanity')
-        }
+    const onBrandCompanyChange=(e,i)=>{
+        var tempList = [...updatedData.orderedProductList]
         var tempItem = tempList[i]
+
+        var spaceRemovedBC = e.target.value?e.target.value.replace(/ /g,"").toUpperCase():""
+        // const cleanedBC = spaceRemovedBC.slice(0,3)
+        // const bC = cleanedBC
+
         let newItem = {
-            sku:tempItem.sku,
-            productFullName:tempItem.productFullName,
-            quantity:intInputValue?intInputValue:0
+            ...tempItem,
+            brandCompany:spaceRemovedBC
         }
 
-
-        // tempItem["quantity"] = e.target.value
         tempList.splice(i,1,newItem)
 
-        // console.log(`itemList:${JSON.stringify(tempList,null,4)}`)
-        setFormData((prevState)=>({
+        setUpdatedData((prevState)=>({
             ...prevState,
-            recievedProductList:tempList
+            orderedProductList:tempList
         }))
 
+    }
+
+    const onPartNumberChange=(e,i)=>{
+        var tempList = [...updatedData.orderedProductList]
+        var tempItem = tempList[i]
+
+        var spaceRemovedPN = e.target.value?e.target.value.replace(/ /g,""):""
+        // const cleanedPN = spaceRemovedPN.split("-").join("")
+        // const cleanedPN2 = cleanedPN.split("/").join("")
+        // const pN = cleanedPN2.toUpperCase()
+
+        let newItem = {
+            ...tempItem,
+            partNum: spaceRemovedPN
+        }
+
+        tempList.splice(i,1,newItem)
+
+        setUpdatedData((prevState)=>({
+            ...prevState,
+            orderedProductList:tempList
+        }))
     }
 
     const handleNumField = (e) => {
-        const value = e.target.value.replace(/\D/g, "");
-        setFormData((prevState)=>({...prevState, 
+        let value = e.target.value.replace(/[^.0-9]/g, "")
+        value = value.replace(/\s/g,"")
+
+        setUpdatedData((prevState)=>({...prevState, 
             [e.target.name]:value}));
     };
 
     const onSubmit = (e) =>{
         e.preventDefault()
 
-        let updatedOrderList = [...formData.recievedProductList]
-        // console.log(`updatedOL:${JSON.stringify(updatedOrderList,null,4)}`)
-        // console.log(`orderedList:${JSON.stringify(formData.orderedProductList,null,4)}`)
+        console.log(`uD:${JSON.stringify(updatedData,null,4)}`)
         
         let emptyOrderListObj = []
-        emptyOrderListObj = updatedOrderList.filter(prod=>(prod.sku===""
-                                                    ||prod.productFullName===""
-                                                    ||prod.quantity===""))
+        let newDataStatus = "incomplete"
+        emptyOrderListObj = updatedData.orderedProductList.filter(prod=>(
+                                        prod.sku!=="MANUAL" && 
+                                        (prod.sku.split("-")?.length<4
+                                        || prod.sku.split("-")[2]?.length===1
+                                        || prod.sku.split("-")[3]?.length===1
+                                        || prod.sku.includes("-undefined")
+                                        || prod.productFullName?.split(" ").length<4)
+                                    ))
+                                    // return console.log(`sku:${prod.sku}`)
+        console.log(`eOL:${JSON.stringify(emptyOrderListObj,null,4)}`)
 
-        //Check for Empty Order List
-        if(emptyOrderListObj.length>0){
-            return alert('Empty Field/s')
+        // Check for Empty Order List
+        // if(emptyOrderListObj.length>0 || !updatedData.totalCost
+        //     || parseInt(updatedData.totalCost)===0
+        // ){
+        //     return alert('Empty or Invalid Field/s')
+        // }else{
+            newDataStatus = "complete"
+        // }
+
+        const updatedInfo = {
+            ...initialValue,
+            dataStatus: newDataStatus,
+            orderedProductList: updatedData.orderedProductList,
+            totalCost: Number(updatedData.totalCost)
         }
-
-        // Status-wise Order List update
-        if(formData.status==="failed"){
-            updatedOrderList = []
-        }else if(formData.status==="fulfilled"){
-            updatedOrderList = [...formData.orderedProductList]
-        }
-
-        // Invalid Partial Status input check
-        if(formData.status==="partial"){
-            let allQtyZeroBool = true
-            let noQtyChangeBool = true
-
-            updatedOrderList.map((item,index)=>{
-                // All qty zero flag check
-                `${item.quantity}`==='0'?
-                    allQtyZeroBool=allQtyZeroBool && true 
-                    :
-                    allQtyZeroBool=allQtyZeroBool && false;
-                
-                // All qty same as ordered check
-                `${item.quantity}`===formData.orderedProductList[index].quantity?
-                    noQtyChangeBool = noQtyChangeBool && true
-                    :
-                    noQtyChangeBool = noQtyChangeBool && false;
-                }
-            )
-
-            // Partial to Failed Alert
-            if(allQtyZeroBool){
-                return alert('All prodcut quantity zero:\nSet status to Failed')
-            }
-
-            // Partial to Fulfilled Alert
-            if(noQtyChangeBool){
-                return alert('Partial status invalid:\nSet Status to Fulfilled')
-            }
-        }
-
-
-        // Total Cost Zero check for Partial and Fulfilled status
-        if(formData.status!=="failed" && `${formData.totalCost}`==='0' ){
-            return alert('Invalid Total Cost')
-        }
-
-
-        // Invalid status check
-        if( formData.status==="" 
-            || (formData.status!=="partial" && formData.status!=="fulfilled" && formData.status!=="failed") 
-            || !Array.isArray(updatedOrderList)
-            ){
-            return alert(`Please enter valid data`)
-        }else{
-            const updatedInfo = {
-                ...formData,
-                recievedProductList: updatedOrderList,
-            }
+        
+        console.log(`formData:${JSON.stringify(updatedInfo,null,4)}`)
             
-            // console.log(`formData:${JSON.stringify(updatedInfo,null,4)}`)
+        // dispatch(updateDemandSlip(updatedInfo))
             
-            dispatch(updateDemandSlip(updatedInfo))
-            
-        }
+        // }
     }
     /////////////////////////////////////////////////
     //////// Hooks //////////////////////////////////
@@ -150,6 +125,10 @@ function UpdateIncompleteProdDataForm({initialValue}) {
     // useEffect(()=>{
     //     console.log(`iV:${JSON.stringify(initialValue,null,4)}`)
     // },[])
+
+    useEffect(()=>{
+        // console.log(`uD;${JSON.stringify(updatedData,null,4)}`)
+    },[updatedData])
 
     useEffect(()=>{
         if(isSuccess && updatedDataFlag){
@@ -168,35 +147,41 @@ function UpdateIncompleteProdDataForm({initialValue}) {
   return (
     <>        
         <form onSubmit={onSubmit} style={{width:`100%`}}>
+        <br />
+        <p><span>Total Cost: </span>
+            {initialValue.totalCost===0?
+                <input
+                    type="text" 
+                    className='card-form-control'
+                    name="totalCost"
+                    id={`${updatedData.ticketNumber} totalCost`}
+                    value = {updatedData.totalCost}
+                    placeholder=""
+                    autoComplete='off'
+                    onChange={(e)=>handleNumField(e)} 
+                    style={{width:`40%`}}
+                />
+                :
+                updatedData.totalCost
+            }
+        </p>
+        <br />
+
+        <div className="card-grid-row">
+            <h3></h3>
+            <h3>Products</h3>
+            <h3>Ord.</h3>
+            {initialValue.status==="partial" && <h3>Recv.</h3>}  
+        </div>
 
             <div className="form-group" style={{width:`100%`}}>
 
-                {/* {console.log(`prodData:${JSON.stringify(formData,null,4)}`)} */}
-                {formData.orderedProductList.map((prod,k)=>{
+                {updatedData.orderedProductList.map((prod,k)=>{
                     return(
-                        // <div className="card-grid-row" key={i}>
-                        //     <p>{i+1}.</p>
-
-                        //     <div className="card-element">
-
-                        //         <p style={{fontWeight:`bold`}}>{prod.productFullName}</p>
-                        //         <p>{prod.sku}</p>
-                        //     </div>
-
-                        //     <p>{prod.quantity} {prod?.unit}</p>
-                            
-                        //     {partialFlag && 
-                        //         <p>{info.recievedProductList[i]?.quantity}</p>
-                        //     }
-                            
-                        // </div>
 
                     <div className="card-grid-row" key={k}>
                         <p>{k+1}.</p>
 
-                        {/* <p>{prod.sku}</p>
-                        
-                        <p>{prod.productFullName}</p> */}
                         <div className="card-element">
 
                             <p style={{fontWeight:`bold`}}>{prod.productFullName}</p>
@@ -208,9 +193,10 @@ function UpdateIncompleteProdDataForm({initialValue}) {
                                 className='card-form-control'
                                 name="brandCompany"
                                 id={`${initialValue.ticketNumber} ${k} brandCompany`}
-                                value = {formData.orderedProductList[k].brandCompany}
+                                value = {updatedData.orderedProductList[k].brandCompany?updatedData.orderedProductList[k].brandCompany:""}
                                 placeholder="Brand Company"
                                 autoComplete='off'
+                                onChange={(e)=>onBrandCompanyChange(e,k)}
                             />}
 
                             {(prod.sku.split("-").length===3 ||
@@ -221,9 +207,10 @@ function UpdateIncompleteProdDataForm({initialValue}) {
                                 className='card-form-control'
                                 name="partNum"
                                 id={`${initialValue.ticketNumber} ${k} partNum`}
-                                value = {formData.orderedProductList[k].partNum}
+                                value = {updatedData.orderedProductList[k].partNum?updatedData.orderedProductList[k].partNum:""}
                                 placeholder="Part Number"
                                 autoComplete='off'
+                                onChange={(e)=>onPartNumberChange(e,k)}
                             />}
                             
                             <p>{prod.sku}</p>
@@ -235,7 +222,7 @@ function UpdateIncompleteProdDataForm({initialValue}) {
                         
                         {initialValue.status==="partial" && 
                                 <p>
-                                {formData.recievedProductList.filter((x)=>x.sku===prod.sku)[0].quantity}
+                                {initialValue.recievedProductList.filter((x)=>x.sku===prod.sku)[0].quantity}
 
                                 </p>
                         }
