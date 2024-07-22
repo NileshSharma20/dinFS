@@ -5,6 +5,10 @@ const reviewproductsSchema = mongoose.Schema({
         type: String,
         required: [true, 'Please add Ticket Number']
     },
+    username:{
+        type: String,
+        required: true
+    },
     sku:{
         type: String,
         required: [true, 'Please add the Stock Keeping Unit']
@@ -61,4 +65,4 @@ const reviewproductsSchema = mongoose.Schema({
     }
 )
 
-module.exports = mongoose.model('Reviewroducts', reviewproductsSchema)
+module.exports = mongoose.model('Reviewproducts', reviewproductsSchema)

@@ -139,6 +139,36 @@ export const updateDemandSlip = createAsyncThunk(
   }
 )
 
+export const updateIncompleteDemandSlip = createAsyncThunk(
+  'orders/updateIncompleteDemandSlip',
+  async(updatedData,thunkAPI)=>{
+    try {
+      try {
+            
+        const token = thunkAPI.getState().auth.token
+        return await orderService.updateIncompleteDemandSlip({updatedData,token})
+        // await thunkAPI.dispatch(getFilteredDemandSlips()) 
+
+      } catch (err) {
+        
+        if(err.response.status === 403){
+          await thunkAPI.dispatch(refreshToken())
+
+          const token = thunkAPI.getState().auth.token
+          return await orderService.updateIncompleteDemandSlip({updatedData,token})
+          // await thunkAPI.dispatch(getFilteredDemandSlips()) 
+        }
+      }
+    } catch (error) {
+      const message =
+          (error.response && error.response.data && error.response.data.message) ||
+          error.message ||
+          error.toString()
+      return thunkAPI.rejectWithValue(message)
+    }
+  }
+)
+
 export const orderSlice = createSlice({
     name: 'orders',
     initialState,
@@ -235,6 +265,23 @@ export const orderSlice = createSlice({
           state.message = action.payload
         })
         .addCase(updateDemandSlip.rejected, (state, action) => {
+          state.isLoading = false
+          state.isError = true
+          state.message = action.payload
+        })
+
+      // Update Incomplete Demand Slip Data //////
+        .addCase(updateIncompleteDemandSlip.pending, (state) => {
+          state.isLoading = true
+          state.updatedDataFlag=false
+        })
+        .addCase(updateIncompleteDemandSlip.fulfilled, (state, action) => {
+          state.isLoading = false
+          state.isSuccess = true
+          state.updatedDataFlag=true
+          state.message = action.payload
+        })
+        .addCase(updateIncompleteDemandSlip.rejected, (state, action) => {
           state.isLoading = false
           state.isError = true
           state.message = action.payload

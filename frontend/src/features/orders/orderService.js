@@ -190,11 +190,24 @@ const updateDemandSlip = async({updatedData, token})=>{
     return response.data
 }
 
+const updateIncompleteDemandSlip = async({updatedData, token})=>{
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }
+    // API Call
+    const response = await axios.patch(order_URI+`updateData/`+updatedData.ticketNumber, updatedData, config)
+    
+    return response.data
+}
+
 const orderService = {
     getAllDemandSlips,
     getFilteredDemandSlips,
     generateDemandSlip,
     updateDemandSlip,
+    updateIncompleteDemandSlip,
 }
 
 export default orderService

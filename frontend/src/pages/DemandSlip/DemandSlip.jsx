@@ -40,8 +40,8 @@ function DemandSlip() {
 
   const usernameList = [`all`, ...usersList.map(user=>user.username)]
 
-  const [createFlag, setCreateFlag] = useState(false)
-  const [allFlag, setAllFlag] = useState(true)
+  const [createFlag, setCreateFlag] = useState(true)
+  const [allFlag, setAllFlag] = useState(false)
   const [pendingFlag, setPendingFlag] = useState(false)
   const [fulfilledFlag, setFulfilledFlag] = useState(false)
   const [failedFlag, setFailedFlag] = useState(false)
@@ -89,8 +89,8 @@ function DemandSlip() {
     filterToDate:'',
     filterPublisherUsername:'',
     filterStatus:'',
-    filterDataStatus:'incomplete',
-    // filterDataStatus:'',
+    // filterDataStatus:'incomplete',
+    filterDataStatus:'',
     filterTicketNum:'',
     accessLevel: isAccountant
   })

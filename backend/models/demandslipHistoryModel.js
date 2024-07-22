@@ -41,6 +41,10 @@ const demandsliphistorySchema = mongoose.Schema({
         type: [Object],
         required: false
     },
+    notes:{
+        type: String,
+        required: false
+    }
     
     },
     {

@@ -11,6 +11,7 @@ const Demandslip = require("../models/demandslipModel")
 const DemandslipHistory = require('../models/demandslipHistoryModel')
 const User = require("../models/userModel")
 const Products = require('../models/productsModel')
+const ReviewProducts = require("../models/reviewproductsModel")
 
 
 // @desc   Create a new Demand Slip
@@ -536,8 +537,6 @@ const updateIncompleteOrder = asyncHandler(async(req,res)=>{
     const { orderedProductList, status, dataStatus, totalCost } = req.body
     const { ticketNumber } = req.params
 
-    // console.log(`oL:${JSON.stringify(orderedProductList,null,4)}`)
-
     // Create 7 days logic for Accountant and Manager and infinite for Admin
 
     const { username, roles } = req
@@ -578,6 +577,41 @@ const updateIncompleteOrder = asyncHandler(async(req,res)=>{
     demandSlip.totalCost = totalCost
     demandSlip.dataStatus = dataStatus
 
+    let newSKUList =[], oldSKUList=[], cleanedReviewData=[]
+
+    for(const itemData of updatedOrderList){
+        if(itemData.sku !=="MANUAL"){
+            const existingSKU = await Products.findOne({sku:itemData.sku}).lean()
+            
+            if(!existingSKU){
+                newSKUList.push(itemData)
+            }else{
+                oldSKUList.push(itemData)
+            }
+        }
+        
+    }
+    // console.log(`nSL:${JSON.stringify(newSKUList,null,4)}`)
+
+    if(newSKUList.length>0){
+        cleanedReviewData = cleanDataFoReview(newSKUList, ticketNumber, employeeExists.username)
+    }
+
+    // Update Quantity of Recieved Products
+    // let toUpdateProdList = demandSlip.recievedProductList
+
+    // for(const itemData of toUpdateProdList){ 
+    //     let partNumber = itemData.sku.split("-")[3]
+    //     console.log(`pN: ${partNumber}`)           
+    //     await Products.updateMany({$or:[
+    //                                 {sku:itemData.sku},
+    //                                 {sku:{$regex:partNumber}}
+    //                             ]},
+    //         {$inc:{qty:itemData.quantity}},
+    //         {upsert:false}
+    //     )
+    // }
+
     const demandBackup = {
         ticketNumber: demandSlip.ticketNumber,
         employeeId,
@@ -587,39 +621,25 @@ const updateIncompleteOrder = asyncHandler(async(req,res)=>{
         status: demandSlip.status,
         orderedProductList: demandSlip.orderedProductList,
         recievedProductList: demandSlip.recievedProductList,
-        totalCost: demandSlip.totalCost
+        totalCost: demandSlip.totalCost,
+        // note: `Incomplete Data updated by ${employeeExists.username} with ${newSKUList.length} non-existing products`
     }
+
+    const options = { ordered: true }
 
     const demandHistory =  await DemandslipHistory.create(demandBackup)
     const updatedDemandslip = await demandSlip.save()
 
-    let newSKUList =[], cleanedReviewData=[]
+    const reviewProducts = await ReviewProducts.insertMany(cleanedReviewData, options) 
 
-    for(const itemData of updatedOrderList){
-        // var existingSKU 
-        if(itemData.sku !=="MANUAL"){
-            const existingSKU = await Products.findOne({sku:itemData.sku}).lean()
-            
-            if(!existingSKU){
-                newSKUList.push(itemData)
-            }
-        }
-        
+    // res.status(200).json(cleanedReviewData)
+
+    if(demandHistory && reviewProducts){
+        res.status(200).json({message:`Demand Slip ${updatedDemandslip.ticketNumber} Data updated with dataStatus Compelte`})
+    }else{
+        res.status(400)
+        throw new Error(`Failure`)
     }
-    console.log(`nSL:${JSON.stringify(newSKUList,null,4)}`)
-
-    if(!newSKUList.length===0){
-        cleanedReviewData = cleanDataFoReview(newSKUList)
-    }
-
-    res.status(200).json(cleanedReviewData)
-
-    // if(demandHistory){
-    //     res.json({message:`Demand Slip ${updatedDemandslip.ticketNumber} Data updated with dataStatus Compelte`})
-    // }else{
-    //     res.status(400)
-    //     throw new Error(`Failure`)
-    // }
 })
 
 // @desc   Delete Demand Slip (Admin access only)

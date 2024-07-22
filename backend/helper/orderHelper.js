@@ -50,14 +50,12 @@ const generateSKUforIncompleteData = (orderedProductList)=>{
         let pN, spaceRemovedPN, bC, spaceRemovedBC, newSKU, newProdFullName
 
         if(item.partNum && item.partNum!==""){
-            spaceRemovedPN = item.partNum.replace(/ /g,"").toUpperCase()
-            const cleanedPN = spaceRemovedPN.split("-").join("")
-            const cleanedPN2 = cleanedPN.split("/").join("")
-            pN = cleanedPN2
+            spaceRemovedPN = item.partNum.replace(/\s/g,"").toUpperCase()
+            pN = spaceRemovedPN.replace(/[-/]/g,"")
         }
         
         if(item.brandCompany && item.brandCompany!==""){
-            spaceRemovedBC = item.brandCompany.replace(/ /g,"").toUpperCase()
+            spaceRemovedBC = item.brandCompany.replace(/\s/g,"").toUpperCase()
             const cleanedBC = spaceRemovedBC.slice(0,3)
             bC = cleanedBC
         }
@@ -69,11 +67,11 @@ const generateSKUforIncompleteData = (orderedProductList)=>{
         }else if(item.partNum && !item.brandCompany){
             // Only Part Num update
             newSKU = item.sku +"-"+ pN
-            newProdFullName = item.productFullName +"-"+ spaceRemovedPN
+            newProdFullName = item.productFullName +" "+ spaceRemovedPN
         }else if(item.partNum && item.brandCompany){
             // Brand Company and Part Num update
             newSKU = item.sku +"-"+ bC +"-"+ pN
-            newProdFullName = item.productFullName +"-"+ spaceRemovedBC +"-"+ spaceRemovedPN
+            newProdFullName = item.productFullName +" "+ spaceRemovedBC +" "+ spaceRemovedPN
         }
 
         let newItem = {
@@ -85,23 +83,24 @@ const generateSKUforIncompleteData = (orderedProductList)=>{
 
         return newItem
     })
-
+    
     return updatedOrderList
 }
 
 // @desc   Clean Non-existing Data for Review Collection
-const cleanDataFoReview = (newDataList, ticketNumber) =>{
+const cleanDataFoReview = (newDataList, ticketNumber, username) =>{
     const cleanedData = newDataList.map((item)=>{
         let itemCode, productName, partNum, vehicleModel, brandCompany
 
-        itemCode = sku.split("-")[0]
-        productName = item.split(" ")[0]
-        vehicleModel = item.split(" ")[1]
-        brandCompany = item.split(" ")[2]
-        partNum = item.split(" ")[3]
+        itemCode = item.sku.split("-")[0]
+        productName = item.productFullName.split(" ")[0]
+        vehicleModel = item.productFullName.split(" ")[1]
+        brandCompany = item.productFullName.split(" ")[2]
+        partNum = item.productFullName.split(" ")[3]
 
         let updatedItem = {
             ticketNumber: ticketNumber,
+            username:username,
             sku: item.sku,
             itemCode,
             productName,
@@ -116,7 +115,7 @@ const cleanDataFoReview = (newDataList, ticketNumber) =>{
         return updatedItem
     })
 
-    console.log(`reviewList:${cleanedData}`)
+    // console.log(`reviewList:${cleanedData}`)
 
     return cleanedData
 } 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from "react-redux"
-import { getFilteredDemandSlips, resetAfterNewDemandSlip } from '../../features/orders/orderSlice';
+import { getFilteredDemandSlips, resetAfterNewDemandSlip, updateIncompleteDemandSlip } from '../../features/orders/orderSlice';
 import useAuth from '../../hooks/useAuth';
 
 function UpdateIncompleteProdDataForm({initialValue}) {
@@ -102,7 +102,7 @@ function UpdateIncompleteProdDataForm({initialValue}) {
                                         || prod?.brandCompany===""
                                     ))
 
-        console.log(`eOL:${JSON.stringify(emptyOrderListObj,null,4)}`)
+        // console.log(`eOL:${JSON.stringify(emptyOrderListObj,null,4)}`)
 
         // Check for Empty Order List
         if(emptyOrderListObj.length>0 || !updatedData.totalCost
@@ -123,7 +123,7 @@ function UpdateIncompleteProdDataForm({initialValue}) {
         
         console.log(`formData:${JSON.stringify(updatedInfo,null,4)}`)
             
-        // dispatch(updateDemandSlip(updatedInfo))
+        dispatch(updateIncompleteDemandSlip(updatedInfo))
             
         // }
     }
