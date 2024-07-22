@@ -45,49 +45,81 @@ const generateTicket = asyncHandler(async()=>{
 })
 
 // @desc   Genearet SKU for Incomplete Demand Slip Data
-const generateSKUforIncompleteData = asyncHandler(async(orderedProductList)=>{
+const generateSKUforIncompleteData = (orderedProductList)=>{
     const updatedOrderList = orderedProductList.map((item)=>{
-        let pN, bC, newSKU, newProdFullName
+        let pN, spaceRemovedPN, bC, spaceRemovedBC, newSKU, newProdFullName
 
         if(item.partNum && item.partNum!==""){
-            const spaceRemovedPN = item.partNum.replace(/ /g,"")
+            spaceRemovedPN = item.partNum.replace(/ /g,"").toUpperCase()
             const cleanedPN = spaceRemovedPN.split("-").join("")
             const cleanedPN2 = cleanedPN.split("/").join("")
-            pN = cleanedPN2.toUpperCase()
+            pN = cleanedPN2
         }
         
         if(item.brandCompany && item.brandCompany!==""){
-            const spaceRemovedBC = item.brandCompany.replace(/ /g,"").toUpperCase()
+            spaceRemovedBC = item.brandCompany.replace(/ /g,"").toUpperCase()
             const cleanedBC = spaceRemovedBC.slice(0,3)
             bC = cleanedBC
         }
 
-        switch(item){
-            case (!item.partNum && !item.brandCompany):
-                newSKU = item.sku
-                newProdFullName = item.productFullName
-                break;
-
-            case (item.partNum && !item.brandCompany):
-                newSKU = item.sku +"-"+ pN
-                newProdFullName = item.productFullName +"-"+ spaceRemovedPN
-                break;
-            
-            case (item.partNum && item.brandCompany):
-                newSKU = item.sku +"-"+ bC +"-"+ pN
-                newProdFullName = item.productFullName +"-"+ spaceRemovedBC +"-"+ spaceRemovedPN
-                break;
-
-            default:
-                newSKU = item.sku
-                newProdFullName = item.productFullName
-                break;
-            
+        if(!item.partNum && !item.brandCompany){
+            // No update to SKu
+            newSKU = item.sku
+            newProdFullName = item.productFullName
+        }else if(item.partNum && !item.brandCompany){
+            // Only Part Num update
+            newSKU = item.sku +"-"+ pN
+            newProdFullName = item.productFullName +"-"+ spaceRemovedPN
+        }else if(item.partNum && item.brandCompany){
+            // Brand Company and Part Num update
+            newSKU = item.sku +"-"+ bC +"-"+ pN
+            newProdFullName = item.productFullName +"-"+ spaceRemovedBC +"-"+ spaceRemovedPN
         }
+
+        let newItem = {
+            sku: newSKU,
+            productFullName: newProdFullName,
+            quantity: item.quantity,
+            unit: item.unit
+        }
+
+        return newItem
     })
 
     return updatedOrderList
-})
+}
+
+// @desc   Clean Non-existing Data for Review Collection
+const cleanDataFoReview = (newDataList, ticketNumber) =>{
+    const cleanedData = newDataList.map((item)=>{
+        let itemCode, productName, partNum, vehicleModel, brandCompany
+
+        itemCode = sku.split("-")[0]
+        productName = item.split(" ")[0]
+        vehicleModel = item.split(" ")[1]
+        brandCompany = item.split(" ")[2]
+        partNum = item.split(" ")[3]
+
+        let updatedItem = {
+            ticketNumber: ticketNumber,
+            sku: item.sku,
+            itemCode,
+            productName,
+            vehicleModel,
+            brandCompany,
+            partNum,
+            qty:item.quantity,
+            unit: item.unit,
+            productFullName: item.productFullName,
+        }
+
+        return updatedItem
+    })
+
+    console.log(`reviewList:${cleanedData}`)
+
+    return cleanedData
+} 
 
 // @desc   Generating Demand Reciept PDF
 const generateDemandReciept=(ticketNumber, distributorName, date, prodData)=>{
@@ -131,5 +163,6 @@ const generateDemandReciept=(ticketNumber, distributorName, date, prodData)=>{
 module.exports = {
     generateTicket,
     generateSKUforIncompleteData,
+    cleanDataFoReview,
     generateDemandReciept,
 }

@@ -4,6 +4,7 @@ const { createNewDemandSlip,
         getAllDemandSlips,
         getFilteredDemandSlips,
         updateAfterDelivery,
+        updateIncompleteOrder,
         deleteDemandSlip,
         deleteAllDemandSlip,
         deleteAllDemandHistory } =  require("../controllers/orderController")
@@ -23,6 +24,8 @@ router.route("/:ticketNumber")
 router.route("/filter")
         // .post(getFilteredDemandSlips)
         .get(getFilteredDemandSlips)
+router.route("/updateData/:ticketNumber")
+        .patch(updateIncompleteOrder)
 
 router.route("/reset/history")
         .delete(deleteAllDemandHistory)

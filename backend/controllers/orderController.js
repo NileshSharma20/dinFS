@@ -1,7 +1,7 @@
 const asyncHandler = require('express-async-handler')
 const fs = require("fs")
 
-const { generateTicket, generateSKUforIncompleteData } = require("../helper/orderHelper")
+const { generateTicket, generateSKUforIncompleteData, cleanDataFoReview } = require("../helper/orderHelper")
 const { paginateData } = require('../helper/paginationHelper')
 
 const { endOfDay } = require('date-fns/endOfDay')
@@ -488,6 +488,7 @@ const updateAfterDelivery = asyncHandler(async(req,res)=>{
         demandSlip.recievedProductList = []
         demandSlip.totalCost = 0
     }
+
     const demandBackup = {
         ticketNumber: demandSlip.ticketNumber,
         employeeId,
@@ -532,8 +533,10 @@ const updateAfterDelivery = asyncHandler(async(req,res)=>{
 // @route  PATCH /api/order/:ticketNumber
 // @access Private
 const updateIncompleteOrder = asyncHandler(async(req,res)=>{
-    const { orderedProductList, status, totalCost } = req.body
+    const { orderedProductList, status, dataStatus, totalCost } = req.body
     const { ticketNumber } = req.params
+
+    // console.log(`oL:${JSON.stringify(orderedProductList,null,4)}`)
 
     // Create 7 days logic for Accountant and Manager and infinite for Admin
 
@@ -568,9 +571,55 @@ const updateIncompleteOrder = asyncHandler(async(req,res)=>{
             res.status(403)
             throw new Error("Forbidden: Minimum Accountant Access required or Order Status Pending")
     }
-
+    
     const updatedOrderList = generateSKUforIncompleteData(orderedProductList)
     
+    demandSlip.orderedProductList = updatedOrderList
+    demandSlip.totalCost = totalCost
+    demandSlip.dataStatus = dataStatus
+
+    const demandBackup = {
+        ticketNumber: demandSlip.ticketNumber,
+        employeeId,
+        username: employeeExists.username,
+        deliveryPartnerName: demandSlip.deliveryPartnerName,
+        distributorName: demandSlip.distributorName,
+        status: demandSlip.status,
+        orderedProductList: demandSlip.orderedProductList,
+        recievedProductList: demandSlip.recievedProductList,
+        totalCost: demandSlip.totalCost
+    }
+
+    const demandHistory =  await DemandslipHistory.create(demandBackup)
+    const updatedDemandslip = await demandSlip.save()
+
+    let newSKUList =[], cleanedReviewData=[]
+
+    for(const itemData of updatedOrderList){
+        // var existingSKU 
+        if(itemData.sku !=="MANUAL"){
+            const existingSKU = await Products.findOne({sku:itemData.sku}).lean()
+            
+            if(!existingSKU){
+                newSKUList.push(itemData)
+            }
+        }
+        
+    }
+    console.log(`nSL:${JSON.stringify(newSKUList,null,4)}`)
+
+    if(!newSKUList.length===0){
+        cleanedReviewData = cleanDataFoReview(newSKUList)
+    }
+
+    res.status(200).json(cleanedReviewData)
+
+    // if(demandHistory){
+    //     res.json({message:`Demand Slip ${updatedDemandslip.ticketNumber} Data updated with dataStatus Compelte`})
+    // }else{
+    //     res.status(400)
+    //     throw new Error(`Failure`)
+    // }
 })
 
 // @desc   Delete Demand Slip (Admin access only)
@@ -682,6 +731,7 @@ module.exports={
     getAllDemandSlips,
     getFilteredDemandSlips,
     updateAfterDelivery,
+    updateIncompleteOrder,
     deleteAllDemandSlip,
     deleteAllDemandHistory,
     deleteDemandSlip

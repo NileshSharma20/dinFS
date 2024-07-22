@@ -12,7 +12,17 @@ function UpdateIncompleteProdDataForm({initialValue}) {
 
     const [updatedData, setUpdatedData] = useState({
         totalCost: initialValue.totalCost,
-        orderedProductList: initialValue.orderedProductList
+        orderedProductList: initialValue.orderedProductList.map((item)=>{
+            let prod = {...item}
+            if(item.sku.split("-").length===3){
+                prod.partNum=""
+            }else if(item.sku.split("-").length===2){
+                prod.partNum=""
+                prod.brandCompany=""
+            }
+
+            return prod
+        })
     })
     
     /////////////////////////////////////////////////
@@ -81,29 +91,28 @@ function UpdateIncompleteProdDataForm({initialValue}) {
     const onSubmit = (e) =>{
         e.preventDefault()
 
-        console.log(`uD:${JSON.stringify(updatedData,null,4)}`)
-        
+        if(!isAccountant){
+            return alert('Forbidden: Minimum Accountant Access required')
+        }   
+
         let emptyOrderListObj = []
         let newDataStatus = "incomplete"
         emptyOrderListObj = updatedData.orderedProductList.filter(prod=>(
-                                        prod.sku!=="MANUAL" && 
-                                        (prod.sku.split("-")?.length<4
-                                        || prod.sku.split("-")[2]?.length===1
-                                        || prod.sku.split("-")[3]?.length===1
-                                        || prod.sku.includes("-undefined")
-                                        || prod.productFullName?.split(" ").length<4)
+                                        prod?.partNum===""
+                                        || prod?.brandCompany===""
                                     ))
-                                    // return console.log(`sku:${prod.sku}`)
+
         console.log(`eOL:${JSON.stringify(emptyOrderListObj,null,4)}`)
 
         // Check for Empty Order List
-        // if(emptyOrderListObj.length>0 || !updatedData.totalCost
-        //     || parseInt(updatedData.totalCost)===0
-        // ){
-        //     return alert('Empty or Invalid Field/s')
-        // }else{
+        if(emptyOrderListObj.length>0 || !updatedData.totalCost
+            || Number(updatedData.totalCost)===0
+            || typeof updatedData.totalCost === "undefined" 
+        ){
+            return alert('Empty or Invalid Field/s')
+        }else{
             newDataStatus = "complete"
-        // }
+        }
 
         const updatedInfo = {
             ...initialValue,
