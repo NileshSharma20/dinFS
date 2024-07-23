@@ -10,7 +10,6 @@ import AllOrderPagination from './AllOrderPagination'
 
 import { getFilteredDemandSlips } from '../../features/orders/orderSlice'
 import { resetProducts } from '../../features/products/productSlice'
-import { AiOutlineClose } from 'react-icons/ai'
 import { getAllUsers } from '../../features/users/usersSlice'
 // 
 import useAuth from '../../hooks/useAuth'
@@ -18,13 +17,12 @@ import useAuth from '../../hooks/useAuth'
 // import UserDropdown from "../../components/Dropdown/UserDropdown"
 import "./DemandSlip.css"
 import LegendModal from '../../components/Modals/LegendModal'
+import DataStatusDropdown from '../../components/Dropdown/DataStatusDropdown'
 
 function DemandSlip() {
   const dispatch = useDispatch()
 
-  const modalRef = useRef()
-
-  const { isAdmin, isManager } = useAuth()
+  const { isAdmin, isManager, isAccountant } = useAuth()
   
   const dateInputRef = useRef(null);
   const toDateInputRef = useRef(null);
@@ -48,8 +46,41 @@ function DemandSlip() {
   const [fulfilledFlag, setFulfilledFlag] = useState(false)
   const [failedFlag, setFailedFlag] = useState(false)
   const [partialFlag, setPartialFlag] = useState(false)
+  // const [incompleteFlag, setIncompleteFlag] = useState(false)
 
   const [legendFlag, setLegendFlag] = useState(false)
+  
+  const currDate = new Date()
+  let currDay = currDate.getDate()
+  let currMonth = currDate.getMonth()+1
+  let currYear = currDate.getFullYear()
+
+  if(currDay<10){
+    currDay = '0'+currDay
+  }
+
+  if(currMonth<10){
+    currMonth = '0'+currMonth
+  }
+
+  const currDateString = currYear+"-"+currMonth+"-"+currDay
+  const currentDateStart = new Date(currDateString)
+
+  let weekAgoDate = new Date(currentDateStart - 7 * 24 * 60 * 60 * 1000)
+
+  let weekAgoDay = weekAgoDate.getDate()
+  let weekAgoMonth = weekAgoDate.getMonth()+1
+  let weekAgoYear = weekAgoDate.getFullYear()
+
+  if(weekAgoDay<10){
+    weekAgoDay = '0'+weekAgoDay
+  }
+
+  if(weekAgoMonth<10){
+    weekAgoMonth = '0'+weekAgoMonth
+  }
+
+  const weekAgoDateString = weekAgoYear+"-"+weekAgoMonth+"-"+weekAgoDay
 
   const [filterParams,setFilterParams] = useState({
     rawDate:'',
@@ -58,13 +89,16 @@ function DemandSlip() {
     filterToDate:'',
     filterPublisherUsername:'',
     filterStatus:'',
+    // filterDataStatus:'incomplete',
+    filterDataStatus:'',
     filterTicketNum:'',
-    accessLevel: isManager
+    accessLevel: isAccountant
   })
 
   const pageLimit = 50
 
   const [filterUsername, setFilterUsername] = useState('')
+  // const [filterDataStatus, setFilterDataStatus] = useState('')
 
   /////////////////////////////////////////////////
   //////// Functions /////////////////////////////
@@ -75,19 +109,22 @@ function DemandSlip() {
   }
 
   const onFilterChange=(e)=>{
+    // console.log(`name:${e.target.name}\nvalue:${e.target.value}`)
     if(e.target.name==='rawDate'){
       const fD = handleDateFilter(e.target.value)
 
-      setFilterParams((prevState)=>({
+      return setFilterParams((prevState)=>({
           ...prevState,
+          rawDate:e.target.value,
           filterDate:fD
       }))
     }
     else if(e.target.name==='rawToDate'){
       const tD = handleDateFilter(e.target.value)
 
-      setFilterParams((prevState)=>({
+      return setFilterParams((prevState)=>({
           ...prevState,
+          rawToDate:e.target.value,
           filterToDate:tD
       }))
     }
@@ -111,11 +148,18 @@ function DemandSlip() {
       filterToDate:'',
       filterPublisherUsername:'',
       filterStatus:'',
+      filterDataStatus:'',
       filterTicketNum:'',
-      accessLevel: isManager
+      accessLevel: isAccountant
     })
 
     setFilterUsername('')
+
+    pendingFlag && setFilterParams((prevState)=>({...prevState,filterStatus:'pending'})) 
+    partialFlag && setFilterParams((prevState)=>({...prevState,filterStatus:'partial'})) 
+    failedFlag && setFilterParams((prevState)=>({...prevState,filterStatus:'failed'})) 
+    fulfilledFlag && setFilterParams((prevState)=>({...prevState,filterStatus:'fulfilled'})) 
+    // setFilterDataStatus('')
   }
 
   const handleFilterSearch =()=>{
@@ -129,8 +173,6 @@ function DemandSlip() {
     }
 
     dispatch(getFilteredDemandSlips(filterParams))
-
-    
   }
   
   const handleCreateClick=()=>{
@@ -141,6 +183,7 @@ function DemandSlip() {
     setPartialFlag(false)
     setPendingFlag(false)
     setFulfilledFlag(false)
+    
   }
 
   const handleAllClick=()=>{
@@ -164,9 +207,8 @@ function DemandSlip() {
     setPendingFlag(false)
     setFulfilledFlag(false)
     
-    setAllFlag(true)
-
     
+    setAllFlag(true)
   }
   
   const handlePendingClick=()=>{
@@ -189,9 +231,8 @@ function DemandSlip() {
     setPartialFlag(false)
     setFulfilledFlag(false)
     
-    setPendingFlag(true)
-
     
+    setPendingFlag(true)
   }
   
   const handlePartialClick=()=>{
@@ -204,15 +245,14 @@ function DemandSlip() {
       }
     ))
       
-      setCreateFlag(false)
-      setAllFlag(false)
-      setPendingFlag(false)
-      setFailedFlag(false)
-      setFulfilledFlag(false)
-      
-      setPartialFlag(true)
-
-      
+    setCreateFlag(false)
+    setAllFlag(false)
+    setPendingFlag(false)
+    setFailedFlag(false)
+    setFulfilledFlag(false)
+    
+    
+    setPartialFlag(true)
     }
   
   const handleFailedClick=()=>{
@@ -230,6 +270,7 @@ function DemandSlip() {
     setPendingFlag(false)
     setPartialFlag(false)
     setFulfilledFlag(false)
+    
     
     setFailedFlag(true)
 
@@ -252,10 +293,30 @@ function DemandSlip() {
     setFailedFlag(false)
     setPartialFlag(false)
     
+    
     setFulfilledFlag(true)
-    
-    
   }
+
+  // const handleIncompleteClick=()=>{
+  //   setFilterParams(((prevState)=>({...prevState,filterStatus:'', filterDataStatus:'incomplete'})))
+  //   dispatch(getFilteredDemandSlips(
+  //     { ...filterParams,
+  //       filterStatus:'',
+  //       filterDataStatus:'incomplete',
+  //       page:1,
+  //       limit:pageLimit
+  //     }
+  //   ))
+
+  //   setCreateFlag(false)
+  //   setAllFlag(false)
+  //   setPendingFlag(false)
+  //   setFailedFlag(false)
+  //   setPartialFlag(false)
+  //   setFulfilledFlag(false)
+    
+  //   setIncompleteFlag(true)
+  // }
   
   // const handleLegendClick=()=>{
   //   setLegendFlag(!legendFlag)
@@ -269,7 +330,9 @@ function DemandSlip() {
       let inputDay = rawData.slice(8)
       let formatterFilterDate = inputDay+inputMonth+inputYear
       
-      return formatterFilterDate
+      // console.log(formatterFilterDate)
+
+      return formatterFilterDate      
     }
   }
   
@@ -279,7 +342,7 @@ function DemandSlip() {
   
   // Reset Prod Search Results and Load Demand Slips
   useEffect(()=>{
-    if(isAdmin || isManager){
+    if(isAdmin || isManager || isAccountant){
       dispatch(getAllUsers())
     }    
     dispatch(resetProducts())
@@ -301,21 +364,21 @@ function DemandSlip() {
 
   },[filterUsername])
 
-  //Pop up handling
+  // Set Filter Data Status
   // useEffect(()=>{
-  //   let handler = (event) => {
-  //       if(legendFlag && !modalRef.current.contains(event.target) 
-  //         )
-  //         {
-  //             setLegendFlag(false)  
-  //         }
-  //   };
-  //   document.addEventListener("mousedown", handler);
-
-  //   return()=>{
-  //   document.removeEventListener("mousedown",handler);
+  //   if(filterDataStatus!=='all'){
+  //     setFilterParams((prevState)=>({
+  //       ...prevState,
+  //       filterDataStatus:filterDataStatus
+  //     }))
+  //   }else{
+  //     setFilterParams((prevState)=>({
+  //       ...prevState,
+  //       filterDataStatus:''
+  //     }))
   //   }
-  // })
+
+  // },[filterDataStatus])
 
   return (
     <>
@@ -406,6 +469,12 @@ function DemandSlip() {
           Fulfilled        
         </div>
 
+        {/* <div className={`ds-filter-btn ${incompleteFlag?"ds-filer-btn-active":""}`}
+          onClick={()=>handleIncompleteClick()}
+        >
+          Incomplete        
+        </div> */}
+
         <div className={`ds-filter-btn ${legendFlag?"ds-filer-btn-active":""}`}
           onClick={()=>handleLegendClick()}
         >
@@ -415,13 +484,17 @@ function DemandSlip() {
 
       </div>
 
-      {(allFlag||pendingFlag||failedFlag||partialFlag||fulfilledFlag) 
+      {(allFlag||pendingFlag||failedFlag||partialFlag||fulfilledFlag
+        // ||incompleteFlag
+      ) 
         &&
+        <>
+
         <div className="ds-filter-container"
           style={{height:`auto`, marginBottom:`3vh`}}
           >
 
-        {(isAdmin || isManager) && 
+        {(isAdmin || isManager || isAccountant) && 
         <>
           {/* Filter Date Input */}
           <label htmlFor="rawDate" className='date-input-label'>
@@ -431,7 +504,10 @@ function DemandSlip() {
             className='date-input-box'
             name='rawDate'
             type="date"
+            max={currDateString}
+            min={(isAccountant && !isManager)? weekAgoDateString:""}
             value={filterParams.rawDate}
+            // value={filterParams.filterDate}
             onChange={onFilterChange}
             ref={dateInputRef}
           />
@@ -443,6 +519,8 @@ function DemandSlip() {
             className='date-input-box'
             name='rawToDate'
             type="date"
+            max={currDateString}
+            min={filterParams.rawDate?filterParams.rawDate:""}
             value={filterParams.rawToDate}
             onChange={onFilterChange}
             ref={toDateInputRef}
@@ -458,6 +536,22 @@ function DemandSlip() {
           </div>
         </>
         }
+        </div>
+
+        <div className="ds-filter-container"
+          style={{height:`8vh`, marginBottom:`5vh`}}
+        >
+          
+          {/* Data Status Dropdown button */}
+          {/* {!incompleteFlag && */}
+          <div className='ds-filter-dropdown-container'>
+            <DataStatusDropdown
+              value={filterParams.filterDataStatus} 
+              dataList={['all','complete','incomplete']} 
+              passDataStatus={setFilterParams}
+              />
+          </div>
+          {/* } */}
 
         {/* Ticket Number Search*/}
           <input 
@@ -476,6 +570,8 @@ function DemandSlip() {
         <div className='ds-filter-btn' onClick={()=>handleFilterClear()}>Clear</div>
       
       </div>
+
+      </>
     }
       
       {/* All results count */}

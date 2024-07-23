@@ -95,58 +95,58 @@ const createProductDataJSON = (csvFileData) => {
   // Search Products
   const searchSKUProducts = async (itemData,skuOnlyFlag) => {
     const response = await axios.post(prod_URI +`search/sku/${skuOnlyFlag}`, itemData)
-    const res = response.data.map((item)=>{
-      let additionalInfo=''
+    // const res = response.data.map((item)=>{
+    //   let additionalInfo=''
       
       // Foot Rest
-      if(item.itemCode==="FTR"){
-        console.log(`in switch:${item.metaData.position}`)
-        switch(item.metaData.position){
-          case "FRLH":
-            additionalInfo='FRONT LEFT'
-            break;
+      // if(item.itemCode==="FTR"){
+      //   console.log(`in switch:${item.metaData.position}`)
+      //   switch(item.metaData.position){
+      //     case "FRLH":
+      //       additionalInfo='FRONT LEFT'
+      //       break;
           
-          case "FRRH":
-            additionalInfo='FRONT RIGHT'
-            break;
+      //     case "FRRH":
+      //       additionalInfo='FRONT RIGHT'
+      //       break;
           
-          case "RRLH":
-            additionalInfo='REAR LEFT'
-            break;
+      //     case "RRLH":
+      //       additionalInfo='REAR LEFT'
+      //       break;
           
-          case "RRRH":
-            additionalInfo='REAR RIGHT'
-            break;
+      //     case "RRRH":
+      //       additionalInfo='REAR RIGHT'
+      //       break;
             
-            // default:
-            //   additionalInfo=''
-            }
-      }
+      //       // default:
+      //       //   additionalInfo=''
+      //       }
+      // }
 
-      else if(item.itemCode==="RVM"){
-        switch(item.metaData.position){
-          case "LH":
-            additionalInfo="LEFT"
-            break;
+      // else if(item.itemCode==="RVM"){
+      //   switch(item.metaData.position){
+      //     case "LH":
+      //       additionalInfo="LEFT"
+      //       break;
           
-          case "RH":
-            additionalInfo="RIGHT"
-            break;
-        }
-      }
+      //     case "RH":
+      //       additionalInfo="RIGHT"
+      //       break;
+      //   }
+      // }
       
-      var productFullName = item.productName+" "+
-                            item.vehicleModel+" "+
-                            item.brandCompany+" "+
-                            item.partNum
+      // var productFullName = item.productName+" "+
+      //                       item.vehicleModel+" "+
+      //                       item.brandCompany+" "+
+      //                       item.partNum
       
-      if(additionalInfo!==''){
-        productFullName=productFullName+" "+additionalInfo
-      }
-      return {...item, productFullName:productFullName} 
-    })
+      // if(additionalInfo!==''){
+      //   productFullName=productFullName+" "+additionalInfo
+      // }
+      // return {...item, productFullName:productFullName} 
+    // })
     // console.log(JSON.stringify(res,null,4))
-    return res
+    return response.data
   } 
 
   // Update Products

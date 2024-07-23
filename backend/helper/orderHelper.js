@@ -44,6 +44,82 @@ const generateTicket = asyncHandler(async()=>{
     return {ticketNumber, date}
 })
 
+// @desc   Genearet SKU for Incomplete Demand Slip Data
+const generateSKUforIncompleteData = (orderedProductList)=>{
+    const updatedOrderList = orderedProductList.map((item)=>{
+        let pN, spaceRemovedPN, bC, spaceRemovedBC, newSKU, newProdFullName
+
+        if(item.partNum && item.partNum!==""){
+            spaceRemovedPN = item.partNum.replace(/\s/g,"").toUpperCase()
+            pN = spaceRemovedPN.replace(/[-/]/g,"")
+        }
+        
+        if(item.brandCompany && item.brandCompany!==""){
+            spaceRemovedBC = item.brandCompany.replace(/\s/g,"").toUpperCase()
+            const cleanedBC = spaceRemovedBC.slice(0,3)
+            bC = cleanedBC
+        }
+
+        if(!item.partNum && !item.brandCompany){
+            // No update to SKu
+            newSKU = item.sku
+            newProdFullName = item.productFullName
+        }else if(item.partNum && !item.brandCompany){
+            // Only Part Num update
+            newSKU = item.sku +"-"+ pN
+            newProdFullName = item.productFullName +" "+ spaceRemovedPN
+        }else if(item.partNum && item.brandCompany){
+            // Brand Company and Part Num update
+            newSKU = item.sku +"-"+ bC +"-"+ pN
+            newProdFullName = item.productFullName +" "+ spaceRemovedBC +" "+ spaceRemovedPN
+        }
+
+        let newItem = {
+            sku: newSKU,
+            productFullName: newProdFullName,
+            quantity: item.quantity,
+            unit: item.unit
+        }
+
+        return newItem
+    })
+    
+    return updatedOrderList
+}
+
+// @desc   Clean Non-existing Data for Review Collection
+const cleanDataFoReview = (newDataList, ticketNumber, username) =>{
+    const cleanedData = newDataList.map((item)=>{
+        let itemCode, productName, partNum, vehicleModel, brandCompany
+
+        itemCode = item.sku.split("-")[0]
+        productName = item.productFullName.split(" ")[0]
+        vehicleModel = item.productFullName.split(" ")[1]
+        brandCompany = item.productFullName.split(" ")[2]
+        partNum = item.productFullName.split(" ")[3]
+
+        let updatedItem = {
+            ticketNumber: ticketNumber,
+            username:username,
+            sku: item.sku,
+            itemCode,
+            productName,
+            vehicleModel,
+            brandCompany,
+            partNum,
+            qty:item.quantity,
+            unit: item.unit,
+            productFullName: item.productFullName,
+        }
+
+        return updatedItem
+    })
+
+    // console.log(`reviewList:${cleanedData}`)
+
+    return cleanedData
+} 
+
 // @desc   Generating Demand Reciept PDF
 const generateDemandReciept=(ticketNumber, distributorName, date, prodData)=>{
 
@@ -82,7 +158,10 @@ const generateDemandReciept=(ticketNumber, distributorName, date, prodData)=>{
     doc.end();  
 }
 
+
 module.exports = {
     generateTicket,
+    generateSKUforIncompleteData,
+    cleanDataFoReview,
     generateDemandReciept,
 }

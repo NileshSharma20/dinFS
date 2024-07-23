@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import useAuth from '../../hooks/useAuth'
+import { FiEdit2 } from 'react-icons/fi'
 
 import '../../pages/DemandSlip/DemandSlip.css'
+import { AiOutlineClose } from 'react-icons/ai'
+import UpdateIncompleteProdDataForm from '../Forms/UpdateIncompleteProdDataForm'
+
 
 function DemandSlipCard({info, partialFlag=false}) {
-    const { isAdmin, isManager } = useAuth()
+    const { isAdmin, isManager, isAccountant } = useAuth()
 
     const [statusColour, setStatusColour] = useState({})
+    const [editFlag, setEditFlag] = useState(false)
 
     const createdTimeString = new Date(info.createdAt).toString().split(' ')[4]
     const updatedTimeString = new Date(info.updatedAt).toString().split(' ')[4]
@@ -31,22 +36,40 @@ function DemandSlipCard({info, partialFlag=false}) {
             <div className="card-element">
 
             <h3>{info.ticketNumber}</h3>
-            {(isAdmin||isManager) && 
+            {(isAdmin||isManager||isAccountant) && 
             <h3>{info?.username}</h3>
             }
             </div>
 
-            <div className="card-element">
+            <div className="card-element"
+                style={{ justifyContent:`flex-end`}}
+            >
+                {info?.dataStatus === "incomplete" &&
+                (info.status!=="pending") &&
+                (isAccountant || isManager || isAdmin) 
+                &&
+                    <div className="edit-card-btn"
+                        onClick={()=>setEditFlag(!editFlag)}
+                    >
+                        {editFlag?<AiOutlineClose />:<FiEdit2 />}
+                    </div>
+                }
+                
                 <div className="status-circle"
                     style={statusColour}
                 >
+                    {info?.dataStatus === "incomplete" &&
+                        <p style={{color:`black`}}>?</p>
+                    }
                 </div>
+
+                
             </div>
 
         </div>
         <br />
 
-        {(isAdmin||isManager) && 
+        {(isAdmin||isManager||isAccountant) && 
         <div className="card-row">
             <div className="card-element" 
                 style={{gridColumn:`1/span 2`, marginBottom:`1rem`}}
@@ -56,19 +79,21 @@ function DemandSlipCard({info, partialFlag=false}) {
                 </h3>
             </div>
 
-            <div className="card-element">
-                <h3>Created</h3>
-                {createdTimeString}
-            </div>
+            {isAdmin && isManager &&
+                <>
+                <div className="card-element">
+                    <h3>Created</h3>
+                    {createdTimeString}
+                </div>
 
-            <div className="card-element">
-                <h3>Updated</h3>
-                {updatedTimeString}
-            </div>
+                <div className="card-element">
+                    <h3>Updated</h3>
+                    {updatedTimeString}
+                </div>
+                </>
+            }
         </div>
         }
-        {/* <div className="card-row">
-        </div> */}
         
         <br />
         
@@ -85,18 +110,22 @@ function DemandSlipCard({info, partialFlag=false}) {
         </div>
     {/* <p><span>Status: </span> {info.status}</p> */}
 
-    <br />
-    <p><span>Total Cost: </span>{info.totalCost}</p>
-    <br />
-
-    <div className="card-grid-row">
-        <h3></h3>
-        <h3>Products</h3>
-        <h3>Ord.</h3>
-        {partialFlag && <h3>Recv.</h3>}  
-    </div>
-
     {/* <div className='ds-new-col'> */}
+    {(editFlag && info.status!=="pending") ?
+            <UpdateIncompleteProdDataForm initialValue={info} />
+        :
+        <>
+        <br />
+        <p><span>Total Cost: </span>{info.totalCost}</p>
+        <br />
+
+        <div className="card-grid-row">
+            <h3></h3>
+            <h3>Products</h3>
+            <h3>Ord.</h3>
+            {partialFlag && <h3>Recv.</h3>}  
+        </div>
+        
         {info.orderedProductList?.map((prod,i)=>
             <div className="card-grid-row" key={i}>
                 <p>{i+1}.</p>
@@ -107,16 +136,16 @@ function DemandSlipCard({info, partialFlag=false}) {
                     <p>{prod.sku}</p>
                 </div>
 
-                <p>{prod.quantity}</p>
+                <p>{prod.quantity} {prod?.unit}</p>
                 
                 {partialFlag && 
                     <p>{info.recievedProductList[i]?.quantity}</p>
                 }
                 
-                {/* <br /> */}
-            {/* </React.Fragment>   */}
-        </div>
+            </div>
         )}
+        </>
+    }
     </div>
     </div>
     </>

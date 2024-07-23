@@ -393,7 +393,7 @@ const getSKUProd = asyncHandler(async (req,res)=>{
         prod = await dbCollection.find({ $and:[
             ...searchParams
         ]})
-        .select('sku itemCode productName vehicleModel brandCompany partNum metaData -_id')
+        .select('sku itemCode productName productFullName vehicleModel brandCompany partNum metaData -_id')
         .lean()
     }else if(skuOnlyFlag==="false"){
         // console.log(`searchParams:${JSON.stringify(searchParams,null,4)}`)

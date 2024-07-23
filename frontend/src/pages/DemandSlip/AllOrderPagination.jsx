@@ -18,7 +18,7 @@ function AllOrderPagination({
 
     const dispatch = useDispatch()
     
-    const { isManager } = useAuth()
+    const { isAccountant } = useAuth()
 
     const { 
         pageCount,
@@ -192,7 +192,7 @@ function AllOrderPagination({
     <div className="ds-filter-data-container">
         <div className="ds-content ds-card-content">
         {dataList.length>0 &&
-            dataList.map((order,key)=>{
+            dataList?.map((order,key)=>{
             return (
                 <React.Fragment key={key}>
                     {
@@ -211,7 +211,7 @@ function AllOrderPagination({
         {isLoaded && dataList.length===0 &&
 
             <div style={{gridColumn:"1/span 3"}}>
-                <h1>No Orders {isManager?`Today`:``}</h1>
+                <h1>No Orders {isAccountant?`Today`:``}</h1>
             </div>
         }
         

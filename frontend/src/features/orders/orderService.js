@@ -37,7 +37,7 @@ const getFilteredDemandSlips = async(filterParams,token)=>{
     if(!accessLevel){
         let filterQueryString = ''
 
-        const {filterTicketNum, filterStatus, page, limit} = filterParams
+        const {filterTicketNum, filterStatus, filterDataStatus, page, limit} = filterParams
         
         let currDate = new Date()
         let ticketDate = currDate.getDate()
@@ -53,6 +53,7 @@ const getFilteredDemandSlips = async(filterParams,token)=>{
         }
         
         fullDate = `${ticketDate}${ticketMonth}${ticketYear}`
+        // 12062024
         
         if(filterTicketNum && filterTicketNum!==''){
             filterQueryString = filterQueryString+`&ticketNum=${filterTicketNum}`
@@ -60,6 +61,13 @@ const getFilteredDemandSlips = async(filterParams,token)=>{
         if(filterStatus && filterStatus!==''){
             
             filterQueryString = filterQueryString+`&status=${filterStatus}`
+        }
+        if(filterDataStatus && filterDataStatus!==''){
+
+            filterQueryString = filterQueryString[filterQueryString.length-1]==='?'?
+                                filterQueryString+`dataStatus=${filterDataStatus}`
+                                :
+                                filterQueryString+`&dataStatus=${filterDataStatus}`
         }
         if(page){
             filterQueryString = filterQueryString+`&page=${page}`
@@ -71,6 +79,7 @@ const getFilteredDemandSlips = async(filterParams,token)=>{
 
         response = await axios.get(order_URI+`filter?date=${fullDate}${filterQueryString}`, config)
     }
+    // else if(!accessLevel)
     // Admin and Managaer Level Access
     else{   
 
@@ -85,6 +94,7 @@ const getFilteredDemandSlips = async(filterParams,token)=>{
                 filterToDate, 
                 filterPublisherUsername, 
                 filterStatus,
+                filterDataStatus,
                 filterTicketNum,
                 page, 
                 limit
@@ -113,6 +123,14 @@ const getFilteredDemandSlips = async(filterParams,token)=>{
                                     filterQueryString+`status=${filterStatus}`
                                     :
                                     filterQueryString+`&status=${filterStatus}`
+            }
+
+            if(filterDataStatus && filterDataStatus!==''){
+
+                filterQueryString = filterQueryString[filterQueryString.length-1]==='?'?
+                                    filterQueryString+`dataStatus=${filterDataStatus}`
+                                    :
+                                    filterQueryString+`&dataStatus=${filterDataStatus}`
             }
 
             if(filterTicketNum && filterTicketNum!==''){
@@ -172,11 +190,24 @@ const updateDemandSlip = async({updatedData, token})=>{
     return response.data
 }
 
+const updateIncompleteDemandSlip = async({updatedData, token})=>{
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }
+    // API Call
+    const response = await axios.patch(order_URI+`updateData/`+updatedData.ticketNumber, updatedData, config)
+    
+    return response.data
+}
+
 const orderService = {
     getAllDemandSlips,
     getFilteredDemandSlips,
     generateDemandSlip,
     updateDemandSlip,
+    updateIncompleteDemandSlip,
 }
 
 export default orderService

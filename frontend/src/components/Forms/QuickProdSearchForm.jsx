@@ -20,9 +20,12 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
     const [formData, setFormData] = useState({
         deliveryPartnerName: "",
         distributorName: "",
+        dataStatus:"complete",
         orderedProductList: [{
             sku:"",
             productFullName:"",
+            productBrandName:"",
+            productPartNumber:"",
             quantity:"",
             unit:'PC',
         }]
@@ -31,6 +34,8 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
     const [updatedOrderList, setUpdatedOrderList] = useState([{
         sku:"MANUAL",
         productFullName:"",
+        productBrandName:"",
+        productPartNumber:"",
         quantity:"",
         unit:'PC',
     }])
@@ -43,7 +48,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
         skuOnlyFlag:"true"
     })
       
-    const { deliveryPartnerName, distributorName } = formData
+    const { deliveryPartnerName, distributorName, dataStatus } = formData
 
     /////////////////////////////////////////////////
     //////// Functions /////////////////////////////
@@ -64,15 +69,20 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
         setUpdatedOrderList([{
             sku:"MANUAL",
             productFullName:"",
+            productBrandName:"",
+            productPartNumber:"",
             quantity:"",
             unit:'PC',
         }])
         setFormData({
             deliveryPartnerName: "",
             distributorName: "",
+            dataStatus:"complete",
             orderedProductList: [{
                 sku:"",
                 productFullName:"",
+                productBrandName:"",
+                productPartNumber:"",
                 quantity:"",
                 unit:'PC',
             }]
@@ -88,9 +98,16 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
     // };
 
     const addItemfromSearch=(item)=>{
+        let prodBrand = item.productFullName.split(" ")[2]
+        let prodPartNum = item.productFullName.split(" ")[3]
+        let newProdFullName = item.productFullName.split(" ").slice(0,2).join(" ")
+
+        // console.log(`brand: ${prodBrand}\npartNum:${prodPartNum}`)
         const newItem = {
             sku: item.sku,
-            productFullName: item.productFullName,
+            productFullName: newProdFullName,
+            productBrandName: prodBrand,
+            productPartNumber: prodPartNum,
             quantity:"",
             unit:"PC"
         }
@@ -114,7 +131,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
         setFormData((prevState)=>({
             ...prevState,
             [e.target.name]:e.target.value
-        }))
+        }))        
     }
 
     const onSKUChange=(e)=>{
@@ -124,12 +141,59 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
         }))
     }
 
+    const handleBrandNameDelete =(i)=>{
+        let orderList = [...updatedOrderList]
+        let orderItem = orderList[i]
+        const skuSplitList = orderItem.sku.split("-")
+
+        
+        let newSku = skuSplitList.slice(0,2)
+        // skuSplitList.length===4 ? 
+        //     (newSku = newSku.join("-") +"-"+ orderItem.sku.split("-")[3])
+        //     :
+        newSku = newSku.join("-")
+
+        if(skuSplitList.length===4){
+            orderItem.productPartNumber=""
+        }
+
+        // console.log(`newSku:${newSku}`)
+        
+        orderItem.sku=newSku
+        orderItem.productBrandName=""
+
+        setUpdatedOrderList(orderList)
+    }
+
+    const handlePartNumberDelete =(i)=>{
+        let orderList = [...updatedOrderList]
+        let orderItem = orderList[i]
+        
+        let newSku = orderItem.sku.split("-").slice(0,-1)
+        newSku = newSku.join("-")
+        // console.log(`newSku:${newSku}`)
+        
+        orderItem.sku=newSku
+        orderItem.productPartNumber=""
+
+        setUpdatedOrderList(orderList)
+    }
+
     const onOrderItemChange=(e,i)=>{
         let orderList = [...updatedOrderList]
         let orderItem = orderList[i]
+        // console.log(`oI:${JSON.stringify(orderItem,null,4)}`)
         if(e.target.name==="quantity"){
             const numValue = e.target.value.replace(/\D/g, "")
             orderItem[e.target.name] = numValue
+        }else if(e.target.name==="productPartNumber"){
+            let newSku = orderItem.sku.split("-").slice(0,3)
+            newSku = newSku.join("-")
+            newSku = newSku+"-"+e.target.value.toUpperCase()
+            // console.log(`newSku:${newSku}\npN:${e.target.value}`)
+            
+            orderItem.sku=newSku
+            orderItem[e.target.name]=e.target.value.toUpperCase()
         }else{
             orderItem[e.target.name] = e.target.value.toUpperCase()
         }
@@ -163,21 +227,46 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                                                     ||prod.productFullName===""
                                                     ||prod.quantity===""
                                                     ||prod.unit===""))
+        var dataStatusCheck = "complete"
+
+        const finalOrderList = updatedOrderList.map((orderItem)=>{
+                                    let finalProductFullName = orderItem.productFullName
+                                    if(orderItem.sku!=="MANUAL"){
+                                        
+                                        orderItem.productBrandName?
+                                        (finalProductFullName=finalProductFullName+" "+orderItem.productBrandName)
+                                        :
+                                        (dataStatusCheck="incomplete")
+
+                                        orderItem.productPartNumber?
+                                            (finalProductFullName=finalProductFullName+" "+orderItem.productPartNumber)
+                                            :
+                                            (dataStatusCheck="incomplete")
+                                    }
+                                    
+                                    return  {
+                                        sku:orderItem.sku,
+                                        productFullName:finalProductFullName,
+                                        quantity:parseInt(orderItem.quantity),
+                                        unit:orderItem.unit
+                                    }
+                                })
+
+        // console.log(`fOL:${JSON.stringify(finalOrderList,null,4)}`)
 
         if(emptyOrderListObj.length>0){
             return alert('Empty Field/s')
         }
-
-        // if(updatedOrderList)
-
-        if(deliveryPartnerName==="" || distributorName==="" || updatedOrderList.length===0 
+        
+        if(deliveryPartnerName==="" || distributorName==="" || updatedOrderList.length===0 || dataStatus===""
             || !Array.isArray(updatedOrderList)){
             return alert(`Please enter valid data`)
         }else{
             const orderInfo = {
-                deliveryPartnerName:deliveryPartnerName.toUpperCase(),
-                distributorName:distributorName.toUpperCase(),
-                orderedProductList:updatedOrderList,
+                deliveryPartnerName: deliveryPartnerName.toUpperCase(),
+                distributorName: distributorName.toUpperCase(),
+                orderedProductList: finalOrderList,
+                dataStatus: dataStatusCheck,
             }
             
             // console.log(`formData:${JSON.stringify(orderInfo,null,4)}`)
@@ -190,12 +279,20 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
     // Get SKU Products API call 
     const onSKUSubmit=(e)=>{
         e.preventDefault()
+
+        let cleanedSKUData = {
+            itemCode:skuData.itemCode.trim(),
+            vehicleModel:skuData.vehicleModel.trim(),
+            brandCompany:skuData.brandCompany.trim(),
+            partNum:skuData.partNum.trim(),
+            skuOnlyFlag:"true"
+        }
         
         if(skuData.itemCode===""){
             return alert(`Please Enter Item Code`)
         }else{
             setSearchInput("")
-            dispatch(searchSKUProducts(skuData))
+            dispatch(searchSKUProducts(cleanedSKUData))
         }
     }
 
@@ -220,6 +317,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                 setFormData({
                     deliveryPartnerName: "",
                     distributorName: "",
+                    dataStatus:"complete",
                     orderedProductList: [{
                         sku:"",
                         productFullName:"",
@@ -340,6 +438,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                                 placeholder="Prod SKU"
                                 autoComplete='off'
                                 onChange={(e)=>onOrderItemChange(e,index)}
+                                readOnly
                                 />
                              <input
                                 className='card-form-control'
@@ -348,13 +447,61 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                                 name= {`productFullName`}
                                 id={`productFullName ${index}`}
                                 value = {prod.productFullName}
-                                placeholder="Prod Full Name"
+                                placeholder="Product"
                                 autoComplete='off'
                                 onChange={(e)=>onOrderItemChange(e,index)}
                                 />
-
                             
-                                
+                            {prod.sku!=="MANUAL" &&
+                                <div
+                                style={{
+                                    display:`grid`,
+                                    flexDirection:`none`,
+                                    gridTemplateColumns:`1fr 1fr`,
+                                    columnGap:`0.1rem`,
+                                    width:`calc(100% - 0.2rem)`,
+                                    // border:`1px solid red`
+                                }}
+                            >
+                                <div style={{position:`relative`}}>
+                                    <div className="delete-btn" 
+                                        onClick={()=>handleBrandNameDelete(index)}
+                                    >
+                                    <AiOutlineClose />
+                                    </div>
+
+                                    <input
+                                        className='card-form-control'
+                                        type='text'
+                                        style={{width:"100%"}}
+                                        name= {`productBrandName`}
+                                        id={`productBrandName ${index}`}
+                                        value = {prod.productBrandName}
+                                        placeholder="Brand Name"
+                                        readOnly
+                                        />   
+                                </div> 
+
+                                <div style={{position:`relative`}}>
+                                    <div className="delete-btn" 
+                                        onClick={()=>handlePartNumberDelete(index)}
+                                    >
+                                    <AiOutlineClose />
+                                    </div>
+                                    <input
+                                        className='card-form-control'
+                                        type='text'
+                                        style={{width:"100%"}}
+                                        name= {`productPartNumber`}
+                                        id={`productPartNum ${index}`}
+                                        value = {prod.productPartNumber}
+                                        placeholder="Part Number"
+                                        readOnly
+                                        />                          
+                                </div>
+
+                            </div>}
+
                             </section>
 
                             <div style={{display:`flex`, 
@@ -391,6 +538,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                                 <option value="PC">PC</option>
                                 <option value="SET">SET</option>
                                 <option value="PAIR">PAIR</option>
+                                <option value="BOX">BOX</option>
                                 <option value="ML">ML</option>
                                 <option value="L">L</option>
                             </select>

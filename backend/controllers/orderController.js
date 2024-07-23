@@ -1,7 +1,7 @@
 const asyncHandler = require('express-async-handler')
 const fs = require("fs")
 
-const { generateTicket } = require("../helper/orderHelper")
+const { generateTicket, generateSKUforIncompleteData, cleanDataFoReview } = require("../helper/orderHelper")
 const { paginateData } = require('../helper/paginationHelper')
 
 const { endOfDay } = require('date-fns/endOfDay')
@@ -11,6 +11,7 @@ const Demandslip = require("../models/demandslipModel")
 const DemandslipHistory = require('../models/demandslipHistoryModel')
 const User = require("../models/userModel")
 const Products = require('../models/productsModel')
+const ReviewProducts = require("../models/reviewproductsModel")
 
 
 // @desc   Create a new Demand Slip
@@ -19,7 +20,9 @@ const Products = require('../models/productsModel')
 const createNewDemandSlip = asyncHandler(async (req,res)=>{
     const {deliveryPartnerName,
            distributorName,
-           orderedProductList } = req.body
+           orderedProductList,
+           dataStatus
+        } = req.body
     
     const { username } = req
 
@@ -34,21 +37,27 @@ const createNewDemandSlip = asyncHandler(async (req,res)=>{
     const employeeId = employeeExists._id
 
     if(!employeeId || !deliveryPartnerName || !distributorName ||
-        !orderedProductList ||
+        !orderedProductList || !dataStatus || 
         !orderedProductList.length || !Array.isArray(orderedProductList)){
             res.status(400)
             throw new Error(`All fields are required`)
-        }
+    }
     
+    if(!(dataStatus==="incomplete" || dataStatus==="complete")){
+            res.status(400)
+            throw new Error(`Incorrect Data Status`)
+    }
+        
     const { ticketNumber, date } = await generateTicket()
-    
-    
+    // console.log(`orderController`)
+
     const newDemandSlip = {
         ticketNumber,
         employeeId,
         username: employeeExists.username,
         deliveryPartnerName,
         distributorName,
+        dataStatus,
         orderedProductList,
     }
 
@@ -59,6 +68,7 @@ const createNewDemandSlip = asyncHandler(async (req,res)=>{
         username: employeeExists.username,
         deliveryPartnerName,
         distributorName,
+        dataStatus,
         orderedProductList,
     }
     
@@ -123,7 +133,6 @@ const getAllDemandSlips =asyncHandler(async(req,res)=>{
 })
 
 // @desc   Get date filtered Demand Slips
-// @route  POST /api/order/filter/:date
 // @route  GET /api/order/filter
 // @access Private
 const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
@@ -131,8 +140,31 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
             endDate,
             publisherUsername, 
             status, 
-            ticketNum    
+            ticketNum,
+            dataStatus    
         } = req.query
+    
+    const currentDate = new Date();
+
+    let todayDate = currentDate.getDate();
+    let todayMonth = currentDate.getMonth() + 1;
+    let todayYear = currentDate.getFullYear();
+
+    if(todayDate<10){
+        todayDate = `0${todayDate}`
+    }
+    
+    if(todayMonth<10){
+        todayMonth = `0${todayMonth}`
+    }
+
+    const fullCurrentDateString = todayYear+'-'+todayMonth+'-'+todayDate
+    const fullCurrentDate = new Date(fullCurrentDateString)
+
+    const fullCurrentDateClean = todayYear+todayMonth+todayDate
+
+    // let weekAgoDate = new Date(fullCurrentDate - 7 * 24 * 60 * 60 * 1000)
+    // console.log(`week ago date: ${weekAgoDate}`)
     
     const currPage = parseInt(req.query.page) || 1
     const recordLimit = parseInt(req.query.limit) || 50
@@ -158,10 +190,14 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
             res.status(400)
             throw new Error('Bad Request: Invalid DemandSlip Status')
     }
+    if( dataStatus & !(dataStatus==="incomplete" || dataStatus==="complete") ){
+        res.status(400)
+        throw new Error('Bad Request: Invalid DemandSlip Data Status')
+    }
 
     // Employee Level Access
     if(!roles?.length || !Array.isArray(roles) ||
-        !roles.includes("Manager")){
+        !roles.includes("Accountant")){
 
             // Employee Level Access
             let searchParams = []
@@ -170,7 +206,10 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
             if(status){
                 searchParams=[{status:status}, ...searchParams]
             }
-            if(ticketNum ){
+            if(dataStatus){
+                searchParams=[{dataStatus:dataStatus},...searchParams]
+            }
+            if(ticketNum){
                 searchParams=[{ticketNumber:{ $regex:ticketNum}},
                     ...searchParams]
             }
@@ -179,7 +218,7 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
             if(searchParams.length!==0){
                 docCount = await Demandslip.find({$and: [
                             ...searchParams,
-                            {ticketNumber:{ $regex:date}},
+                            {ticketNumber:{ $regex:fullCurrentDateClean}},
                             {username:username},
                             {employeeId: employeeExists._id.toString()},
                             ]
@@ -218,6 +257,93 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
                         .lean().exec()
             }
         
+        }else if(roles.includes("Accountant") && !roles.includes("Manager")){
+            // Accountant Level Access
+            let searchParams = []
+            let weekAgoDate = new Date(fullCurrentDate - 7 * 24 * 60 * 60 * 1000)
+
+            // Maximum Date Range for Accountant is 7days from today
+            searchParams = [
+                {createdAt:{$gte:startOfDay(weekAgoDate)}},
+                {createdAt:{$lte:endOfDay(fullCurrentDate)}}
+            ]
+
+            // Params based search string
+            if(date && !endDate){
+                let fromDateString = date.slice(4)+
+                                    '-'+date.slice(2,4)+
+                                    '-'+date.slice(0,2)
+                let fromDate = new Date(fromDateString) 
+                
+                if(fromDate < weekAgoDate){
+                    searchParams=[
+                        {createdAt:{$gte:startOfDay(weekAgoDate)}},
+                        {createdAt:{$lte:endOfDay(weekAgoDate)}},
+                    ]
+                    // res.status(400)
+                    // throw new Error('Bad Request: Date Range Greater than 7 days')
+                }else{
+                    searchParams=[{ticketNumber:{ $regex:date}}, ...searchParams]
+                }
+            }
+            if(date && endDate){
+                let fromDateString = date.slice(4)+
+                                    '-'+date.slice(2,4)+
+                                    '-'+date.slice(0,2) 
+                let toDateString = endDate.slice(4)+
+                                    '-'+endDate.slice(2,4)+
+                                    '-'+endDate.slice(0,2)
+                let fromDate = new Date(fromDateString) 
+                let toDate = new Date(toDateString) 
+
+                if(fromDate < weekAgoDate && !(toDate>fullCurrentDate)){
+                    searchParams=[
+                        {createdAt:{$gte:startOfDay(weekAgoDate)}},
+                        {createdAt:{$lte:endOfDay(toDate)}},
+                    ]
+                    // res.status(400)
+                    // throw new Error('Bad Request: Date Range Greater than 7 days')
+                }else if(toDate>fullCurrentDate && !(fromDate<weekAgoDate)){
+                    searchParams=[
+                        {createdAt:{$gte:startOfDay(fromDate)}},
+                        {createdAt:{$lte:endOfDay(fullCurrentDate)}},
+                    ]
+                    // res.status(400)
+                    // throw new Error('Bad Request: End Date Greater than Today')
+                }else if(fromDate < weekAgoDate && toDate>fullCurrentDate){
+                    searchParams=[...searchParams]
+                }else{
+                    searchParams=[
+                        {createdAt:{$gte:startOfDay(fromDate)}},
+                        {createdAt:{$lte:endOfDay(toDate)}},
+                    ]
+                }
+
+            }
+            if(status){
+                searchParams=[{status:status}, ...searchParams]
+            }
+            if(dataStatus){
+                searchParams=[{dataStatus:dataStatus}, ...searchParams]
+            }
+            if(publisherUsername){
+                searchParams = [{username:publisherUsername}, ...searchParams]
+            }
+            if(ticketNum){
+                searchParams=[{ticketNumber:{ $regex:ticketNum}},
+                    ...searchParams]
+            }
+
+            // Parameterized search
+            docCount = await Demandslip.find({$and: searchParams})
+                                    .countDocuments()
+
+            orders = await Demandslip.find({$and: searchParams}
+                                    ,'-_id -__v')
+                                    .skip(firstIndex)
+                                    .limit(recordLimit)
+                                    .lean().exec()
+
         }else{
             // Manager and Admin Level Access
                 let searchParams = []
@@ -247,6 +373,9 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
                 if(status){
                     searchParams=[{status:status}, ...searchParams]
                 }
+                if(dataStatus){
+                    searchParams=[{dataStatus:dataStatus}, ...searchParams]
+                }
                 if(publisherUsername){
                     searchParams = [{username:publisherUsername}, ...searchParams]
                 }
@@ -256,7 +385,7 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
                 }
 
                 // Find all incase of no search params
-                if(!date && !status && !publisherUsername && !ticketNum){
+                if(!date && !status && !publisherUsername && !ticketNum & !dataStatus){
                     docCount = await Demandslip?.find().countDocuments()
 
                     orders = await Demandslip?.find({}
@@ -360,6 +489,7 @@ const updateAfterDelivery = asyncHandler(async(req,res)=>{
         demandSlip.recievedProductList = []
         demandSlip.totalCost = 0
     }
+
     const demandBackup = {
         ticketNumber: demandSlip.ticketNumber,
         employeeId,
@@ -394,6 +524,118 @@ const updateAfterDelivery = asyncHandler(async(req,res)=>{
 
     if(demandHistory){
         res.json({message:`Demand Slip ${updatedDemandslip.ticketNumber} with ${updatedDemandslip.status} status`})
+    }else{
+        res.status(400)
+        throw new Error(`Failure`)
+    }
+})
+
+// @desc   Update pending Demand Slip (Admin can update closed tickets)
+// @route  PATCH /api/order/:ticketNumber
+// @access Private
+const updateIncompleteOrder = asyncHandler(async(req,res)=>{
+    const { orderedProductList, status, dataStatus, totalCost } = req.body
+    const { ticketNumber } = req.params
+
+    // Create 7 days logic for Accountant and Manager and infinite for Admin
+
+    const { username, roles } = req
+    
+    const employeeExists = await User.findOne({username}).select('-password').lean()
+
+    // Check if User exists and Active
+    if(!employeeExists || !employeeExists.active){
+        res.status(403)
+        throw new Error('Unauthorized')
+    }
+
+    const employeeId = employeeExists._id
+    
+    const demandSlip = await Demandslip.findOne({ticketNumber:ticketNumber}).exec()
+
+    if(!employeeId || !status || !totalCost
+        ){
+        res.status(400)
+        throw new Error('Data Missing')
+    }
+
+    // Check for existing ticket
+    if(!demandSlip){
+        res.status(400)
+        throw new Error("Demand Slip not found")
+    }
+
+    // Check if ticket status is not pending or if Different User has Accountant access
+    if(demandSlip.status==="pending" || !roles.includes("Accountant")){
+            res.status(403)
+            throw new Error("Forbidden: Minimum Accountant Access required or Order Status Pending")
+    }
+    
+    const updatedOrderList = generateSKUforIncompleteData(orderedProductList)
+    
+    demandSlip.orderedProductList = updatedOrderList
+    demandSlip.totalCost = totalCost
+    demandSlip.dataStatus = dataStatus
+
+    let newSKUList =[], oldSKUList=[], cleanedReviewData=[]
+
+    for(const itemData of updatedOrderList){
+        if(itemData.sku !=="MANUAL"){
+            const existingSKU = await Products.findOne({sku:itemData.sku}).lean()
+            
+            if(!existingSKU){
+                newSKUList.push(itemData)
+            }else{
+                oldSKUList.push(itemData)
+            }
+        }
+        
+    }
+    // console.log(`nSL:${JSON.stringify(newSKUList,null,4)}`)
+
+    if(newSKUList.length>0){
+        cleanedReviewData = cleanDataFoReview(newSKUList, ticketNumber, employeeExists.username)
+    }
+
+    // Update Quantity of Recieved Products
+    // let toUpdateProdList = demandSlip.recievedProductList
+
+    // for(const itemData of toUpdateProdList){ 
+    //     let partNumber = itemData.sku.split("-")[3]
+    //     console.log(`pN: ${partNumber}`)           
+    //     await Products.updateMany({$or:[
+    //                                 {sku:itemData.sku},
+    //                                 {sku:{$regex:partNumber}}
+    //                             ]},
+    //         {$inc:{qty:itemData.quantity}},
+    //         {upsert:false}
+    //     )
+    // }
+
+    const demandBackup = {
+        ticketNumber: demandSlip.ticketNumber,
+        employeeId,
+        username: employeeExists.username,
+        deliveryPartnerName: demandSlip.deliveryPartnerName,
+        distributorName: demandSlip.distributorName,
+        status: demandSlip.status,
+        orderedProductList: demandSlip.orderedProductList,
+        recievedProductList: demandSlip.recievedProductList,
+        totalCost: demandSlip.totalCost,
+        // note: `Incomplete Data updated by ${employeeExists.username} with ${newSKUList.length} non-existing products`
+    }
+
+    const options = { ordered: true }
+
+    const demandHistory =  await DemandslipHistory.create(demandBackup)
+    const updatedDemandslip = await demandSlip.save()
+
+    const reviewProducts = await ReviewProducts.insertMany(cleanedReviewData, options) 
+
+    // res.status(200).json(cleanedReviewData)
+
+    if(demandHistory && reviewProducts){
+        res.status(200).json({message:`Demand Slip ${updatedDemandslip.ticketNumber} Data updated with dataStatus Compelte`})
     }else{
         res.status(400)
         throw new Error(`Failure`)
@@ -509,6 +751,7 @@ module.exports={
     getAllDemandSlips,
     getFilteredDemandSlips,
     updateAfterDelivery,
+    updateIncompleteOrder,
     deleteAllDemandSlip,
     deleteAllDemandHistory,
     deleteDemandSlip

@@ -24,12 +24,40 @@
     font-weight: bold;
 }
 
+.edit-card-btn{
+    width: 1.5rem;
+    height: 1.5rem;
+
+    align-self: flex-end;
+    justify-self: flex-end;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* border-radius: 50%;  */
+    box-shadow: 2px 2px black;
+    margin-bottom: 1rem;
+
+    transition: 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+.edit-card-btn:hover{
+    transition: 0.3s ease-in-out;
+    background-color: #c6cec9;
+}
+
 .status-circle{
     width: 1.5rem;
     height: 1.5rem;
 
     align-self: flex-end;
     justify-self: flex-end;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     border-radius: 50%;
 }
@@ -83,7 +111,7 @@
 }
 
 .card-grid-row>p{
-    justify-self: center;
+    justify-self: flex-start;
     align-self: center;
 }
 
