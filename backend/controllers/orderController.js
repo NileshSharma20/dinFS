@@ -490,6 +490,8 @@ const updateAfterDelivery = asyncHandler(async(req,res)=>{
         demandSlip.totalCost = 0
     }
 
+    demandSlip.dataStatus = dataStatus
+
     const demandBackup = {
         ticketNumber: demandSlip.ticketNumber,
         employeeId,
@@ -499,7 +501,8 @@ const updateAfterDelivery = asyncHandler(async(req,res)=>{
         status: demandSlip.status,
         orderedProductList: demandSlip.orderedProductList,
         recievedProductList: demandSlip.recievedProductList,
-        totalCost: demandSlip.totalCost
+        totalCost: demandSlip.totalCost,
+        dataStatus: dataStatus
     }
 
     // Update Quantity of Recieved Products
