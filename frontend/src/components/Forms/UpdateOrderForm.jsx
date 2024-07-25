@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from "react-redux"
-import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai"
+// import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai"
 import { getFilteredDemandSlips, resetAfterNewDemandSlip, updateDemandSlip } from '../../features/orders/orderSlice';
 import useAuth from '../../hooks/useAuth';
 
@@ -11,12 +11,15 @@ function UpdateOrderForm({ initialValue, setFlag}) {
 
     const {isSuccess, updatedDataFlag} = useSelector((state)=>state.orders)
 
+    const pageLimit = 50
+
     const [formData, setFormData] = useState({
         ...initialValue, 
-        recievedProductList: initialValue.orderedProductList
+        recievedProductList: initialValue.orderedProductList,
+        updateTotalCostLaterFlag: false
     })
     
-    const { deliveryPartnerName, distributorName } = formData
+    // const { deliveryPartnerName, distributorName } = formData
 
     /////////////////////////////////////////////////
     //////// Functions /////////////////////////////
@@ -60,8 +63,19 @@ function UpdateOrderForm({ initialValue, setFlag}) {
 
     }
 
+    const handleUpdateTotalCostLaterFlag = (e)=>{
+        // let updateFlagValue = e.target.value
+        // console.log(`checked:${updateFlagValue}`) 
+        setFormData((prevState)=>({...prevState,
+            updateTotalCostLaterFlag: e.target.checked
+        }))
+    }
+
     const handleNumField = (e) => {
-        const value = e.target.value.replace(/\D/g, "");
+        // const value = e.target.value.replace(/\D/g, "");
+        let value = e.target.value.replace(/[^.0-9]/g, "")
+        value = value.replace(/\s/g,"")
+
         setFormData((prevState)=>({...prevState, 
             [e.target.name]:value}));
     };
@@ -97,16 +111,18 @@ function UpdateOrderForm({ initialValue, setFlag}) {
 
             updatedOrderList.map((item,index)=>{
                 // All qty zero flag check
-                `${item.quantity}`==='0'?
+                item.quantity===0?
                     allQtyZeroBool=allQtyZeroBool && true 
                     :
                     allQtyZeroBool=allQtyZeroBool && false;
                 
                 // All qty same as ordered check
-                `${item.quantity}`===formData.orderedProductList[index].quantity?
+                item.quantity===formData.orderedProductList[index].quantity?
                     noQtyChangeBool = noQtyChangeBool && true
                     :
                     noQtyChangeBool = noQtyChangeBool && false;
+                
+                // return item
                 }
             )
 
@@ -121,11 +137,25 @@ function UpdateOrderForm({ initialValue, setFlag}) {
             }
         }
 
+        let updatedDataStatus = (formData.status!=="failed" && formData.updateTotalCostLaterFlag)?
+                                    "incomplete"
+                                    :
+                                    formData.dataStatus
 
-        // Total Cost Zero check for Partial and Fulfilled status
-        if(formData.status!=="failed" && `${formData.totalCost}`==='0' ){
+        let updatedTotalCost = (formData.status==="failed" || formData.updateTotalCostLaterFlag)?
+                                0
+                                :
+                                formData.totalCost
+        
+        // Total Cost Zero check for Partial and Fulfilled status (Update TotalCostLater flag check)
+        if(formData.status!=="failed" 
+            && Number(formData.totalCost)===0
+            && !formData.updateTotalCostLaterFlag 
+        ){
             return alert('Invalid Total Cost')
         }
+
+
 
 
         // Invalid status check
@@ -138,9 +168,13 @@ function UpdateOrderForm({ initialValue, setFlag}) {
             const updatedInfo = {
                 ...formData,
                 recievedProductList: updatedOrderList,
+                totalCost: Number(updatedTotalCost),
+                dataStatus: updatedDataStatus
             }
+
+            delete updatedInfo.updateTotalCostLaterFlag
             
-            // console.log(`formData:${JSON.stringify(updatedInfo,null,4)}`)
+            console.log(`formData:${JSON.stringify(updatedInfo,null,4)}`)
             
             dispatch(updateDemandSlip(updatedInfo))
             
@@ -150,14 +184,23 @@ function UpdateOrderForm({ initialValue, setFlag}) {
     //////// Hooks //////////////////////////////////
     ////////////////////////////////////////////////
 
-    // useEffect(()=>{
-    //     console.log(`iV:${JSON.stringify(initialValue,null,4)}`)
-    // },[])
+    // Reset updateTotalCostLaterFlag if Failed status is clicked
+    useEffect(()=>{
+        if(formData.status==="failed"){
+            setFormData((prevState)=>({...prevState,
+                updateTotalCostLaterFlag:false
+            }))
+        }
+    },[formData.status])
 
     useEffect(()=>{
         if(isSuccess && updatedDataFlag){
             // dispatch(resetOrders())
-            dispatch(getFilteredDemandSlips())
+            dispatch(getFilteredDemandSlips({
+                filterStatus:'pending',
+                page:1,
+                limit:pageLimit
+              }))
 
             if(isSuccess){
                 dispatch(resetAfterNewDemandSlip())
@@ -203,11 +246,11 @@ function UpdateOrderForm({ initialValue, setFlag}) {
                         <div className="radio-group-item">
                         <input type="radio" 
                             name="status" 
-                            id={`${initialValue.ticketNumber} partial`} 
+                            id={`partial`} 
                             value="partial"
                             defaultChecked={initialValue.status==="partial"?true:false}
                             onChange={onChange} />
-                        <label htmlFor={`${initialValue.ticketNumber} partial`}>Partial</label>
+                        <label htmlFor={`partial`}>Partial</label>
                         </div>
                     {/* </div> */}
 
@@ -215,11 +258,11 @@ function UpdateOrderForm({ initialValue, setFlag}) {
                         <div className="radio-group-item">
                         <input type="radio" 
                             name="status" 
-                            id={`${initialValue.ticketNumber} failed`} 
+                            id={`failed`} 
                             value="failed"
                             defaultChecked={initialValue.status==="failed"?true:false}
                             onChange={onChange} />
-                        <label htmlFor={`${initialValue.ticketNumber} failed`}>Failed</label>
+                        <label htmlFor={`failed`}>Failed</label>
                         </div>
                     {/* </div> */}
 
@@ -227,11 +270,11 @@ function UpdateOrderForm({ initialValue, setFlag}) {
                         <div className="radio-group-item">
                         <input type="radio" 
                             name="status" 
-                            id={`${initialValue.ticketNumber} fulfilled`} 
+                            id={`fulfilled`} 
                             value="fulfilled"
                             defaultChecked={initialValue.status==="fulfilled"?true:false}
                             onChange={onChange} />
-                        <label htmlFor={`${initialValue.ticketNumber} fulfilled`}>Fulfilled</label>
+                        <label htmlFor={`fulfilled`}>Fulfilled</label>
                         </div>
                     {/* </div> */}
 
@@ -239,6 +282,20 @@ function UpdateOrderForm({ initialValue, setFlag}) {
                 </div>
 
             {formData.status!=="failed" &&
+            <>
+            <div className="form-checkbox">
+                <input type="checkbox" 
+                    name="updateTotalCostLaterFlag" 
+                    id={`${initialValue.ticketNumber} updateTotalCostLaterFlag`}
+                    value={formData.updateTotalCostLaterFlag}
+                    onChange={handleUpdateTotalCostLaterFlag} 
+                />
+                <label htmlFor="updateTotalCostLaterFlag">
+                    Update Total Cost Later
+                </label>
+            </div>
+
+             {!(formData.updateTotalCostLaterFlag) &&
              <div className="form-group">
                 <label htmlFor={`totalCost`}>Total Cost</label>
                 <input type="text" 
@@ -252,6 +309,10 @@ function UpdateOrderForm({ initialValue, setFlag}) {
                     style={{width:`40%`}}
                     />
             </div>}
+        
+            
+            </>
+            }
 
             {formData.status==="partial" &&
 

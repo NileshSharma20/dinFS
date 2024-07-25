@@ -169,11 +169,16 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
         let orderList = [...updatedOrderList]
         let orderItem = orderList[i]
         
-        let newSku = orderItem.sku.split("-").slice(0,-1)
-        newSku = newSku.join("-")
+        const splitSKU = orderItem.sku.split("-")
+        let newSku 
+        // newSku = newSku.join("-")
+        
+        if( !(splitSKU.length===2) && orderItem.productPartNumber!=="" ){
+            newSku = splitSKU.slice(0,-1).join("-")
+            orderItem.sku=newSku
+        }
         // console.log(`newSku:${newSku}`)
         
-        orderItem.sku=newSku
         orderItem.productPartNumber=""
 
         setUpdatedOrderList(orderList)
@@ -440,7 +445,22 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                                 onChange={(e)=>onOrderItemChange(e,index)}
                                 readOnly
                                 />
-                             <input
+
+                            {prod.sku!=="MANUAL"?
+                            <input
+                                className='card-form-control'
+                                type='text'
+                                style={{width:"99%",marginRight:"0.2rem"}}
+                                name= {`productFullName`}
+                                id={`productFullName ${index}`}
+                                value = {prod.productFullName}
+                                placeholder="Product"
+                                autoComplete='off'
+                                onChange={(e)=>onOrderItemChange(e,index)}
+                                readOnly
+                                />
+                            :
+                            <input
                                 className='card-form-control'
                                 type='text'
                                 style={{width:"99%",marginRight:"0.2rem"}}
@@ -451,6 +471,7 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                                 autoComplete='off'
                                 onChange={(e)=>onOrderItemChange(e,index)}
                                 />
+                            }
                             
                             {prod.sku!=="MANUAL" &&
                                 <div

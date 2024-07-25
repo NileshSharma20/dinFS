@@ -40,6 +40,8 @@ function UpdateIncompleteProdDataForm({initialValue}) {
         var tempList = [...updatedData.orderedProductList]
         var tempItem = tempList[i]
 
+        // sku 2 logic
+
         var spaceRemovedBC = e.target.value?e.target.value.replace(/ /g,"").toUpperCase():""
         // const cleanedBC = spaceRemovedBC.slice(0,3)
         // const bC = cleanedBC
@@ -61,6 +63,8 @@ function UpdateIncompleteProdDataForm({initialValue}) {
     const onPartNumberChange=(e,i)=>{
         var tempList = [...updatedData.orderedProductList]
         var tempItem = tempList[i]
+        
+        // sku 2 logic
 
         var spaceRemovedPN = e.target.value?e.target.value.replace(/ /g,""):""
         // const cleanedPN = spaceRemovedPN.split("-").join("")
@@ -158,7 +162,7 @@ function UpdateIncompleteProdDataForm({initialValue}) {
         <form onSubmit={onSubmit} style={{width:`100%`}}>
         <br />
         <p><span>Total Cost: </span>
-            {initialValue.totalCost===0?
+            {(initialValue.totalCost===0 && initialValue.status!=="failed")?
                 <input
                     type="text" 
                     className='card-form-control'

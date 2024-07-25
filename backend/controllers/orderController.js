@@ -436,7 +436,7 @@ const getFilteredDemandSlips = asyncHandler(async(req,res)=>{
 // @route  PATCH /api/order/:ticketNumber
 // @access Private
 const updateAfterDelivery = asyncHandler(async(req,res)=>{
-    const { status, recievedProductList,totalCost } = req.body
+    const { status, recievedProductList, totalCost, dataStatus } = req.body
     const { ticketNumber } = req.params
 
     const { username, roles } = req
@@ -453,7 +453,7 @@ const updateAfterDelivery = asyncHandler(async(req,res)=>{
     
     const demandSlip = await Demandslip.findOne({ticketNumber:ticketNumber}).exec()
 
-    if(!employeeId || !status || (status!=="failed" && !totalCost)
+    if(!employeeId || !status || (status!=="failed" && !totalCost && dataStatus!=="incomplete") 
         ){
         res.status(400)
         throw new Error('All fields are requied')
