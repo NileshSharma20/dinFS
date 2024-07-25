@@ -81,6 +81,9 @@
 .form-checkbox>label{
     margin-left: 0.5rem;
 }
+input[type=checkbox] {
+    accent-color: var(--backgroundColor);
+}
 
 .radio-group{
     display: flex;

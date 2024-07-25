@@ -484,9 +484,7 @@ function DemandSlip() {
 
       </div>
 
-      {(allFlag||pendingFlag||failedFlag||partialFlag||fulfilledFlag
-        // ||incompleteFlag
-      ) 
+      {(allFlag||pendingFlag||failedFlag||partialFlag||fulfilledFlag) 
         &&
         <>
 
@@ -503,6 +501,7 @@ function DemandSlip() {
           <input
             className='date-input-box'
             name='rawDate'
+            id='rawDate'
             type="date"
             max={currDateString}
             min={(isAccountant && !isManager)? weekAgoDateString:""}
@@ -518,6 +517,7 @@ function DemandSlip() {
           <input
             className='date-input-box'
             name='rawToDate'
+            id='rawToDate'
             type="date"
             max={currDateString}
             min={filterParams.rawDate?filterParams.rawDate:""}
