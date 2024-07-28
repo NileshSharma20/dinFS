@@ -11,6 +11,7 @@ function LegendModal({data, setFlag, flag}) {
 
     const [searchKey, setSearchKey] = useState("")
     const [filteredData, setFilteredData] = useState([...data])
+    const [copiedFlag, setCopiedFlag] = useState(false)
 
     /////////////////////////////////////////////////
     //////// Functions /////////////////////////////
@@ -24,13 +25,21 @@ function LegendModal({data, setFlag, flag}) {
         setSearchKey(e.target.value);
     }
 
+    const handleItemCodeClick = (e) =>{
+        navigator.clipboard.writeText(e)
+        setCopiedFlag(true)
+
+        setTimeout(()=>{
+            setCopiedFlag(false)
+        },1500)
+    }
+
     // Debounce function
     const debouncedResults = debouce(handleSearchChange, 800)
 
-    const onChange=(e)=>{
-        // e.preventDefault()
-        setSearchKey(e.target.value)
-    }
+    // const onChange=(e)=>{
+    //     setSearchKey(e.target.value)
+    // }
 
     /////////////////////////////////////////////////
     /////////// Hooks ///////////////////////////////
@@ -56,7 +65,7 @@ function LegendModal({data, setFlag, flag}) {
     useEffect(()=>{
         let cleanedSearchKey = searchKey.trim() 
         cleanedSearchKey = cleanedSearchKey.replace(/ /g,"-")
-        console.log(`searchKey: ${cleanedSearchKey}`)
+        // console.log(`searchKey: ${cleanedSearchKey}`)
 
         if(cleanedSearchKey===""){
             return setFilteredData(data)
@@ -86,6 +95,10 @@ function LegendModal({data, setFlag, flag}) {
     <>
         <div className="modal-backdrop" ></div> 
         <div className='legend-modal-container' ref={modalRef}>
+
+            <div className={`copied-alert-box ${copiedFlag?``:`copied-alert-box-hidden`}`}>
+                Copied!
+            </div>
             
             <div className="edit-btn legend-close-btn"
                 onClick={()=>handleLegendClick()}
@@ -115,7 +128,10 @@ function LegendModal({data, setFlag, flag}) {
                 <div className='ds-prodList-box'>
               {filteredData.map((item,index)=>(
                 
-                  <div className='ds-prodList-col' key={index}>
+                  <div className='ds-prodList-col' key={index}
+                    style={{cursor:`pointer`}}
+                    onClick={() => handleItemCodeClick(item.itemCode)}
+                  >
 
                     <div className='ds-prodList-itemCode' >
                       <span>{index+1}. </span>

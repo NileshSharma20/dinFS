@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from "react-redux"
 import { AiOutlinePlus, AiOutlineClose,AiOutlineSearch } from "react-icons/ai"
-import { resetSearchProducts,searchProducts, searchSKUProducts,searchSKUProductsOnly } from '../../features/products/productSlice';
-import { generateDemandSlip, getFilteredDemandSlips, resetAfterNewDemandSlip, resetOrders } from '../../features/orders/orderSlice';
+import { resetSearchProducts,searchProducts, searchSKUProducts } from '../../features/products/productSlice';
+import { generateDemandSlip, getFilteredDemandSlips, resetAfterNewDemandSlip } from '../../features/orders/orderSlice';
 import Loader from '../Loader/Loader';
 
 import debouce from "lodash.debounce";
@@ -16,6 +16,40 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
     const [newDSFlag, setNewDSFlag] = useState(false)
 
     const [searchInput, setSearchInput] = useState("");
+
+    const tempDeliveryPartnerList=[
+        "AAKASH",
+        "GOUTAM",
+        "SOUMEN",
+        "BISU",
+        "VINAY",
+        "VIKAS",
+        "DUTTA",
+        "PINTU",
+    ]
+
+    const tempDistList = [
+        "GAUTAM",
+        "OM",
+        "DUBEY",
+        "PAPPU",
+        "AS AUTO",
+        "SAI AUTO",
+        "CITY AUTO",
+        "HP AUTO",
+        "ROYAL AUTO DISTRIBUTORS",
+        "UNIVERSAL AUTO",
+        "V2",
+        "KK ENTERPRISE",
+        "TRADING AUTO",
+        "SATYAM",
+        "NEW HONDA",
+        "AUTO IMPORTING",
+        "PATODIYA",
+        "MANOJ",
+        "MOUSIN",
+        "BUHRANI",
+    ]
 
     const [formData, setFormData] = useState({
         deliveryPartnerName: "",
@@ -58,7 +92,16 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
     //     navigator.clipboard.writeText(text)
     // }
     const handleSearchChange = (e) => {
+        e.preventDefault(e)
+
         setSearchInput(e.target.value);
+        setSKUData({
+            itemCode:"",
+            vehicleModel:"",
+            brandCompany:"",
+            partNum:"",
+            skuOnlyFlag:"true"
+        })
     }
 
     // Debounce function
@@ -406,24 +449,48 @@ function QuickProdSearchForm({setToggleFlag,passNextFlag }) {
                 <label htmlFor={`deliveryPartnerName`}>Delivery Partner Name</label>
                 <input type="text" 
                     className='card-form-control'
+                    list='deliveryPartnerNameList'
                     name= 'deliveryPartnerName'
                     id={`deliveryPartnerName`}
                     value = {deliveryPartnerName}
                     placeholder="Delivery Partner Name"
                     autoComplete='off'
                     onChange={onChange} />
+                <datalist id='deliveryPartnerNameList'>
+                    {tempDeliveryPartnerList.map((parterName,index)=>{
+                        return(
+                            <option
+                                key={index}
+                                value={parterName}
+                            >
+                                {parterName}
+                            </option>
+                        )
+                    })}
+                </datalist>
             </div>
 
             <div className="form-group">
                 <label htmlFor={`distributorName`}>Distributor Name</label>
-                <input type="text" 
-                    className='card-form-control'
-                    name= 'distributorName'
-                    id={`distributorName`}
-                    value = {distributorName}
-                    placeholder="Distributor Name"
-                    autoComplete='off'
-                    onChange={onChange} />
+                    <input type="text" 
+                        className='card-form-control'
+                        list="distributorNameList" 
+                        name= 'distributorName'
+                        id={`distributorName`}
+                        value = {distributorName}
+                        placeholder="Distributor Name"
+                        autoComplete='off'
+                        onChange={onChange}
+                    />
+                    <datalist id='distributorNameList'>
+                        {tempDistList.map((distName,index)=>{
+                            return(
+                                <option key={index} value={distName}>
+                                    {distName}
+                                </option>
+                            )
+                        })}
+                    </datalist>
             </div>
 
             <div className="form-group-flex" style={{marginBottom:`1rem`}}>

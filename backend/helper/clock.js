@@ -30,10 +30,10 @@ const clockEvents = asyncHandler(async() => {
     if( (date===count.date && hour>=21) 
     // && (date==count.date && hour<19) 
     ){
-        await Demandslip.updateMany({status:"pending"},{$set:{status:"failed"}})
+        // await Demandslip.updateMany({status:"pending"},{$set:{status:"failed"}})
         count.counterNumber = 1
     }else if( (date!==count.date && hour<9)){
-        await Demandslip.updateMany({status:"pending"},{$set:{status:"failed"}})
+        // await Demandslip.updateMany({status:"pending"},{$set:{status:"failed"}})
         count.counterNumber = 1
         count.date = date
     }
