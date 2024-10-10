@@ -187,7 +187,9 @@ function UpdateIncompleteProdDataForm({initialValue}) {
             {initialValue.status==="partial" && <h3>Recv.</h3>}  
         </div>
 
-            <div className="form-group" style={{width:`100%`}}>
+            {/* <div className="form-group" style={{width:`100%`}}> */}
+        <div className='card-grid-prod-box'>
+
 
                 {updatedData.orderedProductList.map((prod,k)=>{
                     return(

@@ -315,9 +315,10 @@ function UpdateOrderForm({ initialValue, setFlag}) {
             }
 
             {formData.status==="partial" &&
+            // {/* // <div className="form-group" style={{width:`100%`}}> */}
+            <div className='card-grid-prod-box'>    
 
-            <div className="form-group" style={{width:`100%`}}>
-                <div className="card-grid-row card-grid-row-partial ">
+                <div className="card-grid-row ">
                     <h3></h3>
                     <h3>Products</h3>
                     <h3>Ord.</h3>
@@ -328,7 +329,7 @@ function UpdateOrderForm({ initialValue, setFlag}) {
                 {formData.recievedProductList.map((prod,k)=>{
                     return(
 
-                    <div className="card-grid-row card-grid-row-partial " key={k}>
+                    <div className="card-grid-row" key={k}>
                         <p>{k+1}.</p>
 
                         {/* <p>{prod.sku}</p>

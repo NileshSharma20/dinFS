@@ -84,6 +84,16 @@
     /* border: 1px solid blue; */
 }
 
+.card-grid-prod-box{
+    width: 100%;
+    max-height: 40vh;
+
+    /* background-color: antiquewhite; */
+    /* border: 1px solid blue; */
+    border-bottom: 3px solid var(--backgroundColor);
+    overflow-y: scroll;
+}
+
 .card-grid-row{
     /* width: 100%; */
     /* width: auto; */
@@ -99,7 +109,10 @@
     border-bottom: 1px solid var(--backgroundColor);
     /* border: 1px solid red; */
 }
-    
+
+.card-grid-row:last-child{
+    border-bottom: none;
+}    
 .card-grid-row-partial{
     max-width: calc(30vw - 2rem);
     /* grid-template-columns: 3rem 30% calc();         */

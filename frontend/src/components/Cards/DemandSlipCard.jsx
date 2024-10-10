@@ -110,7 +110,6 @@ function DemandSlipCard({info, partialFlag=false}) {
         </div>
     {/* <p><span>Status: </span> {info.status}</p> */}
 
-    {/* <div className='ds-new-col'> */}
     {(editFlag && info.status!=="pending") ?
             <UpdateIncompleteProdDataForm initialValue={info} />
         :
@@ -126,6 +125,8 @@ function DemandSlipCard({info, partialFlag=false}) {
             {partialFlag && <h3>Recv.</h3>}  
         </div>
         
+        <div className='card-grid-prod-box'>
+
         {info.orderedProductList?.map((prod,i)=>
             <div className="card-grid-row" key={i}>
                 <p>{i+1}.</p>
@@ -144,6 +145,8 @@ function DemandSlipCard({info, partialFlag=false}) {
                 
             </div>
         )}
+
+        </div>
         </>
     }
     </div>

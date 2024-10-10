@@ -18,11 +18,12 @@ const ReviewProducts = require("../models/reviewproductsModel")
 // @route  POST /api/order/
 // @access Private
 const createNewDemandSlip = asyncHandler(async (req,res)=>{
-    const {deliveryPartnerName,
-           distributorName,
-           orderedProductList,
-           dataStatus
-        } = req.body
+    const {
+        deliveryPartnerName,
+        distributorName,
+        orderedProductList,
+        dataStatus
+    } = req.body
     
     const { username } = req
 
@@ -466,13 +467,17 @@ const updateAfterDelivery = asyncHandler(async(req,res)=>{
     }
 
     // Check if ticket status is pending or if Different User has Admin access
-    if((demandSlip.status!=="pending" && !roles.includes("Admin")) 
+    if(
+        (demandSlip.status!=="pending" && !roles.includes("Admin")) 
         || 
-        (employeeId.toString()!==demandSlip.employeeId.toString() 
-        && username!==demandSlip.username 
-        && !roles.includes("Admin"))){
+        (demandSlip.status==="pending" 
+        && employeeId.toString()!==demandSlip.employeeId.toString() 
+        && username!==demandSlip.username  
+        && !roles.includes("Accountant")
+        )
+    ){
             res.status(403)
-            throw new Error("Forbidden")
+            throw new Error("Forbidden: Privilege not granted")
     }
 
     // Status Logic

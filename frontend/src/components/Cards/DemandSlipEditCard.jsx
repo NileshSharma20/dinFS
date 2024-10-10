@@ -127,7 +127,7 @@ function DemandSlipEditCard({info}) {
             <h3>Ordered</h3> 
         </div>
 
-        {/* <div className='ds-new-col'> */}
+        <div className='card-grid-prod-box'>
             {info.orderedProductList?.map((prod,i)=>
                 <div className="card-grid-row" key={i}>
                     <p>{i+1}.</p>
@@ -141,6 +141,7 @@ function DemandSlipEditCard({info}) {
                     <p>{prod.quantity} {prod.unit}</p> 
             </div>
             )}
+          </div>
 
         <br />
 

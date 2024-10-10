@@ -1,8 +1,5 @@
 import axios from 'axios'
 
-// Live URI
-// const auth_URI = 'https://api.dinmotoindia.com/api/auth/'
-
 // Local URI
 const main_URI = process.env.REACT_APP_LOCAL_URI 
                   || `https://api.dinmotoindia.com/api/`

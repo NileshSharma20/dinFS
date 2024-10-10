@@ -12,7 +12,9 @@ function UserCard({info}) {
   return (
     <>
     
-    <div className='card-container'>
+    <div className='card-container'
+      style={info.active?{}: {border:`1px solid red`}}
+    >
         <div className='edit-btn' 
             onClick={()=>setEditFlag(!editFlag)}>
             {editFlag?<AiOutlineClose />:<FiEdit2 />}
