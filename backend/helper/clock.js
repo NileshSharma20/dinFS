@@ -1,13 +1,9 @@
-// const { generateTicket } = require("./orderHelper")
 const asyncHandler = require("express-async-handler")
-// const { getFilteredDemandSlips } = require("../controllers/orderController")
 
 const Counter = require('../models/counterModel')
-const Demandslip = require("../models/demandslipModel")
 
 // @desc   setInterval function to be called at Top level 
 const clockInterval = ()=>{
-    // console.log(`clockInterval`)
     setInterval(clockEvents, 11.5*60*60*1000)
 }
 
@@ -18,29 +14,27 @@ const clockEvents = asyncHandler(async() => {
     let date = currTime.getDate()
     let hour = currTime.getHours()
 
-    const count = await Counter.findOne({counterType:"DemandSlip"}).exec()
+    const demandSlipCount = await Counter.findOne({counterType:"DemandSlip"}).exec()
+    const billCount = await Counter.findOne({counterType:"Bill"}).exec()
     
-    // console.log(`pendingList:${JSON.stringify(pendingDemandSlipList,null,4)}`)
-    
-    if(!count){
-        return 
-        // console.log(`No Counter found`)
+    if( demandSlipCount && (date===demandSlipCount.date && hour>=21) ){
+        demandSlipCount.counterNumber = 1
+    }else if( demandSlipCount && (date!==demandSlipCount.date && hour<9)){
+        demandSlipCount.counterNumber = 1
+        demandSlipCount.date = date
     }
-    
-    if( (date===count.date && hour>=21) 
-    // && (date==count.date && hour<19) 
-    ){
-        // await Demandslip.updateMany({status:"pending"},{$set:{status:"failed"}})
-        count.counterNumber = 1
-    }else if( (date!==count.date && hour<9)){
-        // await Demandslip.updateMany({status:"pending"},{$set:{status:"failed"}})
-        count.counterNumber = 1
-        count.date = date
-    }
-    
-    const updateCounter = await count.save()
 
-    return updateCounter
+    if( billCount && (date===billCount.date && hour>=21) ){
+        billCount.counterNumber = 1
+    }else if( billCount && (date!==billCount.date && hour<9)){
+        billCount.counterNumber = 1
+        billCount.date = date
+    }
+    
+    const updateDemandslipCounter = await demandSlipCount.save()
+    const updateBillCounter = await billCount.save()
+
+    return
 })
 
 module.exports={

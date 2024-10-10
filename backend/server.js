@@ -33,12 +33,14 @@ app.use(cookieParser())
 app.use(express.json())
 app.use(express.urlencoded({ extended:false }))
 
-app.use('/api/users', require('./routes/userRoutes'))
 app.use('/api/auth', require('./routes/authRoutes'))
-app.use('/api/prod', require('./routes/prodRoutes'))
-app.use('/api/order', require('./routes/orderRoutes'))
 app.use('/api/analytics', require('./routes/analyticsRoutes'))
-app.use('/api/aws', require('./routes/awsRoutes'))
+app.use('/api/bill', require('./routes/billRoutes'))
+app.use('/api/order', require('./routes/orderRoutes'))
+app.use('/api/prod', require('./routes/prodRoutes'))
+app.use('/api/users', require('./routes/userRoutes'))
+
+// app.use('/api/aws', require('./routes/awsRoutes'))
 
 app.use(errorHandler)
 

@@ -477,7 +477,7 @@ const updateAfterDelivery = asyncHandler(async(req,res)=>{
         )
     ){
             res.status(403)
-            throw new Error("Forbidden: Privilege not granted")
+            throw new Error("Forbidden: Accountant and above Access Level required")
     }
 
     // Status Logic
