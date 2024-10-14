@@ -30,7 +30,13 @@ function Landing() {
         pathname:"demand-slip-analytics",
         name:"Demand Slip Analytics",
         accessLevel:["Admin","Manager"]
-    }]
+    }
+    // ,{
+    //     pathname:"billing",
+    //     name:"Billing",
+    //     accessLevel:["Admin","Manager","Accountant","Employee"]
+    // }
+    ]
 
     const handleNavigation=(pathname)=>{
         let path = "/"+pathname

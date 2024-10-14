@@ -7,7 +7,7 @@ import Loader from '../Loader/Loader';
 
 import debouce from "lodash.debounce";
 
-function QuickProdSearchForm() {
+function GenerateBillForm() {
     const dispatch = useDispatch();
 
     const { productData, noMatch } = useSelector((state)=>state.product)
@@ -51,6 +51,15 @@ function QuickProdSearchForm() {
         "BUHRANI",
     ]
 
+    const tempDiscountList =[
+        0,
+        5,
+        10,
+        15,
+        20,
+        25
+    ]
+
     const [formData, setFormData] = useState({
         deliveryPartnerName: "",
         distributorName: "",
@@ -58,11 +67,15 @@ function QuickProdSearchForm() {
         orderedProductList: [{
             sku:"",
             productFullName:"",
-            productBrandName:"",
-            productPartNumber:"",
+            // productBrandName:"",
+            // productPartNumber:"",
             quantity:"",
             unit:'PC',
-        }]
+            price:0,
+            prodDiscount:0,
+        }],
+        extraDiscount:0,
+        totalCost:0
     })
 
     const [updatedOrderList, setUpdatedOrderList] = useState([{
@@ -72,6 +85,8 @@ function QuickProdSearchForm() {
         productPartNumber:"",
         quantity:"",
         unit:'PC',
+        // price:,
+        // prodDiscount:0,
     }])
 
     const [skuData, setSKUData] = useState({
@@ -82,7 +97,7 @@ function QuickProdSearchForm() {
         skuOnlyFlag:"true"
     })
       
-    const { deliveryPartnerName, distributorName, dataStatus } = formData
+    const { deliveryPartnerName, distributorName, dataStatus, totalCost, extraDiscount } = formData
 
     /////////////////////////////////////////////////
     //////// Functions /////////////////////////////
@@ -128,17 +143,13 @@ function QuickProdSearchForm() {
                 productPartNumber:"",
                 quantity:"",
                 unit:'PC',
-            }]
+            }],
+            extraDiscount:0,
+            totalCost:0
         })
 
         dispatch(resetSearchProducts())
     }
-
-    // const handleNumField = (e) => {
-    //     const value = e.target.value.replace(/\D/g, "");
-    //     setFormData((prevState)=>({...prevState, 
-    //         [e.target.name]:value}));
-    // };
 
     const addItemfromSearch=(item)=>{
         let prodBrand = item.productFullName.split(" ")[2]
@@ -152,7 +163,9 @@ function QuickProdSearchForm() {
             productBrandName: prodBrand,
             productPartNumber: prodPartNum,
             quantity:"",
-            unit:"PC"
+            unit:"PC",
+            // price:0,
+            // prodDiscount:0,
         }
         
         // Check for Duplicates
@@ -231,9 +244,27 @@ function QuickProdSearchForm() {
         let orderList = [...updatedOrderList]
         let orderItem = orderList[i]
         // console.log(`oI:${JSON.stringify(orderItem,null,4)}`)
-        if(e.target.name==="quantity"){
+        if(e.target.name==="quantity" 
+            || e.target.name==="price" 
+            || e.target.name==="prodDiscount"){
             const numValue = e.target.value.replace(/\D/g, "")
             orderItem[e.target.name] = numValue
+
+            let prodPrice = (orderItem?.price*(100-orderItem?.prodDiscount)/100).toFixed(2)
+            prodPrice = parseFloat(prodPrice) || 0
+
+            let checkTotalPrice = prodPrice 
+            checkTotalPrice= updatedOrderList.reduce((res,item)=>{
+                let discountInt = (100 - item.prodDiscount)/100
+                let discountedPrice = parseFloat((item.price*discountInt).toFixed(2))
+                let totalItemPrice = discountedPrice*item.quantity
+        
+                return res+totalItemPrice
+            },0)
+        
+            checkTotalPrice = Math.round(checkTotalPrice)-formData.extraDiscount
+    
+            setFormData((prevState)=>({...prevState,totalCost:checkTotalPrice}))
         }else if(e.target.name==="productPartNumber"){
             let newSku = orderItem.sku.split("-").slice(0,3)
             newSku = newSku.join("-")
@@ -246,6 +277,8 @@ function QuickProdSearchForm() {
             orderItem[e.target.name] = e.target.value.toUpperCase()
         }
 
+        
+
         // console.log(JSON.stringify(orderItem,null,4))
         setUpdatedOrderList(orderList)
     }
@@ -255,7 +288,7 @@ function QuickProdSearchForm() {
                                     {sku:"MANUAL",
                                     productFullName:"",
                                     quantity:"",
-                                    unit:"PC"
+                                    unit:"PC",
                                 }]
         setUpdatedOrderList(modelList)
     }
@@ -355,6 +388,18 @@ function QuickProdSearchForm() {
         }
     },[searchInput])
 
+    // useEffect(()=>{
+    //     let checkTotalPrice = formData.orderedProductList.reduce((res,item)=>{
+    //         let discountInt = (100 - item.prodDiscount)/100
+    //         let discountedPrice = parseFloat((item.price*discountInt).toFixed(2))
+    //         let totalItemPrice = discountedPrice*item.quantity
+    
+    //         return res+totalItemPrice
+    //     },0)
+    
+    //     checkTotalPrice = Math.round(checkTotalPrice)-formData.extraDiscount
+    // },[formData.orderedProductList])
+
     // Success reset
     useEffect(()=>{
         if(isSuccess && message!==""){
@@ -371,7 +416,9 @@ function QuickProdSearchForm() {
                         productFullName:"",
                         quantity:"",
                         unit:"PC"
-                    }]
+                    }],
+                    extraDiscount:0,
+                    totalCost:0
                 })
 
                 setSKUData({
@@ -493,7 +540,7 @@ function QuickProdSearchForm() {
                     </datalist>
             </div>
 
-            <label>Products</label>
+                <label>Products</label>
             <div className="form-group-flex" style={{marginBottom:`1rem`}}>
                 {updatedOrderList.map((prod,index)=>{
                     return(
@@ -590,6 +637,53 @@ function QuickProdSearchForm() {
 
                             </div>}
 
+                            {/* changes */}
+                            <div
+                                style={{
+                                    display:`grid`,
+                                    flexDirection:`none`,
+                                    gridTemplateColumns:`1fr 1fr`,
+                                    columnGap:`0.1rem`
+                                }}
+                            >
+                                <div style={{position:`relative`}}>
+                                    <input
+                                        className='card-form-control'
+                                        type='text'
+                                        style={{width:"100%"}}
+                                        name= {`price`}
+                                        id={`price ${index}`}
+                                        value = {prod.price}
+                                        placeholder="Price (Rs.)"
+                                        onChange={(e)=>onOrderItemChange(e,index)}
+                                        />   
+                                </div> 
+                                <div style={{position:`relative`}}>
+                                    <input
+                                        className='card-form-control'
+                                        type='text'
+                                        list='discountList'
+                                        style={{width:"100%"}}
+                                        name= {`prodDiscount`}
+                                        id={`prodDiscount ${index}`}
+                                        value = {prod.prodDiscount}
+                                        placeholder="Discount (%)"
+                                        onChange={(e)=>onOrderItemChange(e,index)}
+                                        /> 
+
+                                    <datalist id='discountList'>
+                                        {tempDiscountList.map((discVal,index)=>{
+                                            return(
+                                                <option key={index} value={discVal}>
+                                                    {discVal}
+                                                </option>
+                                            )
+                                        })}
+                                    </datalist> 
+                                </div> 
+                            </div>
+                            {/* changes */}
+
                             </section>
 
                             <div style={{display:`flex`, 
@@ -645,6 +739,9 @@ function QuickProdSearchForm() {
                     <AiOutlinePlus />
                 </div>
 
+            </div>
+            <div className="form-group">
+                Total: {formData.totalCost}
             </div>
             <div className="form-group">
                 <button type="submit" className="submit-btn">
@@ -764,4 +861,4 @@ function QuickProdSearchForm() {
   )
 }
 
-export default QuickProdSearchForm
+export default GenerateBillForm

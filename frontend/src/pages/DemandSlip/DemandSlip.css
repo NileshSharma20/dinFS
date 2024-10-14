@@ -116,7 +116,7 @@
     justify-content: flex-start;
     align-items: flex-start;
 
-    border: 1px solid blue;
+    /* border: 1px solid blue; */
 } 
 
 .ds-col-prod-list{

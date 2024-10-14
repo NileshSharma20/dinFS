@@ -42,11 +42,20 @@
 }
 
 .form-group-flex{
+    /* position: relative; */
+
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
 
+    padding-bottom: 1rem;
+
+    gap: 1.5rem;
+
+    max-height: 90vh;
+
+    overflow-y: scroll;
     /* border: 1px solid blue; */
 }
 
@@ -107,15 +116,11 @@ input[type=checkbox] {
     padding: 0.5rem;
 
     width: 100%;
-    min-height: 5vh;
-
-    margin-bottom: 1.5rem;
-
+    min-height: 10vh;
     /* background-color: white; */
 
     border: 1px solid var(--backgroundColor);
     border-radius: 15px;
-
     /* width: 30vw; */
 }
 
@@ -137,6 +142,10 @@ input[type=checkbox] {
 }
 
 .add-btn{
+    position: sticky;
+    bottom: 0rem;
+    left: 50%;
+
     display: flex;
     justify-content: center;
     align-items: center;

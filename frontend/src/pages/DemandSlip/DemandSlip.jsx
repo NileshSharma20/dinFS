@@ -591,7 +591,7 @@ function DemandSlip() {
           <div className="ds-content"
           >
           <div className="ds-search-container">
-              <QuickProdSearchForm setToggleFlag={setCreateFlag} passNextFlag={setPendingFlag} />
+              <QuickProdSearchForm />
           </div>
           </div>
 

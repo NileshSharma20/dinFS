@@ -13,6 +13,7 @@ import './App.css';
 import Footer from './components/Footer/Footer';
 import DemandSlip from './pages/DemandSlip/DemandSlip';
 import DemandslipAnalytics from './pages/Analytics/DemandslipAnalytics';
+import Billing from './pages/Billing/Billing';
 
 function App() {
   return (
@@ -26,11 +27,16 @@ function App() {
         <Route path="/" element={<Landing />} />
         <Route path='/login' element={<Login />} />
         <Route path="/indiamart-templates" element={<QuickRes />} />
+        
         <Route path="/products" element={<Products />} />
         <Route path='/products/:sku' element={<Product /> }/> 
+        
         <Route path='/user-management' element={<Users />} />
+        
         <Route path='/demand-slip-generator' element={<DemandSlip />} />
         <Route path='/demand-slip-analytics' element={<DemandslipAnalytics />} />
+        
+        <Route path='/billing' element={<Billing />} />
 
         <Route path='*' element={<NotFound /> } />
       </Routes>
