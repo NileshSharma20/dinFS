@@ -31,11 +31,11 @@ function Landing() {
         name:"Demand Slip Analytics",
         accessLevel:["Admin","Manager"]
     }
-    // ,{
-    //     pathname:"billing",
-    //     name:"Billing",
-    //     accessLevel:["Admin","Manager","Accountant","Employee"]
-    // }
+    ,{
+        pathname:"billing",
+        name:"Billing",
+        accessLevel:["Admin","Manager","Accountant","Employee"]
+    }
     ]
 
     const handleNavigation=(pathname)=>{

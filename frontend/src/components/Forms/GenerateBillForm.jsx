@@ -184,10 +184,18 @@ function GenerateBillForm() {
     }
 
     const onChange=(e)=>{
-        setFormData((prevState)=>({
-            ...prevState,
-            [e.target.name]:e.target.value
-        }))        
+        if(e.target.name==='extraDiscount'){
+            const numValue = e.target.value.replace(/\D/g, "") || '0'
+            setFormData((prevState)=>({
+                ...prevState,
+                [e.target.name]:parseInt(numValue)
+            }))   
+        }else{
+            setFormData((prevState)=>({
+                ...prevState,
+                [e.target.name]:e.target.value
+            }))        
+        }
     }
 
     const onSKUChange=(e)=>{
@@ -250,21 +258,21 @@ function GenerateBillForm() {
             const numValue = e.target.value.replace(/\D/g, "")
             orderItem[e.target.name] = numValue
 
-            let prodPrice = (orderItem?.price*(100-orderItem?.prodDiscount)/100).toFixed(2)
-            prodPrice = parseFloat(prodPrice) || 0
+            // let prodPrice = (orderItem?.price*(100-orderItem?.prodDiscount)/100).toFixed(2)
+            // prodPrice = parseFloat(prodPrice) || 0
 
-            let checkTotalPrice = prodPrice 
-            checkTotalPrice= updatedOrderList.reduce((res,item)=>{
-                let discountInt = (100 - item.prodDiscount)/100
-                let discountedPrice = parseFloat((item.price*discountInt).toFixed(2))
-                let totalItemPrice = discountedPrice*item.quantity
+            // let checkTotalPrice = prodPrice 
+            // checkTotalPrice= updatedOrderList.reduce((res,item)=>{
+            //     let discountInt = (100 - item.prodDiscount)/100
+            //     let discountedPrice = parseFloat((item.price*discountInt).toFixed(2))
+            //     let totalItemPrice = discountedPrice*item.quantity
         
-                return res+totalItemPrice
-            },0)
+            //     return res+totalItemPrice
+            // },0)
         
-            checkTotalPrice = Math.round(checkTotalPrice)-formData.extraDiscount
+            // checkTotalPrice = Math.round(checkTotalPrice)-formData.extraDiscount
     
-            setFormData((prevState)=>({...prevState,totalCost:checkTotalPrice}))
+            // setFormData((prevState)=>({...prevState,totalCost:checkTotalPrice}))
         }else if(e.target.name==="productPartNumber"){
             let newSku = orderItem.sku.split("-").slice(0,3)
             newSku = newSku.join("-")
@@ -350,9 +358,9 @@ function GenerateBillForm() {
                 dataStatus: dataStatusCheck,
             }
             
-            // console.log(`formData:${JSON.stringify(orderInfo,null,4)}`)
+            console.log(`formData:${JSON.stringify(orderInfo,null,4)}`)
             
-            dispatch(generateDemandSlip(orderInfo))
+            // dispatch(generateDemandSlip(orderInfo))
             
         }
     }
@@ -388,17 +396,21 @@ function GenerateBillForm() {
         }
     },[searchInput])
 
-    // useEffect(()=>{
-    //     let checkTotalPrice = formData.orderedProductList.reduce((res,item)=>{
-    //         let discountInt = (100 - item.prodDiscount)/100
-    //         let discountedPrice = parseFloat((item.price*discountInt).toFixed(2))
-    //         let totalItemPrice = discountedPrice*item.quantity
+    useEffect(()=>{
+        let checkTotalPrice = updatedOrderList.reduce((res,item)=>{
+            let discountInt = (100 - item.prodDiscount)/100
+            let discountedPrice = parseFloat((item.price*discountInt).toFixed(2))
+            let totalItemPrice = discountedPrice*item.quantity
     
-    //         return res+totalItemPrice
-    //     },0)
+            return res+totalItemPrice
+        },0)
     
-    //     checkTotalPrice = Math.round(checkTotalPrice)-formData.extraDiscount
-    // },[formData.orderedProductList])
+        checkTotalPrice = Math.round(checkTotalPrice)-formData.extraDiscount
+        setFormData((prevState=>({
+            ...prevState,
+            totalCost:checkTotalPrice
+        })))
+    },[updatedOrderList, formData.extraDiscount])
 
     // Success reset
     useEffect(()=>{
@@ -493,17 +505,17 @@ function GenerateBillForm() {
     <div className='card-container card-grid' style={{padding:"0", border:"none"}}>
         <form onSubmit={onSubmit}>
             <div className="form-group">
-                <label htmlFor={`deliveryPartnerName`}>Delivery Partner Name</label>
+                <label htmlFor={`extraDiscount`}>Extra Discount (Rs.)</label>
                 <input type="text" 
                     className='card-form-control'
-                    list='deliveryPartnerNameList'
-                    name= 'deliveryPartnerName'
-                    id={`deliveryPartnerName`}
-                    value = {deliveryPartnerName}
-                    placeholder="Delivery Partner Name"
+                    // list='extraDiscountList'
+                    name= 'extraDiscount'
+                    id={`extraDiscount`}
+                    value = {extraDiscount}
+                    placeholder="Extra Discount (Rs.)"
                     autoComplete='off'
                     onChange={onChange} />
-                <datalist id='deliveryPartnerNameList'>
+                {/* <datalist id='deliveryPartnerNameList'>
                     {tempDeliveryPartnerList.map((parterName,index)=>{
                         return(
                             <option
@@ -514,33 +526,10 @@ function GenerateBillForm() {
                             </option>
                         )
                     })}
-                </datalist>
+                </datalist> */}
             </div>
 
-            <div className="form-group">
-                <label htmlFor={`distributorName`}>Distributor Name</label>
-                    <input type="text" 
-                        className='card-form-control'
-                        list="distributorNameList" 
-                        name= 'distributorName'
-                        id={`distributorName`}
-                        value = {distributorName}
-                        placeholder="Distributor Name"
-                        autoComplete='off'
-                        onChange={onChange}
-                    />
-                    <datalist id='distributorNameList'>
-                        {tempDistList.map((distName,index)=>{
-                            return(
-                                <option key={index} value={distName}>
-                                    {distName}
-                                </option>
-                            )
-                        })}
-                    </datalist>
-            </div>
-
-                <label>Products</label>
+            <label>Products</label>
             <div className="form-group-flex" style={{marginBottom:`1rem`}}>
                 {updatedOrderList.map((prod,index)=>{
                     return(
@@ -741,7 +730,7 @@ function GenerateBillForm() {
 
             </div>
             <div className="form-group">
-                Total: {formData.totalCost}
+                Total: Rs.{formData.totalCost || 0}
             </div>
             <div className="form-group">
                 <button type="submit" className="submit-btn">
