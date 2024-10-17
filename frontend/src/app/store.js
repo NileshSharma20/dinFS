@@ -5,6 +5,7 @@ import authReducer from "../features/auth/authSlice"
 import usersReducer from "../features/users/usersSlice"
 import ordersReducer from "../features/orders/orderSlice"
 import analyticsReducer from "../features/analytics/analyticsSlice"
+import billingReducer from "../features/billing/billingSlice"
 
 export const store = configureStore({
   reducer: {
@@ -14,5 +15,6 @@ export const store = configureStore({
     users: usersReducer,
     orders: ordersReducer,
     analytics: analyticsReducer,
+    billing: billingReducer,
   },
 });

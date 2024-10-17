@@ -6,8 +6,9 @@ import { generateDemandSlip, getFilteredDemandSlips, resetAfterNewDemandSlip } f
 import Loader from '../Loader/Loader';
 
 import debouce from "lodash.debounce";
+import { setPreviewData } from '../../features/billing/billingSlice';
 
-function GenerateBillForm() {
+function GenerateBillForm({setModalFlag}) {
     const dispatch = useDispatch();
 
     const { productData, noMatch } = useSelector((state)=>state.product)
@@ -61,14 +62,9 @@ function GenerateBillForm() {
     ]
 
     const [formData, setFormData] = useState({
-        deliveryPartnerName: "",
-        distributorName: "",
-        dataStatus:"complete",
         orderedProductList: [{
             sku:"",
             productFullName:"",
-            // productBrandName:"",
-            // productPartNumber:"",
             quantity:"",
             unit:'PC',
             price:0,
@@ -258,21 +254,6 @@ function GenerateBillForm() {
             const numValue = e.target.value.replace(/\D/g, "")
             orderItem[e.target.name] = numValue
 
-            // let prodPrice = (orderItem?.price*(100-orderItem?.prodDiscount)/100).toFixed(2)
-            // prodPrice = parseFloat(prodPrice) || 0
-
-            // let checkTotalPrice = prodPrice 
-            // checkTotalPrice= updatedOrderList.reduce((res,item)=>{
-            //     let discountInt = (100 - item.prodDiscount)/100
-            //     let discountedPrice = parseFloat((item.price*discountInt).toFixed(2))
-            //     let totalItemPrice = discountedPrice*item.quantity
-        
-            //     return res+totalItemPrice
-            // },0)
-        
-            // checkTotalPrice = Math.round(checkTotalPrice)-formData.extraDiscount
-    
-            // setFormData((prevState)=>({...prevState,totalCost:checkTotalPrice}))
         }else if(e.target.name==="productPartNumber"){
             let newSku = orderItem.sku.split("-").slice(0,3)
             newSku = newSku.join("-")
@@ -312,53 +293,40 @@ function GenerateBillForm() {
         e.preventDefault()
 
         let emptyOrderListObj = []
-        emptyOrderListObj = updatedOrderList.filter(prod=>(prod.sku===""
-                                                    ||prod.productFullName===""
-                                                    ||prod.quantity===""
-                                                    ||prod.unit===""))
-        var dataStatusCheck = "complete"
+        emptyOrderListObj = updatedOrderList.filter(prod=>(!prod.productFullName
+                                                    ||!prod.quantity
+                                                    ||!prod.unit
+                                                    ||!prod.price        
+                                                ))
+        // var dataStatusCheck = "complete"
 
-        const finalOrderList = updatedOrderList.map((orderItem)=>{
-                                    let finalProductFullName = orderItem.productFullName
-                                    if(orderItem.sku!=="MANUAL"){
-                                        
-                                        orderItem.productBrandName?
-                                        (finalProductFullName=finalProductFullName+" "+orderItem.productBrandName)
-                                        :
-                                        (dataStatusCheck="incomplete")
-
-                                        orderItem.productPartNumber?
-                                            (finalProductFullName=finalProductFullName+" "+orderItem.productPartNumber)
-                                            :
-                                            (dataStatusCheck="incomplete")
-                                    }
-                                    
-                                    return  {
-                                        sku:orderItem.sku,
-                                        productFullName:finalProductFullName,
-                                        quantity:parseInt(orderItem.quantity),
-                                        unit:orderItem.unit
-                                    }
-                                })
-
+        const billingProdList = updatedOrderList.map((item)=>{
+            let prodDisc = item.prodDiscount || 0
+            return {...item,prodDiscount:prodDisc}
+        })
         // console.log(`fOL:${JSON.stringify(finalOrderList,null,4)}`)
 
         if(emptyOrderListObj.length>0){
             return alert('Empty Field/s')
         }
+
+        if(!formData.totalCost){
+            return alert('Total Cost should not be 0')
+        }
         
-        if(deliveryPartnerName==="" || distributorName==="" || updatedOrderList.length===0 || dataStatus===""
+        if(updatedOrderList.length===0
             || !Array.isArray(updatedOrderList)){
             return alert(`Please enter valid data`)
         }else{
             const orderInfo = {
-                deliveryPartnerName: deliveryPartnerName.toUpperCase(),
-                distributorName: distributorName.toUpperCase(),
-                orderedProductList: finalOrderList,
-                dataStatus: dataStatusCheck,
+                billingProductList: billingProdList,
+                extraDiscount: formData.extraDiscount,
+                totalCost: formData.totalCost
             }
             
             console.log(`formData:${JSON.stringify(orderInfo,null,4)}`)
+            setModalFlag(true)
+            dispatch(setPreviewData(orderInfo))
             
             // dispatch(generateDemandSlip(orderInfo))
             
@@ -398,7 +366,7 @@ function GenerateBillForm() {
 
     useEffect(()=>{
         let checkTotalPrice = updatedOrderList.reduce((res,item)=>{
-            let discountInt = (100 - item.prodDiscount)/100
+            let discountInt = (100 - (item.prodDiscount || 0))/100
             let discountedPrice = parseFloat((item.price*discountInt).toFixed(2))
             let totalItemPrice = discountedPrice*item.quantity
     
@@ -734,7 +702,7 @@ function GenerateBillForm() {
             </div>
             <div className="form-group">
                 <button type="submit" className="submit-btn">
-                    Generate
+                    Preview
                 </button>
             </div>
         </form>
